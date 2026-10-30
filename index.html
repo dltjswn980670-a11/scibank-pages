@@ -65,11 +65,12 @@ header #main-tabs button.bg-indigo-700,header #main-tabs button.bg-indigo-700:ho
 
 <div id="hero" class="max-w-7xl w-full mx-auto px-4 pt-8 text-center">
   <p class="text-2xl sm:text-3xl font-bold">Sci-Bank</p>
-  <div id="main-tabs" class="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-3xl mx-auto">
+  <div id="main-tabs" class="mt-6 grid grid-cols-2 sm:grid-cols-5 gap-3 max-w-4xl mx-auto">
     <button onclick="switchTab('selector')" id="btn-make" class="transition text-sm">단원별 문제</button>
     <button onclick="switchTab('past')" id="btn-past" class="transition text-sm">기출 문제</button>
     <button onclick="switchTab('var')" id="btn-var" class="transition text-sm">기출 변형 문제</button>
     <button onclick="switchTab('stu')" id="btn-stu" class="transition text-sm">학생</button>
+    <button onclick="switchTab('responses')" id="btn-responses" class="transition text-sm">응답 관리</button>
   </div>
 </div>
 
@@ -126,6 +127,7 @@ header #main-tabs button.bg-indigo-700,header #main-tabs button.bg-indigo-700:ho
     <div id="question-list" class="space-y-4"></div>
   </section>
   <section id="tab-stu" class="hidden max-w-5xl w-full mx-auto bg-white rounded-xl shadow-md p-6"><div id="stu-body"></div></section>
+  <section id="tab-responses" class="hidden max-w-6xl w-full mx-auto bg-white rounded-xl shadow-md p-6"><div id="response-body"></div></section>
 
   <section id="tab-diff" class="hidden bg-white rounded-xl shadow-md p-6 max-w-3xl mx-auto space-y-4">
     <div class="border-b pb-3">
@@ -309,14 +311,15 @@ function renderPreview() {
 function switchTab(t) {
   if (!document.querySelector('header #main-tabs')) { document.querySelector('header .max-w-7xl').appendChild($('main-tabs')); $('hero').style.display = 'none'; document.querySelector('header').classList.remove('hidden'); }
   if (t === 'past' || t === 'var') { pastMode = t === 'var' ? 'var' : 'orig'; t = 'past'; }
-  ['selector','diff','preview','editor','past','stu'].forEach(x => $('tab-'+x).classList.add('hidden'));
-  ['make','past','var','stu'].forEach(x => $('btn-'+x).classList.remove('bg-indigo-700'));
+  ['selector','diff','preview','editor','past','stu','responses'].forEach(x => $('tab-'+x).classList.add('hidden'));
+  ['make','past','var','stu','responses'].forEach(x => $('btn-'+x).classList.remove('bg-indigo-700'));
   $('tab-'+t).classList.remove('hidden');
-  $('btn-'+(t === 'past' ? (pastMode === 'var' ? 'var' : 'past') : t === 'stu' ? 'stu' : 'make')).classList.add('bg-indigo-700');
+  $('btn-'+(t === 'past' ? (pastMode === 'var' ? 'var' : 'past') : t === 'stu' ? 'stu' : t === 'responses' ? 'responses' : 'make')).classList.add('bg-indigo-700');
   if (t === 'editor') renderEditor();
   if (t === 'past') renderPastSelects();
   if (t === 'preview') { saveExamRecord(); renderPreview(); }
   if (t === 'stu') { stuGo('grade'); syncSheet(); }
+  if (t === 'responses') { syncSheet(); renderResponses(); }
 }
 
 async function loadExternalDB(files) {
@@ -645,6 +648,95 @@ function stuVariant(eid) {
   switchTab('preview');
 }
 
+
+/* ===== 응답 관리 대시보드 ===== */
+let responseDetailKey = '';
+function responseScore(r, e) {
+  const total = e.questions.length;
+  const correct = e.questions.reduce((n,q,i) => n + ((r.answers[i] || 0) && (r.answers[i] || 0) === numAns(q.answer) ? 1 : 0), 0);
+  return {correct,total,rate: total ? Math.round(correct / total * 100) : 0};
+}
+function renderResponses() {
+  const root = $('response-body');
+  if (!root) return;
+  const exams = stuDB.exams.slice().sort((a,b) => b.at-a.at);
+  const examId = $('resp-exam') ? $('resp-exam').value : 'all';
+  const grade = $('resp-grade') ? $('resp-grade').value : 'all';
+  const query = $('resp-search') ? $('resp-search').value.trim().toLowerCase() : '';
+  const all = stuDB.results.map(r => {
+    const e = stuDB.exams.find(x => x.id === r.examId);
+    const st = stuDB.students.find(x => x.id === r.studentId);
+    return e && st ? {r,e,st,score:responseScore(r,e)} : null;
+  }).filter(Boolean).sort((a,b) => b.r.at-a.r.at);
+  const filtered = all.filter(x =>
+    (examId === 'all' || x.e.id === examId) &&
+    (grade === 'all' || x.st.grade === grade) &&
+    (!query || x.st.name.toLowerCase().includes(query) || x.e.name.toLowerCase().includes(query) || exCode(x.e.id).toLowerCase().includes(query))
+  );
+  const total = filtered.length;
+  const avg = total ? Math.round(filtered.reduce((n,x)=>n+x.score.rate,0)/total) : 0;
+  const students = new Set(filtered.map(x=>x.st.id)).size;
+  const examOpts = '<option value="all">전체 시험지</option>' + exams.map(e=>'<option value="'+e.id+'" '+(e.id===examId?'selected':'')+'>'+esc(e.name)+' · '+exCode(e.id)+'</option>').join('');
+  const gradeOpts = '<option value="all">전체 학년</option>' + GR.map(g=>'<option value="'+g+'" '+(g===grade?'selected':'')+'>'+g+'</option>').join('');
+  const head = `
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+      <div><h2 class="text-2xl font-bold">📊 학생 응답 관리</h2><p class="text-sm text-gray-500 mt-1">구글폼에서 가져온 제출 내역과 문항별 채점 결과를 확인합니다.</p></div>
+      <div class="flex gap-2"><button onclick="switchTab('stu')" class="stu-back">학생 관리</button><button onclick="syncSheet().then(()=>renderResponses())" class="bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-bold">↻ 응답 새로고침</button><button onclick="exportResponses()" class="bg-emerald-600 text-white px-3 py-2 rounded-lg text-sm font-bold">⬇ CSV 저장</button></div>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+      <div class="rounded-xl border p-4 bg-indigo-50"><p class="text-xs text-indigo-600">제출 건수</p><b class="text-2xl">${total}</b></div>
+      <div class="rounded-xl border p-4"><p class="text-xs text-gray-500">응답 학생 수</p><b class="text-2xl">${students}</b></div>
+      <div class="rounded-xl border p-4"><p class="text-xs text-gray-500">평균 정답률</p><b class="text-2xl">${avg}%</b></div>
+      <div class="rounded-xl border p-4"><p class="text-xs text-gray-500">등록 시험지</p><b class="text-2xl">${exams.length}</b></div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mb-4">
+      <select id="resp-exam" onchange="renderResponses()" class="border rounded-lg p-3 text-sm">${examOpts}</select>
+      <select id="resp-grade" onchange="renderResponses()" class="border rounded-lg p-3 text-sm">${gradeOpts}</select>
+      <input id="resp-search" type="text" value="${esc(query)}" oninput="renderResponses()" placeholder="학생 이름·시험지 검색" class="border rounded-lg p-3 text-sm">
+    </div>`;
+  const rows = filtered.map(x => {
+    const selected = responseDetailKey === x.st.id+'|'+x.e.id;
+    return `<tr>
+      <td class="whitespace-nowrap">${new Date(x.r.at).toLocaleString('ko-KR')}</td>
+      <td>${esc(x.st.grade)}</td><td class="font-semibold">${esc(x.st.name)}</td>
+      <td class="text-left">${esc(x.e.name)}<div class="text-xs text-gray-400">코드 ${exCode(x.e.id)}</div></td>
+      <td class="font-bold">${x.score.correct}/${x.score.total}</td>
+      <td><span class="font-bold ${x.score.rate>=80?'text-emerald-600':x.score.rate>=60?'text-amber-600':'text-red-500'}">${x.score.rate}%</span></td>
+      <td><button onclick="showResponseDetail('${x.st.id}','${x.e.id}')" class="text-indigo-600 underline text-xs font-bold">${selected?'상세 보기 중':'답안 보기'}</button></td>
+    </tr>`;
+  }).join('');
+  const detail = responseDetailKey ? (() => {
+    const [sid,eid]=responseDetailKey.split('|');
+    const x=filtered.find(z=>z.st.id===sid&&z.e.id===eid) || all.find(z=>z.st.id===sid&&z.e.id===eid);
+    if(!x) return '';
+    const qrows=x.e.questions.map((q,i)=>{
+      const ans=x.r.answers[i]||0, key=numAns(q.answer), ok=ans>0&&ans===key;
+      return `<tr class="${ok?'':'bg-red-50'}"><td>${i+1}</td><td class="text-left">${esc(q.unit||'')}</td><td>${esc(dif(q))}</td><td>${circ(key)||esc(q.answer||'-')}</td><td class="font-bold">${ans?circ(ans):'미응답'}</td><td class="font-bold ${ok?'text-emerald-600':'text-red-500'}">${ok?'정답':'오답'}</td></tr>`;
+    }).join('');
+    return `<div class="mt-6 border-2 border-indigo-100 rounded-xl p-4">
+      <div class="flex justify-between flex-wrap gap-2 mb-3"><div><h3 class="font-bold text-lg">${esc(x.st.name)} · ${esc(x.e.name)}</h3><p class="text-xs text-gray-500">${new Date(x.r.at).toLocaleString('ko-KR')} · 시험지 코드 ${exCode(x.e.id)}</p></div><button onclick="responseDetailKey='';renderResponses()" class="stu-back">상세 닫기</button></div>
+      <p class="font-bold mb-3">점수: ${x.score.correct}/${x.score.total}문항 · 정답률 ${x.score.rate}%</p>
+      <div class="overflow-x-auto"><table class="stu-tbl min-w-[620px]"><thead><tr><th>번호</th><th>단원</th><th>난이도</th><th>정답</th><th>학생 답</th><th>채점</th></tr></thead><tbody>${qrows}</tbody></table></div>
+    </div>`;
+  })() : '';
+  root.innerHTML = head + `
+    <div class="overflow-x-auto border rounded-xl"><table class="stu-tbl min-w-[760px]"><thead><tr><th>제출 시간</th><th>학년</th><th>학생</th><th>시험지</th><th>점수</th><th>정답률</th><th>상세</th></tr></thead><tbody>${rows || '<tr><td colspan="7" class="py-10 text-gray-400">표시할 응답이 없습니다. 먼저 학생을 등록하고 구글폼 응답을 불러오세요.</td></tr>'}</tbody></table></div>
+    ${detail}
+    <p class="text-xs text-gray-400 mt-3">※ 정답률은 시험지에 저장된 정답을 기준으로 자동 계산합니다. 미응답은 오답으로 계산됩니다.</p>`;
+}
+function showResponseDetail(sid,eid) { responseDetailKey=sid+'|'+eid; renderResponses(); }
+function exportResponses() {
+  const rows=[['제출 시간','학년','학생 이름','시험지 이름','시험지 코드','정답 수','전체 문항','정답률','학생 답안']];
+  stuDB.results.forEach(r=>{
+    const e=stuDB.exams.find(x=>x.id===r.examId), st=stuDB.students.find(x=>x.id===r.studentId);
+    if(!e||!st) return;
+    const sc=responseScore(r,e);
+    rows.push([new Date(r.at).toLocaleString('ko-KR'),st.grade,st.name,e.name,exCode(e.id),sc.correct,sc.total,sc.rate+'%',r.answers.map(a=>a?circ(a):'미응답').join(' ')]);
+  });
+  const csv=rows.map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['\\uFEFF'+csv],{type:'text/csv;charset=utf-8'})); a.download='Sci-Bank_학생응답.csv'; a.click(); URL.revokeObjectURL(a.href);
+}
+
 /* ===== 구글폼 QR · 응답 불러오기 ===== */
 const exCode = id => id.slice(-6).toUpperCase();
 function qrBox() {
@@ -796,7 +888,7 @@ async function syncSheet() {
     const r = await fetch(stuDB.sheetUrl, {cache: 'no-store'});
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const res = importRows(parseCSV((await r.text()).replace(/^\uFEFF/, '')), '자동 가져오기', true);
-    if (res.ok) { stuSave(); if (stuView[0] === 'detail' && !$('tab-stu').classList.contains('hidden')) renderStu(); }
+    if (res.ok) { stuSave(); if (!$('tab-responses').classList.contains('hidden')) renderResponses(); else if (stuView[0] === 'detail' && !$('tab-stu').classList.contains('hidden')) renderStu(); }
     if (st) st.textContent = `자동 연결됨 · ${new Date().toLocaleTimeString('ko-KR')} 확인` + (res.ok ? ` · 새 응답 ${res.ok}건 반영` : '') + (res.err ? ' · 시트 제목 줄(시험지 코드/이름/답안)을 확인하세요' : '');
   } catch (e) { if (st) st.textContent = '가져오기 실패: 링크가 CSV로 게시됐는지, 인터넷 연결을 확인하세요.'; }
 }
