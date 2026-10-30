@@ -692,7 +692,7 @@ function renderResponses() {
     <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mb-4">
       <select id="resp-exam" onchange="renderResponses()" class="border rounded-lg p-3 text-sm">${examOpts}</select>
       <select id="resp-grade" onchange="renderResponses()" class="border rounded-lg p-3 text-sm">${gradeOpts}</select>
-      <input id="resp-search" type="text" value="${esc(query)}" oninput="renderResponses()" placeholder="학생 이름·시험지 검색" class="border rounded-lg p-3 text-sm">
+      <input id="resp-search" type="text" value="${esc(query)}" onchange="renderResponses()" placeholder="학생 이름·시험지 검색" class="border rounded-lg p-3 text-sm">
     </div>`;
   const rows = filtered.map(x => {
     const selected = responseDetailKey === x.st.id+'|'+x.e.id;
@@ -734,7 +734,7 @@ function exportResponses() {
     rows.push([new Date(r.at).toLocaleString('ko-KR'),st.grade,st.name,e.name,exCode(e.id),sc.correct,sc.total,sc.rate+'%',r.answers.map(a=>a?circ(a):'미응답').join(' ')]);
   });
   const csv=rows.map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');
-  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['\\uFEFF'+csv],{type:'text/csv;charset=utf-8'})); a.download='Sci-Bank_학생응답.csv'; a.click(); URL.revokeObjectURL(a.href);
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([String.fromCharCode(65279)+csv],{type:'text/csv;charset=utf-8'})); a.download='Sci-Bank_학생응답.csv'; a.click(); URL.revokeObjectURL(a.href);
 }
 
 /* ===== 구글폼 QR · 응답 불러오기 ===== */
