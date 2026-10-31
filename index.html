@@ -636,7 +636,7 @@ function switchTab(t) {
 }
 
 async function loadExternalDB(files) {
-  let added=0, dup=0, bad=0, unk=0;
+  let added=0, dup=0, bad=0, unk=0, imgUp=0;
   const keys = new Set(masterDB.map(keyOf));
   for (const f of files) {
     try {
@@ -644,7 +644,7 @@ async function loadExternalDB(files) {
       if (!Array.isArray(arr)) { bad++; continue; }
       for (const q of arr) {
         if (!valid(q)) { bad++; continue; }
-        const k = keyOf(q); if (keys.has(k)) { dup++; continue; }
+        const k = keyOf(q); if (keys.has(k)) { if (q.image) { const o = masterDB.find(x => keyOf(x) === k); if (o && !o.image) { o.image = q.image; imgUp++; } } dup++; continue; }
         keys.add(k);
         if (!(curriculum2022[q.grade] || []).includes(q.unit)) unk++;
         masterDB.push(q); added++;
@@ -653,7 +653,7 @@ async function loadExternalDB(files) {
   }
   $('db-file-input').value = '';
   saveDB(); updateCurriculum();
-  alert(`추가 ${added}문제 · 중복 제외 ${dup} · 형식 오류 ${bad}` + (unk ? `\n⚠ 단원명이 목록과 다른 문제 ${unk}개 (추출되지 않을 수 있음)` : ''));
+  alert(`추가 ${added}문제 · 중복 제외 ${dup} · 형식 오류 ${bad}` + (imgUp ? `\n🖼 기존 문제에 그림 ${imgUp}개 추가` : '') + (unk ? `\n⚠ 단원명이 목록과 다른 문제 ${unk}개 (추출되지 않을 수 있음)` : ''));
 }
 function exportDB() {
   const a = document.createElement('a');
