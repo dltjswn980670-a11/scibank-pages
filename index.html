@@ -868,6 +868,17 @@ function renderPastSelects() {
   $('past-stats').textContent = `등록된 시험지 ${pastDB.length}개`;
   renderPast(pool[0]);
 }
+function fmtQ(t, no) {
+  t = String(t || ''); const mm = /<보기>\s*(?=ㄱ\.)/.exec(t), m = mm ? mm.index : -1;
+  if (m < 0) return `<p class="font-bold whitespace-pre-wrap">${no}. ${esc(t)}</p>`;
+  const stem = t.slice(0, m).trim(); let rest = t.slice(m + mm[0].length).trim(), tail = '';
+  const items = rest.split(/\s+(?=[ㄱ-ㅎ]\.\s)/);
+  const last = items.length - 1, k = items[last].search(/\s(옳은|이에 대한|제시한|\(단,)/);
+  if (last >= 0 && k > 0) { tail = items[last].slice(k).trim(); items[last] = items[last].slice(0, k).trim(); }
+  return `<p class="font-bold whitespace-pre-wrap">${no}. ${esc(stem)}</p>` +
+    `<div style="border:1.5px solid #222;padding:10px 14px;margin:8px 0;font-size:14px;line-height:1.7"><div style="text-align:center;font-weight:bold;margin-bottom:4px">&lt; 보 기 &gt;</div>${items.map(x => `<div style="padding-left:1.4em;text-indent:-1.4em">${esc(x)}</div>`).join('')}</div>` +
+    (tail ? `<p class="font-bold whitespace-pre-wrap">${esc(tail)}</p>` : '');
+}
 function renderPast(x) {
   curPast = x;
   const el = $('print-area');
@@ -879,7 +890,7 @@ function renderPast(x) {
   const qs = cur ? (x.variants[cur-1].questions || []) : x.questions;
   const title = `${x.school} ${sfx(x.year,'년')} ${sfx(x.semester,'학기')} ${sfx(x.round,'차')} ${x.grade} ${x.subject}${cur ? ` · 변형 ${cur}세트` : ''}`;
   el.innerHTML = `<h2 class="text-center text-2xl font-bold mb-6">${esc(title)}</h2>` +
-    qs.map((q, i) => `<div class="pq mb-6"><p class="font-bold whitespace-pre-wrap">${i+1}. ${esc(q.question)}</p>${q.image ? `<img src="${esc(q.image)}" class="my-2 max-h-64">` : ''}${(q.choices || []).map(c => `<p class="ml-4 text-sm">${esc(c)}</p>`).join('')}</div>`).join('') +
+    qs.map((q, i) => `<div class="pq mb-6">${fmtQ(q.question, i+1)}${q.image ? `<img src="${esc(q.image)}" class="my-2 max-h-64">` : ''}${(q.choices || []).map(c => `<p class="ml-4 text-sm">${esc(c)}</p>`).join('')}</div>`).join('') +
     (ans ? `<div class="pq border-t pt-4 mt-8"><h3 class="font-bold mb-2">[정답 및 해설]</h3>${qs.map((q, i) => `<p class="text-sm">${i+1}번 정답: ${esc(q.answer)} ${q.explanation ? '해설: ' + esc(q.explanation) : ''}</p>`).join('')}</div>` : '');
 }
 
@@ -1124,8 +1135,24 @@ function renderEx() {
   const b = $('ex-body'), list = stuDB.exams.slice().sort((x, y) => y.at - x.at);
   b.innerHTML = `<h2 class="text-xl font-bold mb-4">📋 출제한 시험지 (${list.length})</h2>` + (list.length
     ? `<div class="space-y-2">${list.map(e => { const n = stuDB.results.filter(r => r.examId === e.id).length;
-        return `<div class="flex items-center gap-3 border rounded-xl px-4 py-3 flex-wrap"><div class="flex-1 min-w-[12rem]"><div class="font-bold">${esc(e.name)}</div><div class="text-xs text-gray-500">${new Date(e.at).toLocaleString('ko-KR')} · ${e.questions.length}문항 · 코드 ${exCode(e.id)} · 제출 ${n}명</div></div><button onclick="exOpen('${e.id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-sm font-bold">문제 보기·인쇄</button><button onclick="exDel('${e.id}')" class="text-xs text-red-500">삭제</button></div>`; }).join('')}</div>`
+        return `<div><div class="flex items-center gap-3 border rounded-xl px-4 py-3 flex-wrap"><div class="flex-1 min-w-[12rem]"><div class="font-bold">${esc(e.name)}</div><div class="text-xs text-gray-500">${new Date(e.at).toLocaleString('ko-KR')} · ${e.questions.length}문항 · 코드 ${exCode(e.id)} · 제출 ${n}명</div></div><button onclick="exOpen('${e.id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-sm font-bold">문제 보기·인쇄</button><button onclick="exSub('${e.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-sm font-bold">제출 현황</button><button onclick="exDel('${e.id}')" class="text-xs text-red-500">삭제</button></div><div id="ex-sub-${e.id}" class="hidden"></div></div>`; }).join('')}</div>`
     : '<p class="text-center text-gray-400 py-12">아직 출제한 시험지가 없습니다. 단원별 문제에서 시험지를 만들어 보세요.</p>');
+}
+function exSub(id) {
+  const box = $('ex-sub-' + id), e = stuDB.exams.find(x => x.id === id); if (!box || !e) return;
+  if (!box.classList.contains('hidden')) { box.classList.add('hidden'); return; }
+  const rs = stuDB.results.filter(r => r.examId === id).map(r => ({r, s: stuDB.students.find(x => x.id === r.studentId)})).filter(o => o.s)
+    .sort((a, b) => a.s.grade.localeCompare(b.s.grade, 'ko') || a.s.name.localeCompare(b.s.name, 'ko'));
+  const key = e.questions.map(q => numAns(q.answer));
+  const head = e.questions.map((q, i) => `<th>${i+1}</th>`).join('');
+  const keyRow = `<tr class="bg-gray-100 font-bold"><td colspan="2" class="text-left">정답</td>${key.map(k => `<td>${circ(k) || '-'}</td>`).join('')}<td></td></tr>`;
+  const rows = rs.map(({r, s}) => { let ok = 0;
+    const tds = e.questions.map((q, i) => { const st = +(r.answers || [])[i] || 0, good = st && st === key[i]; if (good) ok++;
+      return `<td class="${good ? '' : 'bg-red-50 text-red-500 font-bold'}">${st ? circ(st) : '-'}</td>`; }).join('');
+    return `<tr><td class="text-left">${s.grade}</td><td class="text-left whitespace-nowrap">${esc(s.name)}</td>${tds}<td class="font-bold">${ok}/${e.questions.length}</td></tr>`; }).join('');
+  box.innerHTML = rs.length ? `<div class="overflow-x-auto border rounded-xl mt-2 p-2"><table class="stu-tbl"><thead><tr><th>학년</th><th>이름</th>${head}<th>점수</th></tr></thead><tbody>${keyRow}${rows}</tbody></table></div>`
+    : '<p class="text-center text-gray-400 py-4 text-sm">아직 제출한 학생이 없습니다.</p>';
+  box.classList.remove('hidden');
 }
 function exOpen(id) {
   const e = stuDB.exams.find(x => x.id === id); if (!e) return;
