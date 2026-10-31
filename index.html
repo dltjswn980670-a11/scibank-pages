@@ -868,14 +868,14 @@ function renderPastSelects() {
   $('past-stats').textContent = `등록된 시험지 ${pastDB.length}개`;
   renderPast(pool[0]);
 }
-function fmtQ(t, no) {
+function fmtQ(t, no, img = '') {
   t = String(t || ''); const mm = /<보기>\s*(?=ㄱ\.)/.exec(t), m = mm ? mm.index : -1;
-  if (m < 0) return `<p class="font-bold whitespace-pre-wrap">${no}. ${esc(t)}</p>`;
+  if (m < 0) return `<p class="font-bold whitespace-pre-wrap">${no}. ${esc(t)}</p>${img}`;
   const stem = t.slice(0, m).trim(); let rest = t.slice(m + mm[0].length).trim(), tail = '';
   const items = rest.split(/\s+(?=[ㄱ-ㅎ]\.\s)/);
   const last = items.length - 1, k = items[last].search(/\s(옳은|이에 대한|제시한|\(단,)/);
   if (last >= 0 && k > 0) { tail = items[last].slice(k).trim(); items[last] = items[last].slice(0, k).trim(); }
-  return `<p class="font-bold whitespace-pre-wrap">${no}. ${esc(stem)}</p>` +
+  return `<p class="font-bold whitespace-pre-wrap">${no}. ${esc(stem)}</p>${img}` +
     `<div style="border:1.5px solid #222;padding:10px 14px;margin:8px 0;font-size:14px;line-height:1.7"><div style="text-align:center;font-weight:bold;margin-bottom:4px">&lt; 보 기 &gt;</div>${items.map(x => `<div style="padding-left:1.4em;text-indent:-1.4em">${esc(x)}</div>`).join('')}</div>` +
     (tail ? `<p class="font-bold whitespace-pre-wrap">${esc(tail)}</p>` : '');
 }
@@ -890,7 +890,7 @@ function renderPast(x) {
   const qs = cur ? (x.variants[cur-1].questions || []) : x.questions;
   const title = `${x.school} ${sfx(x.year,'년')} ${sfx(x.semester,'학기')} ${sfx(x.round,'차')} ${x.grade} ${x.subject}${cur ? ` · 변형 ${cur}세트` : ''}`;
   el.innerHTML = `<h2 class="text-center text-2xl font-bold mb-6">${esc(title)}</h2>` +
-    qs.map((q, i) => `<div class="pq mb-6">${fmtQ(q.question, i+1)}${q.image ? `<img src="${esc(q.image)}" class="my-2 max-h-64">` : ''}${(q.choices || []).map(c => `<p class="ml-4 text-sm">${esc(c)}</p>`).join('')}</div>`).join('') +
+    qs.map((q, i) => `<div class="pq mb-6">${fmtQ(q.question, i+1, q.image ? `<img src="${esc(q.image)}" class="my-2 max-h-64">` : '')}${(q.choices || []).map(c => `<p class="ml-4 text-sm">${esc(c)}</p>`).join('')}</div>`).join('') +
     (ans ? `<div class="pq border-t pt-4 mt-8"><h3 class="font-bold mb-2">[정답 및 해설]</h3>${qs.map((q, i) => `<p class="text-sm">${i+1}번 정답: ${esc(q.answer)} ${q.explanation ? '해설: ' + esc(q.explanation) : ''}</p>`).join('')}</div>` : '');
 }
 
