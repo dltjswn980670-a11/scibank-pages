@@ -65,12 +65,11 @@ header #main-tabs button.bg-indigo-700,header #main-tabs button.bg-indigo-700:ho
 
 <div id="hero" class="max-w-7xl w-full mx-auto px-4 pt-8 text-center">
   <p class="text-2xl sm:text-3xl font-bold">Sci-Bank</p>
-  <div id="main-tabs" class="mt-6 grid grid-cols-2 sm:grid-cols-5 gap-3 max-w-4xl mx-auto">
+  <div id="main-tabs" class="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-3xl mx-auto">
     <button onclick="switchTab('selector')" id="btn-make" class="transition text-sm">단원별 문제</button>
     <button onclick="switchTab('past')" id="btn-past" class="transition text-sm">기출 문제</button>
     <button onclick="switchTab('var')" id="btn-var" class="transition text-sm">기출 변형 문제</button>
     <button onclick="switchTab('stu')" id="btn-stu" class="transition text-sm">학생</button>
-    <button onclick="switchTab('responses')" id="btn-responses" class="transition text-sm">응답 관리</button>
   </div>
 </div>
 
@@ -127,7 +126,6 @@ header #main-tabs button.bg-indigo-700,header #main-tabs button.bg-indigo-700:ho
     <div id="question-list" class="space-y-4"></div>
   </section>
   <section id="tab-stu" class="hidden max-w-5xl w-full mx-auto bg-white rounded-xl shadow-md p-6"><div id="stu-body"></div></section>
-  <section id="tab-responses" class="hidden max-w-6xl w-full mx-auto bg-white rounded-xl shadow-md p-6"><div id="response-body"></div></section>
 
   <section id="tab-diff" class="hidden bg-white rounded-xl shadow-md p-6 max-w-3xl mx-auto space-y-4">
     <div class="border-b pb-3">
@@ -191,6 +189,9 @@ header #main-tabs button.bg-indigo-700,header #main-tabs button.bg-indigo-700:ho
 <footer class="text-center py-4 text-sm text-gray-500 border-t bg-white mt-auto">과학 문제은행 시스템 &copy; 2026</footer>
 
 <script>
+/* ★ Supabase 설정: 아래 3줄에 본인 값을 넣으세요 (anon/publishable 키만! service_role 키는 절대 금지)
+   url: https://xxxx.supabase.co  /  anonKey: anon(공개) 키  /  pageUrl: 이 파일을 올린 GitHub Pages 주소 */
+const SB_CONFIG = { url: 'https://rltgdzwwakvjjvpotpsi.supabase.co', anonKey: 'sb_publishable_GzUR51uT4V0HuXVpWcuiAQ_95EaC9iY', pageUrl: 'https://dltjswn980670-a11.github.io/scibank-pages/' };
 /* 2022 개정 단원. 중학교·통합과학·물리학은 교과서/교육과정 기준으로 확인한 이름이고,
    ※표시 주석이 있는 과목은 기존 파일의 이름을 유지한 것(공식 목차 재확인 필요). */
 const curriculum2022 = {
@@ -311,15 +312,14 @@ function renderPreview() {
 function switchTab(t) {
   if (!document.querySelector('header #main-tabs')) { document.querySelector('header .max-w-7xl').appendChild($('main-tabs')); $('hero').style.display = 'none'; document.querySelector('header').classList.remove('hidden'); }
   if (t === 'past' || t === 'var') { pastMode = t === 'var' ? 'var' : 'orig'; t = 'past'; }
-  ['selector','diff','preview','editor','past','stu','responses'].forEach(x => $('tab-'+x).classList.add('hidden'));
-  ['make','past','var','stu','responses'].forEach(x => $('btn-'+x).classList.remove('bg-indigo-700'));
+  ['selector','diff','preview','editor','past','stu'].forEach(x => $('tab-'+x).classList.add('hidden'));
+  ['make','past','var','stu'].forEach(x => $('btn-'+x).classList.remove('bg-indigo-700'));
   $('tab-'+t).classList.remove('hidden');
-  $('btn-'+(t === 'past' ? (pastMode === 'var' ? 'var' : 'past') : t === 'stu' ? 'stu' : t === 'responses' ? 'responses' : 'make')).classList.add('bg-indigo-700');
+  $('btn-'+(t === 'past' ? (pastMode === 'var' ? 'var' : 'past') : t === 'stu' ? 'stu' : 'make')).classList.add('bg-indigo-700');
   if (t === 'editor') renderEditor();
   if (t === 'past') renderPastSelects();
   if (t === 'preview') { saveExamRecord(); renderPreview(); }
-  if (t === 'stu') { stuGo('grade'); syncSheet(); }
-  if (t === 'responses') { syncSheet(); renderResponses(); }
+  if (t === 'stu') { stuGo('grade'); syncSheet(); syncSB(); }
 }
 
 async function loadExternalDB(files) {
@@ -550,14 +550,20 @@ function saveExamRecord() {
   let e = stuDB.exams.find(x => x.id === curExamId);
   if (!e) { e = {id: curExamId, at: Date.now()}; stuDB.exams.push(e); }
   e.name = examName(); e.questions = JSON.parse(JSON.stringify(currentQuestions)); stuSave();
+  if (sbOn() && stuDB.pin) sbCall('sb_upsert_exam', {p: stuDB.pin, c: exCode(curExamId), nm: examName(), cnt: currentQuestions.length}).catch(() => {});
 }
 function stuGo(...v) { stuView = v; renderStu(); const u = $('sheet-url'); if (u) u.value = stuDB.sheetUrl || ''; }
 function renderStu() {
   const b = $('stu-body'), [v, a, c] = stuView;
   if (v === 'grade') {
     b.innerHTML = `<h2 class="text-xl font-bold text-center my-6">학년을 선택하세요</h2><div class="grid grid-cols-3 gap-3 max-w-xl mx-auto mb-6">${GR.map(g => `<button onclick="stuGo('list','${g}')" class="stu-btn text-lg">${g}</button>`).join('')}</div>
+      <div class="max-w-xl mx-auto border rounded-xl p-4 bg-indigo-50 space-y-2 mb-4">
+        <b class="text-sm">☁ 서버(Supabase) 연결</b>
+        <div class="flex gap-2 flex-wrap"><button onclick="sbSetPin()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-bold">PIN 설정</button><button onclick="sbSyncStudents(true)" class="bg-white hover:bg-gray-100 border px-3 py-2 rounded-lg text-xs font-bold">학생 명단 동기화</button><button onclick="syncSB()" class="bg-white hover:bg-gray-100 border px-3 py-2 rounded-lg text-xs font-bold">지금 답 가져오기</button></div>
+        <p id="sb-status" class="text-xs text-gray-500">${sbOn() ? '' : '파일 맨 위 SB_CONFIG에 Supabase 주소·키·페이지 주소를 입력하면 사용할 수 있습니다.'}</p>
+      </div>
       <div class="max-w-xl mx-auto border rounded-xl p-4 bg-gray-50 space-y-3">
-        <b class="text-sm">📥 구글폼 응답 불러오기</b>
+        <b class="text-sm">📥 구글폼 응답 불러오기 (예전 방식)</b>
         <div class="flex gap-2"><input id="sheet-url" type="text" placeholder="자동 가져오기: 웹에 게시한 응답 시트 링크 (CSV)" class="flex-1 border rounded-lg p-2 text-xs"><button onclick="setSheetUrl()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-bold">연결</button></div>
         <p id="sync-status" class="text-xs text-gray-500"></p>
         <textarea id="form-paste" rows="3" placeholder="구글폼 응답 시트에서 제목 줄까지 전체 복사(Ctrl+A → Ctrl+C)해서 여기에 붙여넣기" class="w-full border rounded-lg p-2 text-xs"></textarea>
@@ -578,12 +584,13 @@ function renderStu() {
   } else if (v === 'list') {
     const ss = stuDB.students.filter(s => s.grade === a).sort((x, y) => x.name.localeCompare(y.name, 'ko'));
     b.innerHTML = `<div class="flex items-center gap-3 mb-4 flex-wrap"><button onclick="stuGo('grade')" class="stu-back">← 학년 선택</button><h2 class="text-xl font-bold">${a} 학생 (${ss.length}명)</h2>
-      <form onsubmit="stuAdd(event,'${a}')" class="ml-auto flex gap-2"><input id="stu-new" type="text" placeholder="학생 이름" class="border rounded-lg p-2 text-sm w-36"><button class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-sm font-bold">➕ 등록</button></form></div>` +
+      <button onclick="printQRCards(stuDB.students.filter(s => s.grade==='${a}').map(s => s.id))" class="stu-back ml-auto">🖨 QR 카드</button>
+      <form onsubmit="stuAdd(event,'${a}')" class="flex gap-2"><input id="stu-new" type="text" placeholder="학생 이름" class="border rounded-lg p-2 text-sm w-36"><button class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-sm font-bold">➕ 등록</button></form></div>` +
       (ss.length ? `<div class="grid grid-cols-5 gap-2">${ss.map(s => `<button onclick="stuGo('detail','${s.id}')" class="stu-btn">${esc(s.name)}</button>`).join('')}</div>` : '<p class="text-center text-gray-400 py-12">등록된 학생이 없습니다. 위에서 학생을 등록하세요.</p>');
   } else {
     const s = stuDB.students.find(x => x.id === a);
     if (!s) { stuGo('grade'); return; }
-    const head = `<div class="flex items-center gap-3 mb-4 flex-wrap"><button onclick="stuGo('list','${s.grade}')" class="stu-back">← ${s.grade} 학생 목록</button><h2 class="text-xl font-bold">${s.grade} ${esc(s.name)}</h2><button onclick="stuDel('${s.id}')" class="ml-auto text-xs text-red-500">학생 삭제</button></div>`;
+    const head = `<div class="flex items-center gap-3 mb-4 flex-wrap"><button onclick="stuGo('list','${s.grade}')" class="stu-back">← ${s.grade} 학생 목록</button><h2 class="text-xl font-bold">${s.grade} ${esc(s.name)}</h2><button onclick="printQRCards(['${s.id}'])" class="stu-back ml-auto">🖨 개인 QR</button><button onclick="stuDel('${s.id}')" class="text-xs text-red-500">학생 삭제</button></div>`;
     if (v === 'entry') {
       const e = stuDB.exams.find(x => x.id === c);
       if (!e) { alert('답을 입력할 시험지를 선택하세요.'); stuGo('detail', a); return; }
@@ -613,7 +620,7 @@ function stuAdd(e, g) {
   e.preventDefault();
   const n = $('stu-new').value.trim(); if (!n) return;
   if (stuDB.students.some(s => s.grade === g && s.name === n)) { alert('이미 등록된 학생입니다.'); return; }
-  stuDB.students.push({id: uid('s'), grade: g, name: n}); stuSave(); renderStu();
+  stuDB.students.push({id: 's' + (window.crypto && crypto.randomUUID ? crypto.randomUUID().replace(/-/g, '').slice(0, 14) : uid('s')), grade: g, name: n}); stuSave(); renderStu(); sbSyncStudents();
 }
 function stuDel(id) {
   const s = stuDB.students.find(x => x.id === id);
@@ -648,128 +655,38 @@ function stuVariant(eid) {
   switchTab('preview');
 }
 
-
-/* ===== 응답 관리 대시보드 ===== */
-let responseDetailKey = '';
-function responseScore(r, e) {
-  const total = e.questions.length;
-  const correct = e.questions.reduce((n,q,i) => n + ((r.answers[i] || 0) && (r.answers[i] || 0) === numAns(q.answer) ? 1 : 0), 0);
-  return {correct,total,rate: total ? Math.round(correct / total * 100) : 0};
-}
-function renderResponses() {
-  const root = $('response-body');
-  if (!root) return;
-  const exams = stuDB.exams.slice().sort((a,b) => b.at-a.at);
-  const examId = $('resp-exam') ? $('resp-exam').value : 'all';
-  const grade = $('resp-grade') ? $('resp-grade').value : 'all';
-  const query = $('resp-search') ? $('resp-search').value.trim().toLowerCase() : '';
-  const all = stuDB.results.map(r => {
-    const e = stuDB.exams.find(x => x.id === r.examId);
-    const st = stuDB.students.find(x => x.id === r.studentId);
-    return e && st ? {r,e,st,score:responseScore(r,e)} : null;
-  }).filter(Boolean).sort((a,b) => b.r.at-a.r.at);
-  const filtered = all.filter(x =>
-    (examId === 'all' || x.e.id === examId) &&
-    (grade === 'all' || x.st.grade === grade) &&
-    (!query || x.st.name.toLowerCase().includes(query) || x.e.name.toLowerCase().includes(query) || exCode(x.e.id).toLowerCase().includes(query))
-  );
-  const total = filtered.length;
-  const avg = total ? Math.round(filtered.reduce((n,x)=>n+x.score.rate,0)/total) : 0;
-  const students = new Set(filtered.map(x=>x.st.id)).size;
-  const examOpts = '<option value="all">전체 시험지</option>' + exams.map(e=>'<option value="'+e.id+'" '+(e.id===examId?'selected':'')+'>'+esc(e.name)+' · '+exCode(e.id)+'</option>').join('');
-  const gradeOpts = '<option value="all">전체 학년</option>' + GR.map(g=>'<option value="'+g+'" '+(g===grade?'selected':'')+'>'+g+'</option>').join('');
-  const head = `
-    <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
-      <div><h2 class="text-2xl font-bold">📊 학생 응답 관리</h2><p class="text-sm text-gray-500 mt-1">구글폼에서 가져온 제출 내역과 문항별 채점 결과를 확인합니다.</p></div>
-      <div class="flex gap-2"><button onclick="switchTab('stu')" class="stu-back">학생 관리</button><button onclick="syncSheet().then(()=>renderResponses())" class="bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-bold">↻ 응답 새로고침</button><button onclick="exportResponses()" class="bg-emerald-600 text-white px-3 py-2 rounded-lg text-sm font-bold">⬇ CSV 저장</button></div>
-    </div>
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
-      <div class="rounded-xl border p-4 bg-indigo-50"><p class="text-xs text-indigo-600">제출 건수</p><b class="text-2xl">${total}</b></div>
-      <div class="rounded-xl border p-4"><p class="text-xs text-gray-500">응답 학생 수</p><b class="text-2xl">${students}</b></div>
-      <div class="rounded-xl border p-4"><p class="text-xs text-gray-500">평균 정답률</p><b class="text-2xl">${avg}%</b></div>
-      <div class="rounded-xl border p-4"><p class="text-xs text-gray-500">등록 시험지</p><b class="text-2xl">${exams.length}</b></div>
-    </div>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mb-4">
-      <select id="resp-exam" onchange="renderResponses()" class="border rounded-lg p-3 text-sm">${examOpts}</select>
-      <select id="resp-grade" onchange="renderResponses()" class="border rounded-lg p-3 text-sm">${gradeOpts}</select>
-      <input id="resp-search" type="text" value="${esc(query)}" onchange="renderResponses()" placeholder="학생 이름·시험지 검색" class="border rounded-lg p-3 text-sm">
-    </div>`;
-  const rows = filtered.map(x => {
-    const selected = responseDetailKey === x.st.id+'|'+x.e.id;
-    return `<tr>
-      <td class="whitespace-nowrap">${new Date(x.r.at).toLocaleString('ko-KR')}</td>
-      <td>${esc(x.st.grade)}</td><td class="font-semibold">${esc(x.st.name)}</td>
-      <td class="text-left">${esc(x.e.name)}<div class="text-xs text-gray-400">코드 ${exCode(x.e.id)}</div></td>
-      <td class="font-bold">${x.score.correct}/${x.score.total}</td>
-      <td><span class="font-bold ${x.score.rate>=80?'text-emerald-600':x.score.rate>=60?'text-amber-600':'text-red-500'}">${x.score.rate}%</span></td>
-      <td><button onclick="showResponseDetail('${x.st.id}','${x.e.id}')" class="text-indigo-600 underline text-xs font-bold">${selected?'상세 보기 중':'답안 보기'}</button></td>
-    </tr>`;
-  }).join('');
-  const detail = responseDetailKey ? (() => {
-    const [sid,eid]=responseDetailKey.split('|');
-    const x=filtered.find(z=>z.st.id===sid&&z.e.id===eid) || all.find(z=>z.st.id===sid&&z.e.id===eid);
-    if(!x) return '';
-    const qrows=x.e.questions.map((q,i)=>{
-      const ans=x.r.answers[i]||0, key=numAns(q.answer), ok=ans>0&&ans===key;
-      return `<tr class="${ok?'':'bg-red-50'}"><td>${i+1}</td><td class="text-left">${esc(q.unit||'')}</td><td>${esc(dif(q))}</td><td>${circ(key)||esc(q.answer||'-')}</td><td class="font-bold">${ans?circ(ans):'미응답'}</td><td class="font-bold ${ok?'text-emerald-600':'text-red-500'}">${ok?'정답':'오답'}</td></tr>`;
-    }).join('');
-    return `<div class="mt-6 border-2 border-indigo-100 rounded-xl p-4">
-      <div class="flex justify-between flex-wrap gap-2 mb-3"><div><h3 class="font-bold text-lg">${esc(x.st.name)} · ${esc(x.e.name)}</h3><p class="text-xs text-gray-500">${new Date(x.r.at).toLocaleString('ko-KR')} · 시험지 코드 ${exCode(x.e.id)}</p></div><button onclick="responseDetailKey='';renderResponses()" class="stu-back">상세 닫기</button></div>
-      <p class="font-bold mb-3">점수: ${x.score.correct}/${x.score.total}문항 · 정답률 ${x.score.rate}%</p>
-      <div class="overflow-x-auto"><table class="stu-tbl min-w-[620px]"><thead><tr><th>번호</th><th>단원</th><th>난이도</th><th>정답</th><th>학생 답</th><th>채점</th></tr></thead><tbody>${qrows}</tbody></table></div>
-    </div>`;
-  })() : '';
-  root.innerHTML = head + `
-    <div class="overflow-x-auto border rounded-xl"><table class="stu-tbl min-w-[760px]"><thead><tr><th>제출 시간</th><th>학년</th><th>학생</th><th>시험지</th><th>점수</th><th>정답률</th><th>상세</th></tr></thead><tbody>${rows || '<tr><td colspan="7" class="py-10 text-gray-400">표시할 응답이 없습니다. 먼저 학생을 등록하고 구글폼 응답을 불러오세요.</td></tr>'}</tbody></table></div>
-    ${detail}
-    <p class="text-xs text-gray-400 mt-3">※ 정답률은 시험지에 저장된 정답을 기준으로 자동 계산합니다. 미응답은 오답으로 계산됩니다.</p>`;
-}
-function showResponseDetail(sid,eid) { responseDetailKey=sid+'|'+eid; renderResponses(); }
-function exportResponses() {
-  const rows=[['제출 시간','학년','학생 이름','시험지 이름','시험지 코드','정답 수','전체 문항','정답률','학생 답안']];
-  stuDB.results.forEach(r=>{
-    const e=stuDB.exams.find(x=>x.id===r.examId), st=stuDB.students.find(x=>x.id===r.studentId);
-    if(!e||!st) return;
-    const sc=responseScore(r,e);
-    rows.push([new Date(r.at).toLocaleString('ko-KR'),st.grade,st.name,e.name,exCode(e.id),sc.correct,sc.total,sc.rate+'%',r.answers.map(a=>a?circ(a):'미응답').join(' ')]);
-  });
-  const csv=rows.map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');
-  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([String.fromCharCode(65279)+csv],{type:'text/csv;charset=utf-8'})); a.download='Sci-Bank_학생응답.csv'; a.click(); URL.revokeObjectURL(a.href);
-}
-
 /* ===== 구글폼 QR · 응답 불러오기 ===== */
 const exCode = id => id.slice(-6).toUpperCase();
 function qrBox() {
   if (!curExamId) return '';
-  return stuDB.formUrl
+  return (stuDB.formUrl || sbReady())
     ? `<div class="flex justify-end items-center gap-3 mb-2"><div class="text-xs text-right leading-tight">답안 제출 QR<br>시험지 코드 <b class="text-base">${exCode(curExamId)}</b></div><div id="pv-qr"></div></div>`
     : `<div class="text-right text-xs text-gray-500 mb-2">시험지 코드 <b>${exCode(curExamId)}</b></div>`;
 }
 function qrUrl() {
   const u = stuDB.formUrl, c = exCode(curExamId), i = stuDB.formInfo;
+  if (sbReady()) return `${SB_CONFIG.pageUrl.split('#')[0].split('?')[0]}?e=${c}`;
   if (stuDB.pageUrl && i) return `${stuDB.pageUrl.split('#')[0].split('?')[0]}?c=${c}&n=${currentQuestions.length}&f=${i.f}&a=${i.a}&b=${i.b}&d=${i.d}`;
   return u.includes('EXAMCODE') ? u.split('EXAMCODE').join(c) : u.replace(/([?&]entry\.\d+=)[^&#]*/, '$1' + c);
 }
 function drawQR() {
-  const el = $('pv-qr'); if (!el || !stuDB.formUrl || typeof QRCode === 'undefined') return;
+  const el = $('pv-qr'); if (!el || !(stuDB.formUrl || sbReady()) || typeof QRCode === 'undefined') return;
   el.innerHTML = '';
   new QRCode(el, {text: qrUrl(), width: 110, height: 110, correctLevel: QRCode.CorrectLevel.L});
 }
 function parseFormInfo(u) {
   try {
     const id = /\/forms\/d\/e\/([^/?]+)/.exec(u); if (!id) return null;
-    // 미리 채워진 링크의 입력값은 무시하고 entry ID를 순서대로 시험지 코드/이름/답안 칸으로 사용합니다.
-    const entries = [...new URL(u).searchParams.keys()].filter(k => /^entry\.\d+$/.test(k));
-    if (entries.length < 3) return null;
-    return {f: id[1], a: entries[0].slice(6), b: entries[1].slice(6), d: entries[2].slice(6)};
+    const m = {}; new URL(u).searchParams.forEach((v, k) => { if (/^entry\.\d+$/.test(k)) m[v] = k.slice(6); });
+    return m['1'] && m['2'] && m['3'] ? {f: id[1], a: m['1'], b: m['2'], d: m['3']} : null;
   } catch(e) { return null; }
 }
 function setFormUrl() {
-  const u = prompt('① 구글폼 링크를 붙여넣으세요.\n(문항 수에 맞는 답안 칸을 자동으로 만들려면 "미리 채워진 링크"에서 첫 번째 칸은 시험지 코드, 두 번째는 이름, 세 번째는 답안으로 설정한 링크를 넣으세요. 미리 채운 값은 무엇이든 상관없습니다)', stuDB.formUrl || '');
+  const u = prompt('① 구글폼 링크를 붙여넣으세요.\n(문항 수에 맞는 답안 칸을 자동으로 만들려면 "미리 채워진 링크"에서 시험지 코드 칸에 1, 이름 칸에 2, 답안 칸에 3을 입력해 만든 링크를 넣으세요)', stuDB.formUrl || '');
   if (u === null) return;
   stuDB.formUrl = u.trim(); stuDB.formInfo = parseFormInfo(stuDB.formUrl);
   if (stuDB.formInfo) {
-    const w = prompt('② 이 HTML 파일을 게시한 웹 주소를 붙여넣으세요.\n(예: GitHub Pages 주소. 학생 휴대폰에서 열려야 합니다.)', stuDB.pageUrl || '');
+    const w = prompt('② 이 HTML 파일을 올려 둔 웹 주소를 붙여넣으세요.\n(학생 휴대폰에서 열려야 합니다. 비우면 구글폼 화면으로 연결됩니다)', stuDB.pageUrl || '');
     if (w !== null) stuDB.pageUrl = w.trim();
   }
   stuSave(); renderPreview();
@@ -867,6 +784,105 @@ function renderStudentPage() {
     catch(e) { msg.textContent = '제출에 실패했습니다. 인터넷 연결을 확인하고 다시 눌러 주세요.'; }
   };
 }
+/* ===== Supabase ===== */
+const sbOn = () => !!(SB_CONFIG.url && SB_CONFIG.anonKey);
+const sbReady = () => sbOn() && !!SB_CONFIG.pageUrl;
+async function sbCall(fn, args) {
+  const h = {'Content-Type': 'application/json', apikey: SB_CONFIG.anonKey};
+  if (SB_CONFIG.anonKey.startsWith('eyJ')) h.Authorization = 'Bearer ' + SB_CONFIG.anonKey;
+  const r = await fetch(SB_CONFIG.url.replace(/\/$/, '') + '/rest/v1/rpc/' + fn, {method: 'POST', headers: h, body: JSON.stringify(args)});
+  const t = await r.text();
+  if (!r.ok) throw new Error(t || r.status);
+  return t ? JSON.parse(t) : null;
+}
+async function sbSyncStudents(manual) {
+  if (!sbOn() || !stuDB.pin) { if (manual) alert('먼저 PIN을 설정하세요. (SB_CONFIG 입력도 확인)'); return; }
+  try {
+    await sbCall('sb_upsert_students', {p: stuDB.pin, payload: stuDB.students.map(s => ({id: s.id, grade: s.grade, name: s.name}))});
+    if (manual) alert('학생 명단을 서버에 동기화했습니다.');
+  } catch(e) { if (manual) alert('동기화 실패: ' + e.message); }
+}
+function sbSetPin() {
+  const v = prompt('Supabase SQL에서 설정한 PIN을 입력하세요.', stuDB.pin || '');
+  if (v === null) return;
+  stuDB.pin = v.trim(); stuSave(); sbSyncStudents(true); syncSB();
+}
+async function syncSB() {
+  if (!sbOn() || !stuDB.pin) return;
+  const st = $('sb-status');
+  try {
+    const rows = await sbCall('sb_get_results', {p: stuDB.pin}); let n = 0;
+    (rows || []).forEach(r => {
+      const ex = stuDB.exams.find(e => exCode(e.id) === r.exam_code), s = stuDB.students.find(x => x.id === r.student_id);
+      if (!ex || !s) return;
+      const ans = ex.questions.map((q, i) => +(r.answers || [])[i] || 0), old = stuDB.results.find(x => x.studentId === s.id && x.examId === ex.id);
+      if (old && old.answers.join() === ans.join()) return;
+      stuDB.results = stuDB.results.filter(x => x !== old);
+      stuDB.results.push({studentId: s.id, examId: ex.id, answers: ans, at: Date.parse(r.submitted_at) || Date.now()}); n++;
+    });
+    if (n) { stuSave(); if (stuView[0] === 'detail' && !$('tab-stu').classList.contains('hidden')) renderStu(); }
+    if (st) st.textContent = `☁ 연결됨 · ${new Date().toLocaleTimeString('ko-KR')} 확인` + (n ? ` · 새 답 ${n}건 반영` : '');
+  } catch(e) { if (st) st.textContent = '☁ 연결 실패: PIN·서버 설정·인터넷을 확인하세요.'; }
+}
+function printQRCards(ids) {
+  if (!sbReady()) { alert('파일 맨 위 SB_CONFIG에 Supabase 주소·키·페이지 주소를 먼저 입력하세요.'); return; }
+  if (typeof QRCode === 'undefined') { alert('QR 라이브러리를 불러오지 못했습니다. 인터넷 연결을 확인하세요.'); return; }
+  const list = stuDB.students.filter(s => ids.includes(s.id)).sort((x, y) => x.name.localeCompare(y.name, 'ko'));
+  if (!list.length) { alert('QR을 만들 학생이 없습니다.'); return; }
+  const tmp = document.createElement('div'); tmp.style.display = 'none'; document.body.appendChild(tmp);
+  const base = SB_CONFIG.pageUrl.split('#')[0].split('?')[0];
+  const cards = list.map(s => {
+    tmp.innerHTML = ''; new QRCode(tmp, {text: `${base}?s=${s.id}`, width: 160, height: 160, correctLevel: QRCode.CorrectLevel.M});
+    return `<div class="c"><img src="${tmp.querySelector('canvas').toDataURL()}"><div>${esc(s.grade)} ${esc(s.name)}</div></div>`;
+  }).join('');
+  tmp.remove();
+  const w = window.open('', '_blank');
+  if (!w) { alert('팝업이 차단되어 있습니다. 허용 후 다시 눌러 주세요.'); return; }
+  w.document.write(`<!DOCTYPE html><meta charset="utf-8"><title>학생 QR 카드</title><style>body{font-family:'Noto Sans KR',sans-serif}.g{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.c{border:1px dashed #999;padding:10px;text-align:center;break-inside:avoid}.c img{width:100%;max-width:140px}</style><div class="g">${cards}</div>`);
+  w.document.close(); w.focus(); setTimeout(() => w.print(), 400);
+}
+async function renderSbStudent() {
+  document.title = '답안 입력'; document.body.className = 'bg-gray-50 min-h-screen';
+  document.body.innerHTML = '<div id="sb-root" class="max-w-md mx-auto p-4 space-y-4"></div>';
+  const R = $('sb-root'), msg = t => { R.innerHTML = `<p class="text-center text-gray-500 py-10">${t}</p>`; };
+  if (!sbOn()) { msg('서버 설정이 되어 있지 않습니다.'); return; }
+  let sid = SP.get('s');
+  try { if (sid) localStorage.setItem('sb_sid', sid); else sid = localStorage.getItem('sb_sid'); } catch(e) {}
+  if (!sid) { msg('먼저 내 개인 QR을 스캔해 주세요.'); return; }
+  let me;
+  try { me = ((await sbCall('sb_student', {sid})) || [])[0]; } catch(e) { msg('서버 연결에 실패했습니다. 인터넷을 확인하세요.'); return; }
+  if (!me) { msg('등록되지 않은 QR입니다. 선생님께 문의하세요.'); return; }
+  const who = `<p class="text-center text-sm text-gray-600">${esc(me.grade)} <b>${esc(me.name)}</b> <button id="sb-not" class="underline text-xs text-gray-400 ml-1">내가 아닌가요?</button></p>`;
+  const code = (SP.get('e') || '').trim().toUpperCase();
+  const bindNot = () => { $('sb-not').onclick = () => { try { localStorage.removeItem('sb_sid'); } catch(e) {} msg('저장된 정보를 지웠습니다. 내 개인 QR을 다시 스캔하세요.'); }; };
+  if (!code) {
+    R.innerHTML = `<h1 class="text-xl font-bold text-center">📝 답안 입력</h1>${who}<input id="sb-code" type="text" placeholder="시험지 코드 6자리" class="w-full border rounded-lg p-3 bg-white uppercase"><button id="sb-ok" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg">확인</button>`;
+    bindNot(); $('sb-ok').onclick = () => { const v = $('sb-code').value.trim(); if (v) location.search = '?e=' + encodeURIComponent(v); };
+    return;
+  }
+  let info;
+  try { info = ((await sbCall('sb_exam_info', {c: code})) || [])[0]; } catch(e) { msg('서버 연결에 실패했습니다.'); return; }
+  if (!info) { msg('시험지를 찾을 수 없습니다. 코드를 확인하세요.'); return; }
+  const n = info.n, ans = Array(n).fill(0);
+  R.innerHTML = `<h1 class="text-xl font-bold text-center">📝 답안 입력</h1>${who}<p class="text-center text-sm text-gray-500">${esc(info.name)} · ${n}문항</p><div id="sb-rows" class="bg-white rounded-xl shadow p-3 space-y-1"></div><button id="sb-go" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg">제출하기</button><p id="sb-msg" class="text-center text-sm"></p>`;
+  bindNot();
+  for (let i = 0; i < n; i++) {
+    const d = document.createElement('div'); d.className = 'flex items-center gap-2';
+    d.innerHTML = `<span class="w-10 font-bold text-sm">${i+1}번</span>` + [1,2,3,4,5].map(k => `<button type="button" data-k="${k}" class="flex-1 border rounded-lg py-2 text-lg bg-white">${circ(k)}</button>`).join('');
+    d.querySelectorAll('button').forEach(bt => bt.onclick = () => {
+      ans[i] = +bt.dataset.k;
+      d.querySelectorAll('button').forEach(x => { const on = +x.dataset.k === ans[i]; x.style.background = on ? '#4f46e5' : '#fff'; x.style.color = on ? '#fff' : '#111'; });
+    });
+    $('sb-rows').appendChild(d);
+  }
+  $('sb-go').onclick = async () => {
+    const blank = ans.filter(x => !x).length, m = $('sb-msg');
+    if (blank && !confirm(`답을 고르지 않은 문항이 ${blank}개 있습니다. 그래도 제출할까요?`)) return;
+    try { await sbCall('sb_submit', {sid, c: code, ans}); m.textContent = '✅ 제출했습니다.'; }
+    catch(e) { m.textContent = '제출에 실패했습니다. 다시 시도하세요.'; }
+  };
+}
+
 function copyTxt(k) {
   const t = k === 'rows' ? Array.from({length:50}, (_, i) => (i+1) + '번').join('\n') : '①\n②\n③\n④\n⑤';
   const done = () => alert((k === 'rows' ? '1번~50번' : '①~⑤') + ' 목록을 복사했습니다. 구글폼 그리드의 첫 칸에 붙여넣으세요.');
@@ -888,14 +904,15 @@ async function syncSheet() {
     const r = await fetch(stuDB.sheetUrl, {cache: 'no-store'});
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const res = importRows(parseCSV((await r.text()).replace(/^\uFEFF/, '')), '자동 가져오기', true);
-    if (res.ok) { stuSave(); if (!$('tab-responses').classList.contains('hidden')) renderResponses(); else if (stuView[0] === 'detail' && !$('tab-stu').classList.contains('hidden')) renderStu(); }
+    if (res.ok) { stuSave(); if (stuView[0] === 'detail' && !$('tab-stu').classList.contains('hidden')) renderStu(); }
     if (st) st.textContent = `자동 연결됨 · ${new Date().toLocaleTimeString('ko-KR')} 확인` + (res.ok ? ` · 새 응답 ${res.ok}건 반영` : '') + (res.err ? ' · 시트 제목 줄(시험지 코드/이름/답안)을 확인하세요' : '');
   } catch (e) { if (st) st.textContent = '가져오기 실패: 링크가 CSV로 게시됐는지, 인터넷 연결을 확인하세요.'; }
 }
-setInterval(syncSheet, 30000);
+setInterval(() => { syncSheet(); syncSB(); }, 30000);
 
 updateCurriculum();
 if (SP.get('c') && SP.get('n')) renderStudentPage();
+else if (SP.get('e') || SP.get('s')) renderSbStudent();
 </script>
 </body>
 </html>
