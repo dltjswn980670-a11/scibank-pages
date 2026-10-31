@@ -65,8 +65,9 @@ header #main-tabs button.bg-indigo-700,header #main-tabs button.bg-indigo-700:ho
 
 <div id="hero" class="max-w-7xl w-full mx-auto px-4 pt-8 text-center">
   <p class="text-2xl sm:text-3xl font-bold">Sci-Bank</p>
-  <div id="main-tabs" class="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-3xl mx-auto">
+  <div id="main-tabs" class="mt-6 grid grid-cols-2 sm:grid-cols-5 gap-3 max-w-4xl mx-auto">
     <button onclick="switchTab('selector')" id="btn-make" class="transition text-sm">단원별 문제</button>
+    <button onclick="switchTab('ex')" id="btn-ex" class="transition text-sm">출제 문제</button>
     <button onclick="switchTab('past')" id="btn-past" class="transition text-sm">기출 문제</button>
     <button onclick="switchTab('var')" id="btn-var" class="transition text-sm">기출 변형 문제</button>
     <button onclick="switchTab('stu')" id="btn-stu" class="transition text-sm">학생</button>
@@ -125,6 +126,8 @@ header #main-tabs button.bg-indigo-700,header #main-tabs button.bg-indigo-700:ho
     </div>
     <div id="question-list" class="space-y-4"></div>
   </section>
+  <section id="tab-ex" class="hidden max-w-5xl w-full mx-auto bg-white rounded-xl shadow-md p-6"><div id="ex-body"></div></section>
+
   <section id="tab-stu" class="hidden max-w-5xl w-full mx-auto bg-white rounded-xl shadow-md p-6"><div id="stu-body"></div></section>
 
   <section id="tab-diff" class="hidden bg-white rounded-xl shadow-md p-6 max-w-3xl mx-auto space-y-4">
@@ -312,12 +315,13 @@ function renderPreview() {
 function switchTab(t) {
   if (!document.querySelector('header #main-tabs')) { document.querySelector('header .max-w-7xl').appendChild($('main-tabs')); $('hero').style.display = 'none'; document.querySelector('header').classList.remove('hidden'); }
   if (t === 'past' || t === 'var') { pastMode = t === 'var' ? 'var' : 'orig'; t = 'past'; }
-  ['selector','diff','preview','editor','past','stu'].forEach(x => $('tab-'+x).classList.add('hidden'));
-  ['make','past','var','stu'].forEach(x => $('btn-'+x).classList.remove('bg-indigo-700'));
+  ['selector','diff','preview','editor','past','stu','ex'].forEach(x => $('tab-'+x).classList.add('hidden'));
+  ['make','past','var','stu','ex'].forEach(x => $('btn-'+x).classList.remove('bg-indigo-700'));
   $('tab-'+t).classList.remove('hidden');
-  $('btn-'+(t === 'past' ? (pastMode === 'var' ? 'var' : 'past') : t === 'stu' ? 'stu' : 'make')).classList.add('bg-indigo-700');
+  $('btn-'+(t === 'past' ? (pastMode === 'var' ? 'var' : 'past') : t === 'stu' ? 'stu' : t === 'ex' ? 'ex' : 'make')).classList.add('bg-indigo-700');
   if (t === 'editor') renderEditor();
   if (t === 'past') renderPastSelects();
+  if (t === 'ex') renderEx();
   if (t === 'preview') { saveExamRecord(); renderPreview(); }
   if (t === 'stu') { stuGo('grade'); syncSheet(); syncSB(); }
 }
@@ -896,6 +900,26 @@ async function renderSbStudent() {
     try { show(await sbCall('sb_submit', {sid, c: code, ans})); }
     catch(e) { $('sb-msg').textContent = '제출에 실패했습니다. 다시 시도하세요.'; }
   };
+}
+
+/* ===== 출제 문제 목록 ===== */
+function renderEx() {
+  const b = $('ex-body'), list = stuDB.exams.slice().sort((x, y) => y.at - x.at);
+  b.innerHTML = `<h2 class="text-xl font-bold mb-4">📋 출제한 시험지 (${list.length})</h2>` + (list.length
+    ? `<div class="space-y-2">${list.map(e => { const n = stuDB.results.filter(r => r.examId === e.id).length;
+        return `<div class="flex items-center gap-3 border rounded-xl px-4 py-3 flex-wrap"><div class="flex-1 min-w-[12rem]"><div class="font-bold">${esc(e.name)}</div><div class="text-xs text-gray-500">${new Date(e.at).toLocaleString('ko-KR')} · ${e.questions.length}문항 · 코드 ${exCode(e.id)} · 제출 ${n}명</div></div><button onclick="exOpen('${e.id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-sm font-bold">문제 보기·인쇄</button><button onclick="exDel('${e.id}')" class="text-xs text-red-500">삭제</button></div>`; }).join('')}</div>`
+    : '<p class="text-center text-gray-400 py-12">아직 출제한 시험지가 없습니다. 단원별 문제에서 시험지를 만들어 보세요.</p>');
+}
+function exOpen(id) {
+  const e = stuDB.exams.find(x => x.id === id); if (!e) return;
+  currentQuestions = JSON.parse(JSON.stringify(e.questions)); pvExtra = []; curExamId = id;
+  $('exam-name').value = e.name; switchTab('preview');
+}
+function exDel(id) {
+  const e = stuDB.exams.find(x => x.id === id);
+  if (!e || !confirm(`"${e.name}" 시험지와 이 시험지의 학생 풀이 기록을 삭제할까요? (되돌릴 수 없습니다)`)) return;
+  stuDB.exams = stuDB.exams.filter(x => x.id !== id); stuDB.results = stuDB.results.filter(r => r.examId !== id);
+  stuSave(); renderEx();
 }
 
 function copyTxt(k) {
