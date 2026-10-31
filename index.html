@@ -513,7 +513,8 @@ const subCurriculum = {
 const SEED = [{ grade:"중1", unit:"생물의 구성과 다양성", question:"다음 중 세포에 대한 설명으로 옳은 것은?",
   choices:["① 모든 생물은 단세포이다.","② 세포는 생물체의 구조적·기능적 기본 단위이다.","③ 식물 세포에는 핵이 없다.","④ 동물 세포에는 세포벽이 있다.","⑤ 엽록체는 동물 세포에만 존재한다."],
   answer:"②", explanation:"세포는 모든 생물체의 구조적, 기능적 기본 단위입니다." }];
-const dif = q => ['상','중','하'].includes(q.difficulty) ? q.difficulty : '중';
+const LV = ['최상','상','중','하'];
+const dif = q => LV.includes(q.difficulty) ? q.difficulty : '중';
 const LS = 'sciBankDB_v1';
 let masterDB = SEED.slice();
 const idb = () => new Promise((res, rej) => { const r = indexedDB.open('sciBank', 1); r.onupgradeneeded = () => r.result.createObjectStore('kv'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
@@ -553,7 +554,7 @@ function getUnits() { const g = $('filter-grade').value; return (curriculum2022[
 function updateTotal() { const n = getUnits().length; $('unit-total').textContent = n ? `선택 ${n}개 단원` : ''; }
 function updateStats() {
   const g = $('filter-grade').value;
-  (curriculum2022[g] || []).forEach((u, i) => { const e = $('uk'+i); if (e) e.textContent = `DB 상${dc(g,u,'상')} · 중${dc(g,u,'중')} · 하${dc(g,u,'하')}`; });
+  (curriculum2022[g] || []).forEach((u, i) => { const e = $('uk'+i); if (e) e.textContent = `DB 최상${dc(g,u,'최상')} · 상${dc(g,u,'상')} · 중${dc(g,u,'중')} · 하${dc(g,u,'하')}`; });
   $('db-stats').textContent = `전체 ${masterDB.length}문제`;
   updateTotal();
 }
@@ -573,7 +574,7 @@ function goDifficulty(e) {
   diffUnits.forEach((x, i) => {
     const r = document.createElement('div');
     r.className = 'flex flex-wrap items-center gap-x-3 gap-y-2 border rounded-lg px-3 py-2';
-    r.innerHTML = `<div class="flex-1 min-w-[10rem] text-sm">${esc(x.u)}${x.subs.length ? `<div class="text-xs text-indigo-600">${x.subs.map(esc).join(' · ')}</div>` : ''}</div>` + ['상','중','하'].map((l, k) => `<span class="text-xs text-gray-500">${l} <span class="text-gray-400">(DB ${dc(g,x.u,l,x.subs)})</span></span><input type="number" id="dn${i}_${k}" value="${[1,3,1][k]}" min="0" max="100" class="w-14 border rounded-lg p-1 text-sm text-right">`).join('');
+    r.innerHTML = `<div class="flex-1 min-w-[10rem] text-sm">${esc(x.u)}${x.subs.length ? `<div class="text-xs text-indigo-600">${x.subs.map(esc).join(' · ')}</div>` : ''}</div>` + LV.map((l, k) => `<span class="text-xs text-gray-500">${l} <span class="text-gray-400">(DB ${dc(g,x.u,l,x.subs)})</span></span><input type="number" id="dn${i}_${k}" value="${[0,1,3,1][k]}" min="0" max="100" class="w-14 border rounded-lg p-1 text-sm text-right">`).join('');
     r.querySelectorAll('input').forEach(n => n.oninput = diffTotal);
     box.appendChild(r);
   });
@@ -587,7 +588,7 @@ function diffTotal() {
 }
 function extractNow() {
   const grade = $('filter-grade').value, out = [], lack = [];
-  diffUnits.forEach(({u, subs}, i) => ['상','중','하'].forEach((lv, k) => {
+  diffUnits.forEach(({u, subs}, i) => LV.forEach((lv, k) => {
     const n = Math.max(0, parseInt($(`dn${i}_${k}`).value) || 0); if (!n) return;
     const a = masterDB.filter(q => q.grade===grade && q.unit===u && dif(q)===lv && (!subs.length || subs.includes(q.sub)));
     for (let x = a.length-1; x > 0; x--) { const j = Math.floor(Math.random()*(x+1)); [a[x],a[j]] = [a[j],a[x]]; }
