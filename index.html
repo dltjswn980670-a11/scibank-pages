@@ -869,15 +869,19 @@ function renderPastSelects() {
   renderPast(pool[0]);
 }
 function fmtQ(t, no, img = '') {
-  t = String(t || ''); const mm = /<보기>\s*(?=ㄱ\.)/.exec(t), m = mm ? mm.index : -1;
-  if (m < 0) return `<p class="font-bold whitespace-pre-wrap">${no}. ${esc(t)}</p>${img}`;
-  const stem = t.slice(0, m).trim(); let rest = t.slice(m + mm[0].length).trim(), tail = '';
-  const items = rest.split(/\s+(?=[ㄱ-ㅎ]\.\s)/);
-  const last = items.length - 1, k = items[last].search(/\s(옳은|이에 대한|제시한|\(단,)/);
-  if (last >= 0 && k > 0) { tail = items[last].slice(k).trim(); items[last] = items[last].slice(0, k).trim(); }
-  return `<p class="font-bold whitespace-pre-wrap">${no}. ${esc(stem)}</p>${img}` +
-    `<div style="border:1.5px solid #222;padding:10px 14px;margin:8px 0;font-size:14px;line-height:1.7"><div style="text-align:center;font-weight:bold;margin-bottom:4px">&lt; 보 기 &gt;</div>${items.map(x => `<div style="padding-left:1.4em;text-indent:-1.4em">${esc(x)}</div>`).join('')}</div>` +
-    (tail ? `<p class="font-bold whitespace-pre-wrap">${esc(tail)}</p>` : '');
+  t = String(t || '');
+  const MK = /<(보기|실험 과정|실험 결과|탐구 과정|자료|조건|가설)>\s*/g, ms = [...t.matchAll(MK)].filter(m => m[1] !== '보기' || /^ㄱ\./.test(t.slice(m.index + m[0].length)));
+  if (!ms.length) return `<p class="font-bold whitespace-pre-wrap">${no}. ${esc(t)}</p>${img}`;
+  const stem = t.slice(0, ms[0].index).trim(), TAIL = /\s(옳은 것|옳지 않은|이에 대한|제시한|\(단,|이 실험|위 실험|다음 중)/;
+  let boxes = '', tail = '';
+  ms.forEach((m, i) => {
+    let body = t.slice(m.index + m[0].length, i + 1 < ms.length ? ms[i + 1].index : t.length).trim();
+    if (i === ms.length - 1) { const k = body.search(TAIL); if (k > 0) { tail = body.slice(k).trim(); body = body.slice(0, k).trim(); } }
+    const lab = m[1] === '보기' ? '보 기' : m[1];
+    const items = m[1] === '보기' ? body.split(/\s+(?=[ㄱ-ㅎ]\.\s)/) : body.split(/\n+|\s+(?=\d+\.\s|\([가-하]\)\s)/);
+    boxes += `<div style="border:1.5px solid #222;padding:10px 14px;margin:8px 0;font-size:14px;line-height:1.7"><div style="text-align:center;font-weight:bold;margin-bottom:4px">&lt; ${lab} &gt;</div>${items.filter(Boolean).map(x => `<div style="padding-left:1.4em;text-indent:-1.4em">${esc(x)}</div>`).join('')}</div>`;
+  });
+  return `<p class="font-bold whitespace-pre-wrap">${no}. ${esc(stem)}</p>${img}` + boxes + (tail ? `<p class="font-bold whitespace-pre-wrap">${esc(tail)}</p>` : '');
 }
 function renderPast(x) {
   curPast = x;
