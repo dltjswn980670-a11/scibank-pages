@@ -105,6 +105,49 @@ footer{background:transparent!important;border:0!important;color:#9AA3B0!importa
 .toast{transition:opacity .2s;animation:tin .2s}@keyframes tin{from{opacity:0;transform:translateY(8px)}}
 @media print{#toast-box{display:none!important}}
 .ans-btn{background:#fff;color:var(--ink);border-color:var(--line)}.ans-btn:hover{background:var(--accent-s)}#tab-editor .ans-btn.ans-on{background:var(--accent);color:#fff;border-color:var(--accent)}
+input[type=password],input[type=date]{border:1px solid var(--line)!important;border-radius:8px!important;background:#fff}
+input[type=password]:focus,input[type=date]:focus{outline:none;border-color:var(--accent)!important;box-shadow:0 0 0 3px var(--accent-s)!important}
+/* 학습 보고서 (선생님·학생 공용, 인쇄 가능) */
+.rp{font-size:.9rem}
+.rp-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;border-bottom:2px solid var(--ink);padding-bottom:12px;margin-bottom:16px}
+.rp-title{font-size:1.5rem;font-weight:800;letter-spacing:-.03em}.rp-who{color:var(--muted);margin-top:2px}
+.rp-meta{text-align:right;font-size:.75rem;color:var(--muted)}
+.rp-sum{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:8px}
+.rp-sum div{border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:.75rem;color:var(--muted)}
+.rp-sum b{display:block;font-size:1.3rem;color:var(--ink)}
+.rp-h{font-size:1.05rem;font-weight:800;margin:26px 0 10px;padding-left:10px;border-left:3px solid var(--accent)}
+.rp-note{font-size:.75rem;color:var(--muted);margin:-4px 0 8px}
+.rp-exam{border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:12px;break-inside:avoid}
+.rp-exam-h{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:8px}.rp-exam-h span{font-size:.8rem;color:var(--muted)}
+.rp .tl{text-align:left}.rp .ok{color:#0E9F6E;font-weight:700}.rp .no{color:#D63B3B;font-weight:700}.rp tr.rp-x{background:#FDF2F2}
+.rp-rank b{color:var(--accent)}
+.rp-aggs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.rp-agg{border:1px solid var(--line);border-radius:10px;padding:12px;break-inside:avoid}.rp-agg-t{font-weight:700;margin-bottom:8px}
+.rp-bar{display:grid;grid-template-columns:minmax(0,1fr) 80px 40px;align-items:center;gap:8px;font-size:.8rem;padding:3px 0}
+.rp-track{height:8px;background:var(--soft);border-radius:4px;overflow:hidden}.rp-track i{display:block;height:100%;background:#D63B3B}
+.rp-n{text-align:right;color:var(--muted)}
+.rp-grp{margin-bottom:18px}.rp-grp-h{font-weight:800;padding:6px 0;border-bottom:1px solid var(--line);margin-bottom:4px}.rp-grp-h span{font-weight:500;color:var(--muted);font-size:.8rem;margin-left:4px}
+.rp-q{padding:10px 0;border-bottom:1px dashed var(--line);break-inside:avoid}.rp-q-src{font-size:.75rem;color:var(--muted)}.rp-q-t{font-weight:600;margin:4px 0;white-space:pre-wrap}
+.rp-q-ch{display:flex;flex-wrap:wrap;gap:2px 14px;font-size:.82rem;color:#374151}.rp-q-exp{margin-top:6px;background:var(--soft);border-radius:8px;padding:8px 10px;font-size:.85rem;white-space:pre-wrap}
+.rp-memo{border:1px solid var(--line);border-radius:8px;min-height:112px;padding:6px 10px;color:var(--muted);font-size:.75rem;margin-top:8px;background:repeating-linear-gradient(#fff 0 27px,#E5E7EB 27px 28px);break-inside:avoid}
+.rp-empty{color:var(--muted);text-align:center;padding:24px}
+@media(max-width:640px){.rp-sum{grid-template-columns:repeat(2,minmax(0,1fr))}.rp-aggs{grid-template-columns:1fr}.rp-head{flex-direction:column;align-items:flex-start}.rp-meta{text-align:left}}
+@media print{.no-print{display:none!important}.rp-break{break-before:page}#tab-stu{border:0!important;padding:0!important}.rp tr.rp-x,.rp-track,.rp-track i,.rp-q-exp{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+/* 학생 화면: 답 선택·제출 확인·해설 */
+.sb-primary{background:var(--accent);color:#fff;font-weight:700;padding:13px;border-radius:10px}.sb-primary:hover{filter:brightness(.93)}
+.sb-ghost{background:var(--soft);color:var(--ink);font-weight:700;padding:13px;border-radius:10px}
+.sb-opt{flex:1;border:1px solid var(--line);border-radius:8px;padding:7px 0;font-size:1.1rem;background:#fff;color:var(--ink)}
+.sb-opt.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.sb-mark{flex:none;width:38px;height:34px;border-radius:8px;font-weight:800;background:var(--soft);color:var(--muted)}
+.sb-mark.o{background:#E3F6EE;color:#0E9F6E}.sb-mark.x{background:#FDECEC;color:#D63B3B}
+.sb-exp{margin:4px 0 6px 48px;background:var(--soft);border-radius:8px;padding:8px 10px;font-size:.85rem;white-space:pre-wrap}
+.sb-modal{position:fixed;inset:0;background:rgba(22,32,46,.45);display:flex;align-items:flex-end;justify-content:center;z-index:60;padding:16px}
+.sb-sheet{background:#fff;border-radius:16px;max-width:28rem;width:100%;padding:20px;max-height:85vh;overflow:auto}
+@media(min-width:640px){.sb-modal{align-items:center}}
+.sb-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:12px 0}
+.sb-grid div{border:1px solid var(--line);border-radius:8px;text-align:center;padding:6px 0;font-size:.75rem;color:var(--muted)}
+.sb-grid div b{display:block;font-size:1.1rem;color:var(--ink)}
+.sb-grid div.blank{border-color:#F3B4B4;background:#FDF2F2;color:#C62F2F}.sb-grid div.blank b{color:#C62F2F}
 input.dn-over[type=number]{border-color:#ef4444!important;background:#fef2f2!important}
 @media print{#hero,header,footer,#tab-selector,#tab-editor,#past-controls{display:none!important}body{background:#fff!important}main{padding:0!important;max-width:none!important}#print-area{box-shadow:none!important;border-radius:0!important;padding:0!important;max-width:none!important}.pq{break-inside:avoid}#pv-controls{display:none!important}.pvgap{background:none!important;box-shadow:none!important;min-height:0!important}.pvgap::after{display:none!important}#pv-paper{box-shadow:none!important;border-radius:0!important;padding:0!important;max-width:none!important}}
 </style>
@@ -1059,18 +1102,23 @@ function renderPast(x) {
 
 /* ===== 학생 ===== */
 const SK = 'sciBankStu_v1', GR = ['중1','중2','중3','고1','고2','고3'];
-let stuDB = {students:[], exams:[], results:[]}, stuView = ['grade'], curExamId = null;
+let stuDB = {students:[], exams:[], results:[]}, stuView = ['grade'], curExamId = null, rpFrom = '', rpTo = '';
 const stuReady = (async () => { try { const a = await idbGet(SK); if (a && Array.isArray(a.students)) stuDB = a; } catch(e) {} })();
 const stuSave = () => idbSet(SK, stuDB).catch(() => toast('브라우저 저장에 실패했습니다.'));
 const uid = p => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
 const numAns = a => { const t = String(a ?? '').trim(), k = '①②③④⑤'.indexOf(t[0]); return k >= 0 ? k + 1 : (parseInt(t) || 0); };
 const circ = n => '①②③④⑤'[n-1] || '';
+/* 서버에 올리는 문항 정보: 글만 (그림 제외) */
+const qInfo = qs => qs.map(q => ({q: q.question || '', ch: q.choices || [], exp: q.explanation || '', unit: q.unit || '', sub: q.sub || '', lv: dif(q), type: q.type || '', img: !!q.image}));
 function saveExamRecord() {
   if (!curExamId) return;
   let e = stuDB.exams.find(x => x.id === curExamId);
   if (!e) { e = {id: curExamId, at: Date.now()}; stuDB.exams.push(e); }
   e.name = examName(); e.questions = JSON.parse(JSON.stringify(currentQuestions)); stuSave();
-  if (sbOn() && stuDB.pin) sbCall('sb_upsert_exam', {p: stuDB.pin, c: exCode(curExamId), nm: examName(), cnt: currentQuestions.length, k: currentQuestions.map(q => numAns(q.answer))}).catch(() => {});
+  if (sbOn() && stuDB.pin) {
+    const a = {p: stuDB.pin, c: exCode(curExamId), nm: examName(), cnt: currentQuestions.length, k: currentQuestions.map(q => numAns(q.answer))};
+    sbCall('sb_upsert_exam', {...a, info: qInfo(currentQuestions)}).catch(() => sbCall('sb_upsert_exam', a)).catch(() => {});
+  }
 }
 function stuGo(...v) { stuView = v; renderStu(); bkRefresh(); }
 function renderStu() {
@@ -1093,14 +1141,25 @@ function renderStu() {
   } else if (v === 'list') {
     const ss = stuDB.students.filter(s => s.grade === a).sort((x, y) => x.name.localeCompare(y.name, 'ko'));
     b.innerHTML = `<div class="flex items-center gap-3 mb-4 flex-wrap"><button onclick="stuGo('grade')" class="stu-back">← 학년 선택</button><h2 class="text-xl font-bold">${a} 학생 (${ss.length}명)</h2>
-      <button onclick="printQRCards(stuDB.students.filter(s => s.grade==='${a}').map(s => s.id))" class="stu-back ml-auto">🖨 QR 카드</button>
+      <button onclick="issueAccounts(stuDB.students.filter(s => s.grade==='${a}').map(s => s.id), false)" class="stu-back ml-auto" title="계정이 없는 학생에게 아이디·임시 비밀번호를 만들고 카드를 인쇄합니다">🔑 계정 발급·카드 인쇄</button>
       <form onsubmit="stuAdd(event,'${a}')" class="flex gap-2"><input id="stu-new" type="text" placeholder="학생 이름" class="border rounded-lg p-2 text-sm w-36"><button class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-sm font-bold">➕ 등록</button></form></div>` +
-      (ss.length ? `<div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-2">${ss.map(s => `<button onclick="stuGo('detail','${s.id}')" class="stu-btn">${esc(s.name)}</button>`).join('')}</div>` : '<p class="text-center text-gray-400 py-12">등록된 학생이 없습니다. 위에서 학생을 등록하세요.</p>');
+      (ss.length ? `<div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-2">${ss.map(s => `<button onclick="stuGo('detail','${s.id}')" class="stu-btn">${esc(s.name)}<span class="block text-xs font-normal text-gray-400 mt-0.5">${s.lid ? esc(s.lid) : '계정 없음'}</span></button>`).join('')}</div>` : '<p class="text-center text-gray-400 py-12">등록된 학생이 없습니다. 위에서 학생을 등록하세요.</p>');
   } else {
     const s = stuDB.students.find(x => x.id === a);
     if (!s) { stuGo('grade'); return; }
-    const head = `<div class="flex items-center gap-3 mb-4 flex-wrap"><button onclick="stuGo('list','${s.grade}')" class="stu-back">← ${s.grade} 학생 목록</button><h2 class="text-xl font-bold">${s.grade} ${esc(s.name)}</h2><button onclick="printQRCards(['${s.id}'])" class="stu-back ml-auto">🖨 개인 QR</button><button onclick="stuDel('${s.id}')" class="text-xs text-red-500">학생 삭제</button></div>`;
-    if (v === 'entry') {
+    const acct = s.lid ? `<span class="text-xs text-gray-500">아이디 <b class="text-gray-800">${esc(s.lid)}</b> · ${s.mustChange === false ? '비밀번호 변경함' : '임시 비밀번호 사용 중'}</span>` : '<span class="text-xs text-gray-400">계정 없음</span>';
+    const head = `<div class="flex items-center gap-3 mb-4 flex-wrap no-print"><button onclick="stuGo(${v === 'detail' ? `'list','${s.grade}'` : `'detail','${s.id}'`})" class="stu-back">← ${v === 'detail' ? s.grade + ' 학생 목록' : '학생 정보'}</button><h2 class="text-xl font-bold">${s.grade} ${esc(s.name)}</h2>${acct}
+      <div class="ml-auto flex gap-2 flex-wrap items-center"><button onclick="stuGo('report','${s.id}')" class="stu-back">📄 학습 보고서</button><button onclick="issueAccounts(['${s.id}'], true)" class="stu-back">🔑 ${s.lid ? '비밀번호 초기화' : '계정 발급'}</button><button onclick="stuDel('${s.id}')" class="text-xs text-red-500">학생 삭제</button></div></div>`;
+    if (v === 'report') {
+      b.innerHTML = head + `<div class="no-print flex flex-wrap items-end gap-3 p-3 mb-5 bg-gray-50 rounded-xl border">
+        <label class="text-xs text-gray-500">시작일<input type="date" id="rp-from" value="${rpFrom}" class="block p-2 text-sm"></label>
+        <label class="text-xs text-gray-500">종료일<input type="date" id="rp-to" value="${rpTo}" class="block p-2 text-sm"></label>
+        <button onclick="rpFrom='';rpTo='';stuGo('report','${s.id}')" class="stu-back">전체 기간</button>
+        <div class="ml-auto flex gap-2 flex-wrap"><button onclick="window.print()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold">🖨 보고서 인쇄</button>
+        <button onclick="rpVariant('${s.id}')" class="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-bold" title="선택한 기간에 틀린 문제와 같은 단원·난이도의 다른 문제로 시험지를 만듭니다">🔄 이 기간 틀린 문제로 변형 문제 출제</button></div></div><div id="rp-box"></div>`;
+      const draw = () => { rpFrom = $('rp-from').value; rpTo = $('rp-to').value; $('rp-box').innerHTML = buildReport(teacherReportItems(s.id), {who: `${s.grade} ${s.name}`, from: rpFrom, to: rpTo}); };
+      $('rp-from').onchange = draw; $('rp-to').onchange = draw; draw();
+    } else if (v === 'entry') {
       const e = stuDB.exams.find(x => x.id === c);
       if (!e) { toast('답을 입력할 시험지를 선택하세요.'); stuGo('detail', a); return; }
       const old = (stuDB.results.find(r => r.studentId === a && r.examId === c) || {}).answers || [];
@@ -1117,11 +1176,13 @@ function renderStu() {
       const opts = stuDB.exams.slice().sort((x, y) => y.at - x.at).map(e => `<option value="${e.id}">${esc(e.name)} (${new Date(e.at).toLocaleDateString('ko-KR')} · ${e.questions.length}문항)</option>`).join('');
       const cards = rs.map(r => {
         const e = stuDB.exams.find(x => x.id === r.examId); if (!e) return '';
-        let ok = 0;
-        const rows = e.questions.map((q, i) => { const st = r.answers[i] || 0, good = st && st === numAns(q.answer); if (good) ok++;
-          return `<tr class="${good ? '' : 'bg-red-50'}"><td>${i+1}</td><td class="text-left">${esc(q.unit)}</td><td>${dif(q)}</td><td>${circ(numAns(q.answer)) || esc(q.answer)}</td><td>${st ? circ(st) : '-'}</td><td class="font-bold ${good ? 'text-emerald-600' : 'text-red-500'}">${good ? 'O' : 'X'}</td></tr>`; }).join('');
-        return `<div class="border rounded-xl p-4 space-y-3"><div class="flex justify-between flex-wrap gap-2"><b>${esc(e.name)}</b><span class="text-sm text-gray-500">${new Date(r.at).toLocaleDateString('ko-KR')} · ${ok}/${e.questions.length}</span></div>
-          <table class="stu-tbl"><thead><tr><th>번호</th><th>단원</th><th>난이도</th><th>정답</th><th>학생 답</th><th>정오</th></tr></thead><tbody>${rows}</tbody></table>
+        let ok = 0, ok2 = 0;
+        const hasR = Array.isArray(r.retry);
+        const rows = e.questions.map((q, i) => { const k = numAns(q.answer), st = r.answers[i] || 0, good = st && st === k; if (good) ok++;
+          const ra = hasR ? r.retry[i] || 0 : 0, rg = ra && ra === k; if (rg) ok2++;
+          return `<tr class="${good ? '' : 'bg-red-50'}"><td>${i+1}</td><td class="text-left">${esc(q.unit)}</td><td>${dif(q)}</td><td>${circ(k) || esc(q.answer)}</td><td>${st ? circ(st) : '-'}</td><td class="font-bold ${good ? 'text-emerald-600' : 'text-red-500'}">${good ? 'O' : 'X'}</td>${hasR ? `<td>${good ? '' : ra ? circ(ra) : '-'}</td><td class="font-bold ${rg ? 'text-emerald-600' : 'text-red-500'}">${good ? '' : rg ? 'O' : 'X'}</td>` : ''}</tr>`; }).join('');
+        return `<div class="border rounded-xl p-4 space-y-3"><div class="flex justify-between flex-wrap gap-2"><b>${esc(e.name)}</b><span class="text-sm text-gray-500">${new Date(r.at).toLocaleDateString('ko-KR')} · ${ok}/${e.questions.length}${hasR ? ` → 다시 풀기 후 ${ok2}/${e.questions.length}` : ''}</span></div>
+          <table class="stu-tbl"><thead><tr><th>번호</th><th>단원</th><th>난이도</th><th>정답</th><th>학생 답</th><th>정오</th>${hasR ? '<th>다시 푼 답</th><th>정오</th>' : ''}</tr></thead><tbody>${rows}</tbody></table>
           <button onclick="stuVariant('${e.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg">🔄 이 시험지의 변형문제 출제하기</button></div>`; }).join('');
       b.innerHTML = head + `<div class="flex gap-2 flex-wrap mb-5 p-3 bg-gray-50 rounded-xl border">
         <select id="stu-exam" class="flex-1 min-w-[12rem] border rounded-lg p-2 text-sm">${opts || '<option value="">저장된 시험지가 없습니다</option>'}</select>
@@ -1177,23 +1238,127 @@ function stuSaveAns(e, sid, eid) {
   stuDB.results.push({studentId: sid, examId: eid, answers, at: Date.now()});
   stuSave(); stuGo('detail', sid);
 }
+/* 같은 단원·난이도의 다른 문제 하나 고르기 (같은 중단원, '변형' 유형 우선) */
+function pickVariant(q, used) {
+  const pool = masterDB.filter(x => x.grade === q.grade && x.unit === q.unit && dif(x) === dif(q) && !used.has(keyOf(x)));
+  for (let i = pool.length-1; i > 0; i--) { const j = Math.floor(Math.random()*(i+1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+  const sc = x => (q.sub && x.sub === q.sub ? 2 : 0) + (x.type === '변형' ? 1 : 0);
+  pool.sort((x, y) => sc(y) - sc(x));
+  const pick = pool[0];
+  if (pick) used.add(keyOf(pick));
+  return pick ? JSON.parse(JSON.stringify(pick)) : null;
+}
+function makeVariantExam(src, name) {
+  const used = new Set(src.map(keyOf)), out = src.map(q => pickVariant(q, used)).filter(Boolean);
+  if (!out.length) { toast('같은 단원·난이도의 변형 문제가 DB에 없습니다.'); return; }
+  if (out.length < src.length) toast(`같은 단원·난이도 문제가 부족해 ${out.length}/${src.length}문항만 출제합니다.`);
+  currentQuestions = out; pvExtra = []; curExamId = uid('e');
+  $('exam-name').value = name;
+  switchTab('preview');
+}
 function stuVariant(eid) {
   const ex = stuDB.exams.find(x => x.id === eid); if (!ex) return;
-  const used = new Set(ex.questions.map(keyOf)), out = [];
-  let lack = 0;
-  ex.questions.forEach(q => {
-    const lv = dif(q);
-    const pool = masterDB.filter(x => x.grade === q.grade && x.unit === q.unit && dif(x) === lv && !used.has(keyOf(x)));
-    for (let i = pool.length-1; i > 0; i--) { const j = Math.floor(Math.random()*(i+1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
-    pool.sort((x, y) => (y.type === '변형') - (x.type === '변형'));
-    const pick = pool[0];
-    if (pick) { used.add(keyOf(pick)); out.push(JSON.parse(JSON.stringify(pick))); } else lack++;
+  makeVariantExam(ex.questions, ex.name + ' (변형)');
+}
+/* 기간(YYYY-MM-DD, 이 컴퓨터 시간 기준) → [시작 ms, 끝 다음날 0시 ms) */
+const dayRange = (a, b) => [a ? new Date(a + 'T00:00').getTime() : -Infinity, b ? new Date(b + 'T00:00').getTime() + 864e5 : Infinity];
+/* 보고서 (5): 기간 안에 처음 제출 기준으로 틀린 문제의 변형 문제 출제 */
+function rpVariant(sid) {
+  const s = stuDB.students.find(x => x.id === sid); if (!s) return;
+  const [f, t] = dayRange(rpFrom, rpTo), wrong = [];
+  stuDB.results.filter(r => r.studentId === sid && r.at >= f && r.at < t).forEach(r => {
+    const e = stuDB.exams.find(x => x.id === r.examId);
+    if (e) e.questions.forEach((q, i) => { const k = numAns(q.answer); if (k && r.answers[i] !== k) wrong.push(q); });
   });
-  if (!out.length) { toast('같은 단원·난이도의 변형 문제가 DB에 없습니다.'); return; }
-  if (lack) toast(`같은 단원·난이도 문제가 부족해 ${out.length}/${ex.questions.length}문항만 출제합니다.`);
-  currentQuestions = out; pvExtra = []; curExamId = uid('e');
-  $('exam-name').value = ex.name + ' (변형)';
-  switchTab('preview');
+  if (!wrong.length) { toast('이 기간에 틀린 문제가 없습니다.'); return; }
+  makeVariantExam(wrong, `${s.name} 오답 변형 문제`);
+}
+
+/* ===== 학습 보고서: (1) 정오표 (2) 틀린 유형 (3) 개념 정리 (4) 등수 — 선생님·학생 공용 =====
+   items: [{name, at, qs:[{q, ch, exp, unit, sub, lv, type, img, ans}], answers, retry, rank, count}] */
+function teacherReportItems(sid) {
+  return stuDB.results.filter(r => r.studentId === sid).map(r => {
+    const e = stuDB.exams.find(x => x.id === r.examId); if (!e) return null;
+    const key = e.questions.map(q => numAns(q.answer)), sc = a => key.filter((k, i) => k && (a || [])[i] === k).length;
+    const all = stuDB.results.filter(x => x.examId === e.id), mine = sc(r.answers);
+    return {name: e.name, at: r.at, qs: qInfo(e.questions).map((q, i) => ({...q, ans: key[i]})), answers: r.answers || [], retry: r.retry || null,
+      rank: 1 + all.filter(x => sc(x.answers) > mine).length, count: all.length};
+  }).filter(Boolean);
+}
+function buildReport(all, o) {
+  const [f, t] = dayRange(o.from, o.to);
+  const items = all.filter(x => x.at >= f && x.at < t).sort((a, b) => a.at - b.at);
+  const d = ms => new Date(ms).toLocaleDateString('ko-KR');
+  const period = o.from || o.to ? `${o.from || '처음'} ~ ${o.to || '오늘'}` : '전체 기간';
+  let h = `<div class="rp"><div class="rp-head"><div><div class="rp-title">학습 보고서</div><div class="rp-who">${esc(o.who)}</div></div><div class="rp-meta">${period}<br>${d(Date.now())} 출력</div></div>`;
+  if (!items.length) return h + '<p class="rp-empty">이 기간에 푼 시험지가 없습니다.</p></div>';
+  const rec = [];
+  items.forEach(x => x.qs.forEach((q, i) => { if (q.ans) rec.push({...q, ok: x.answers[i] === q.ans, my: x.answers[i] || 0, exam: x.name, no: i + 1}); }));
+  const okN = rec.filter(r => r.ok).length;
+  h += `<div class="rp-sum"><div><b>${items.length}</b>푼 시험지</div><div><b>${rec.length}</b>채점한 문항</div><div><b>${rec.length ? Math.round(okN / rec.length * 100) : 0}%</b>정답률</div><div><b>${rec.length - okN}</b>틀린 문항</div></div>`;
+  // (4) 등수
+  h += `<h3 class="rp-h">시험지별 점수와 등수</h3><table class="stu-tbl rp-rank"><thead><tr><th class="tl">시험지</th><th>날짜</th><th>점수</th><th>등수</th></tr></thead><tbody>` +
+    items.map(x => { const s = x.qs.filter((q, i) => q.ans && x.answers[i] === q.ans).length;
+      return `<tr><td class="tl">${esc(x.name)}</td><td>${d(x.at)}</td><td>${s}/${x.qs.length}</td><td>${x.count ? `<b>${x.rank}등</b> / ${x.count}명` : '-'}</td></tr>`; }).join('') + '</tbody></table>';
+  // (1) 정오표
+  h += `<h3 class="rp-h">시험지별 정오표</h3>` + items.map(x => {
+    const hasR = Array.isArray(x.retry), s = x.qs.filter((q, i) => q.ans && x.answers[i] === q.ans).length;
+    const rows = x.qs.map((q, i) => { const a = x.answers[i] || 0, good = q.ans && a === q.ans, ra = hasR ? x.retry[i] || 0 : 0, rg = q.ans && ra === q.ans;
+      return `<tr class="${good ? '' : 'rp-x'}"><td>${i+1}</td><td class="tl">${esc(q.sub || q.unit)}</td><td>${esc(q.lv)}</td><td>${circ(q.ans) || '-'}</td><td>${a ? circ(a) : '-'}</td><td class="${good ? 'ok' : 'no'}">${good ? 'O' : 'X'}</td>${hasR ? `<td>${good ? '' : ra ? circ(ra) : '-'}</td><td class="${rg ? 'ok' : 'no'}">${good ? '' : rg ? 'O' : 'X'}</td>` : ''}</tr>`; }).join('');
+    return `<div class="rp-exam"><div class="rp-exam-h"><b>${esc(x.name)}</b><span>${d(x.at)} · ${s}/${x.qs.length} · ${x.count}명 중 ${x.rank}등</span></div>
+      <table class="stu-tbl"><thead><tr><th>번호</th><th class="tl">단원</th><th>난이도</th><th>정답</th><th>처음 답</th><th>정오</th>${hasR ? '<th>다시 푼 답</th><th>정오</th>' : ''}</tr></thead><tbody>${rows}</tbody></table></div>`; }).join('');
+  // (2) 틀린 유형
+  const agg = (title, key) => {
+    const m = {}; rec.forEach(r => { const k = r[key] || (key === 'type' ? '일반' : '(미분류)'); (m[k] = m[k] || {t: 0, w: 0}).t++; if (!r.ok) m[k].w++; });
+    const rows = Object.entries(m).sort((a, b) => b[1].w - a[1].w || b[1].t - a[1].t);
+    if (rows.length === 1 && ['(미분류)', '일반'].includes(rows[0][0])) return '';
+    return `<div class="rp-agg"><div class="rp-agg-t">${title}</div>${rows.map(([k, v]) => `<div class="rp-bar"><span class="tl">${esc(k)}</span><span class="rp-track"><i style="width:${v.w / v.t * 100}%"></i></span><span class="rp-n">${v.w}/${v.t}</span></div>`).join('')}</div>`; };
+  h += `<h3 class="rp-h">틀린 유형</h3><p class="rp-note">막대는 분류마다 틀린 비율입니다. 오른쪽 숫자는 틀린 문항/전체 문항이며, 처음 제출한 답 기준입니다.</p><div class="rp-aggs">${agg('대단원', 'unit')}${agg('중단원', 'sub')}${agg('난이도', 'lv')}${agg('문항 유형', 'type')}</div>`;
+  // (3) 개념 정리: 틀린 문제를 중단원별로 모아 해설과 정리 칸
+  const g = {}; rec.filter(r => !r.ok).forEach(r => { const k = r.sub ? `${r.unit} › ${r.sub}` : (r.unit || '단원 미분류'); (g[k] = g[k] || []).push(r); });
+  h += `<div class="rp-break"></div><h3 class="rp-h">틀린 문제 개념 정리</h3>` + (Object.keys(g).length ? Object.entries(g).map(([k, ws]) =>
+    `<div class="rp-grp"><div class="rp-grp-h">${esc(k)}<span>${ws.length}문항</span></div>${ws.map(w => `<div class="rp-q"><div class="rp-q-src">${esc(w.exam)} ${w.no}번 · 내 답 ${w.my ? circ(w.my) : '없음'} · 정답 ${circ(w.ans)}</div>
+      <div class="rp-q-t">${esc(w.q) || '(문제 내용 없음)'}${w.img ? ' <span class="rp-q-src">(그림은 시험지를 참고하세요)</span>' : ''}</div>${(w.ch || []).length ? `<div class="rp-q-ch">${w.ch.map(c => `<span>${esc(c)}</span>`).join('')}</div>` : ''}
+      <div class="rp-q-exp"><b>해설</b> ${esc(w.exp) || '해설이 없습니다.'}</div></div>`).join('')}<div class="rp-memo">나의 정리</div></div>`).join('') : '<p class="rp-empty">틀린 문제가 없습니다.</p>');
+  return h + '</div>';
+}
+
+/* ===== 학생 계정: 아이디 sci+이름, 임시 비밀번호(6자리) 발급 → 학생이 첫 로그인 때 변경 ===== */
+const pw6 = () => String(Math.floor(100000 + Math.random() * 900000));
+async function issueAccounts(ids, reset) {
+  if (!sbOn() || !stuDB.pin) { toast('먼저 학생 화면 첫 페이지에서 PIN을 설정하세요.'); return; }
+  const list = stuDB.students.filter(s => ids.includes(s.id) && (reset || !s.lid));
+  if (!list.length) { toast('새로 계정을 만들 학생이 없습니다.\n이미 계정이 있는 학생은 학생 개인 화면에서 비밀번호를 초기화하세요.'); return; }
+  if (reset && list.some(s => s.lid) && !confirm(`${list.map(s => s.name).join(', ')} 학생의 비밀번호를 새 임시 비밀번호로 바꿀까요?\n지금 쓰는 비밀번호로는 더 이상 로그인할 수 없습니다.`)) return;
+  await sbSyncStudents();
+  const done = [], fail = [];
+  for (const s of list) {
+    const base = 'sci' + s.name.replace(/\s/g, ''), pw = pw6();
+    let lid = s.lid || base, k = 1, ok = false;
+    if (!s.lid) while (stuDB.students.some(x => x !== s && x.lid === lid)) lid = base + (++k);
+    for (let tries = 0; tries < 5 && !ok; tries++) {
+      try { await sbCall('sb_set_account', {p: stuDB.pin, sid: s.id, lid, pw}); ok = true; }
+      catch (e) { if (/dup id/.test(e.message) && !s.lid) lid = base + (++k); else break; }
+    }
+    if (ok) { s.lid = lid; s.mustChange = true; done.push({s, pw}); } else fail.push(s.name);
+  }
+  stuSave(); renderStu();
+  if (fail.length) toast(`계정 발급 실패: ${fail.join(', ')}\nSupabase에서 supabase-update3.sql을 실행했는지 확인하세요.`);
+  if (done.length) printAccountCards(done);
+}
+function printAccountCards(list) {
+  const url = SB_CONFIG.pageUrl.split('#')[0].split('?')[0] + '?me=1';
+  let qr = '';
+  if (typeof QRCode !== 'undefined') {
+    const tmp = document.createElement('div'); tmp.style.display = 'none'; document.body.appendChild(tmp);
+    new QRCode(tmp, {text: url, width: 120, height: 120, correctLevel: QRCode.CorrectLevel.M}); qr = tmp.querySelector('canvas').toDataURL(); tmp.remove();
+  }
+  const cards = list.slice().sort((x, y) => x.s.name.localeCompare(y.s.name, 'ko')).map(({s, pw}) =>
+    `<div class="c">${qr ? `<img src="${qr}">` : ''}<div><div class="n">${esc(s.grade)} ${esc(s.name)}</div><div>아이디 <b>${esc(s.lid)}</b></div><div>임시 비밀번호 <b>${pw}</b></div><div class="u">QR을 찍거나 아래 주소에서 로그인한 뒤 새 비밀번호로 바꾸세요.<br>${esc(url)}</div></div></div>`).join('');
+  const w = window.open('', '_blank');
+  if (!w) { toast('팝업이 차단되어 카드를 열지 못했습니다. 임시 비밀번호를 적어 두세요.\n' + list.map(x => `${x.s.name} ${x.s.lid} / ${x.pw}`).join('\n')); return; }
+  w.document.write(`<!DOCTYPE html><meta charset="utf-8"><title>학생 계정 카드</title><style>body{font-family:'Pretendard Variable','Malgun Gothic',sans-serif;margin:16px}.g{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.c{display:flex;gap:12px;align-items:center;border:1px dashed #999;border-radius:8px;padding:10px;break-inside:avoid;font-size:13px;line-height:1.6}.c img{width:90px;height:90px}.n{font-size:15px;font-weight:700}.u{font-size:10px;color:#666;word-break:break-all;line-height:1.4;margin-top:2px}.note{font-size:12px;color:#666}@media print{.note{display:none}}</style><p class="note">임시 비밀번호는 이 창에서만 볼 수 있습니다. 인쇄하거나 학생에게 전달한 뒤 창을 닫으세요.</p><div class="g">${cards}</div>`);
+  w.document.close(); w.focus(); setTimeout(() => w.print(), 400);
 }
 
 /* ===== 시험지 QR ===== */
@@ -1238,91 +1403,187 @@ async function syncSB() {
   if (!sbOn() || !stuDB.pin) return;
   const st = $('sb-status');
   try {
-    const rows = await sbCall('sb_get_results', {p: stuDB.pin}); let n = 0;
+    let rows; try { rows = await sbCall('sb_get_results2', {p: stuDB.pin}); } catch(e) { rows = await sbCall('sb_get_results', {p: stuDB.pin}); }
+    let n = 0;
     (rows || []).forEach(r => {
       const ex = stuDB.exams.find(e => exCode(e.id) === r.exam_code), s = stuDB.students.find(x => x.id === r.student_id);
       if (!ex || !s) return;
       const ans = ex.questions.map((q, i) => +(r.answers || [])[i] || 0), old = stuDB.results.find(x => x.studentId === s.id && x.examId === ex.id);
-      if (old && old.answers.join() === ans.join()) return;
+      const retry = Array.isArray(r.retry_answers) ? ex.questions.map((q, i) => +r.retry_answers[i] || 0) : null;
+      if (old && old.answers.join() === ans.join() && String(old.retry || '') === String(retry || '')) return;
       stuDB.results = stuDB.results.filter(x => x !== old);
-      stuDB.results.push({studentId: s.id, examId: ex.id, answers: ans, at: Date.parse(r.submitted_at) || Date.now()}); n++;
+      stuDB.results.push({studentId: s.id, examId: ex.id, answers: ans, retry, at: Date.parse(r.submitted_at) || Date.now()}); n++;
     });
-    if (n) { stuSave(); if (stuView[0] === 'detail' && !$('tab-stu').classList.contains('hidden')) renderStu(); }
+    try {
+      (await sbCall('sb_accounts', {p: stuDB.pin}) || []).forEach(x => {
+        const s = stuDB.students.find(y => y.id === x.id);
+        if (s && ((s.lid || null) !== (x.login_id || null) || s.mustChange !== x.must_change)) { s.lid = x.login_id || undefined; s.mustChange = x.must_change; n++; }
+      });
+    } catch(e) {}
+    if (n) { stuSave(); if (['detail', 'list'].includes(stuView[0]) && !$('tab-stu').classList.contains('hidden')) renderStu(); }
     if (st) st.textContent = `☁ 연결됨 · ${new Date().toLocaleTimeString('ko-KR')} 확인` + (n ? ` · 새 답 ${n}건 반영` : '');
   } catch(e) { if (st) st.textContent = '☁ 연결 실패: PIN·서버 설정·인터넷을 확인하세요.'; }
 }
-function printQRCards(ids) {
-  if (!sbReady()) { toast('파일 맨 위 SB_CONFIG에 Supabase 주소·키·페이지 주소를 먼저 입력하세요.'); return; }
-  if (typeof QRCode === 'undefined') { toast('QR 라이브러리를 불러오지 못했습니다. 인터넷 연결을 확인하세요.'); return; }
-  const list = stuDB.students.filter(s => ids.includes(s.id)).sort((x, y) => x.name.localeCompare(y.name, 'ko'));
-  if (!list.length) { toast('QR을 만들 학생이 없습니다.'); return; }
-  const tmp = document.createElement('div'); tmp.style.display = 'none'; document.body.appendChild(tmp);
-  const base = SB_CONFIG.pageUrl.split('#')[0].split('?')[0];
-  const cards = list.map(s => {
-    tmp.innerHTML = ''; new QRCode(tmp, {text: `${base}?s=${s.id}`, width: 160, height: 160, correctLevel: QRCode.CorrectLevel.M});
-    return `<div class="c"><img src="${tmp.querySelector('canvas').toDataURL()}"><div>${esc(s.grade)} ${esc(s.name)}</div></div>`;
-  }).join('');
-  tmp.remove();
-  const w = window.open('', '_blank');
-  if (!w) { toast('팝업이 차단되어 있습니다. 허용 후 다시 눌러 주세요.'); return; }
-  w.document.write(`<!DOCTYPE html><meta charset="utf-8"><title>학생 QR 카드</title><style>body{font-family:'Noto Sans KR',sans-serif}.g{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.c{border:1px dashed #999;padding:10px;text-align:center;break-inside:avoid}.c img{width:100%;max-width:140px}</style><div class="g">${cards}</div>`);
-  w.document.close(); w.focus(); setTimeout(() => w.print(), 400);
+/* ===== 학생 화면 (GitHub Pages 주소): 아이디·비밀번호 로그인 → 답안 제출(?e=코드) / 내 학습 페이지(?me=1) ===== */
+const tokGet = () => { try { return localStorage.getItem('sb_tok'); } catch(e) { return null; } };
+const tokSet = v => { try { v ? localStorage.setItem('sb_tok', v) : localStorage.removeItem('sb_tok'); } catch(e) {} };
+let sbMe = null;
+const sbR = () => $('sb-root');
+function sbTop() {
+  return `<div class="flex items-center justify-between gap-2 no-print"><span class="logo"><span class="logo-tile"><i>51</i>Sb</span>Sci-Bank</span>${sbMe ? `<span class="text-sm text-gray-600 text-right">${esc(sbMe.grade)} <b>${esc(sbMe.name)}</b><br><button id="sb-out" class="underline text-xs text-gray-400">로그아웃</button></span>` : ''}</div>`;
+}
+function sbBindTop() {
+  const b = $('sb-out');
+  if (b) b.onclick = async () => { const t = tokGet(); tokSet(null); sbMe = null; try { await sbCall('sb_logout', {t}); } catch(e) {} sbLogin(); };
+}
+function sbFail(e) {
+  if (/not logged in/.test(String(e && e.message))) { tokSet(null); sbMe = null; sbLogin('로그인이 만료되었습니다. 다시 로그인해 주세요.'); return; }
+  sbR().innerHTML = sbTop() + '<p class="text-center text-gray-500 py-10">서버 연결에 실패했습니다. 인터넷 연결을 확인하고 새로고침해 주세요.</p>'; sbBindTop();
+}
+/* 제출 확인 창: 고른 답을 한눈에 보여 주고 확인 후 제출 */
+function sbConfirm(title, note, items, okLabel) {
+  return new Promise(res => {
+    const blank = items.filter(x => !x.a).length, m = document.createElement('div');
+    m.className = 'sb-modal';
+    m.innerHTML = `<div class="sb-sheet" role="dialog" aria-modal="true"><h2 class="text-lg font-bold">${title}</h2><p class="text-sm text-gray-500 mt-1">${note}</p>
+      ${blank ? `<p class="text-sm font-bold text-red-600 mt-2">답을 고르지 않은 문항이 ${blank}개 있습니다.</p>` : ''}
+      <div class="sb-grid">${items.map(x => `<div class="${x.a ? '' : 'blank'}">${x.no}번<b>${x.a ? circ(x.a) : '—'}</b></div>`).join('')}</div>
+      <div class="flex gap-2"><button class="flex-1 sb-ghost" data-r="0">다시 확인</button><button class="flex-1 sb-primary" data-r="1">${okLabel}</button></div></div>`;
+    m.querySelectorAll('button').forEach(b => b.onclick = () => { m.remove(); res(b.dataset.r === '1'); });
+    m.onclick = e => { if (e.target === m) { m.remove(); res(false); } };
+    document.body.appendChild(m);
+  });
 }
 async function renderSbStudent() {
-  document.title = '답안 입력'; document.body.className = 'bg-gray-50 min-h-screen';
+  document.title = 'Sci-Bank 학생'; document.body.className = 'min-h-screen';
   document.body.innerHTML = '<div id="sb-root" class="max-w-md mx-auto p-4 space-y-4"></div>';
-  const R = $('sb-root'), msg = t => { R.innerHTML = `<p class="text-center text-gray-500 py-10">${t}</p>`; };
-  if (!sbOn()) { msg('서버 설정이 되어 있지 않습니다.'); return; }
-  let sid = SP.get('s');
-  try { if (sid) localStorage.setItem('sb_sid', sid); else sid = localStorage.getItem('sb_sid'); } catch(e) {}
-  if (!sid) { msg('먼저 내 개인 QR을 스캔해 주세요.'); return; }
-  let me;
-  try { me = ((await sbCall('sb_student', {sid})) || [])[0]; } catch(e) { msg('서버 연결에 실패했습니다.<br><span class="text-xs break-all">' + esc(String(e.message)).slice(0, 300) + '</span>'); return; }
-  if (!me) { msg('등록되지 않은 QR입니다. 선생님께 문의하세요.'); return; }
-  const who = `<p class="text-center text-sm text-gray-600">${esc(me.grade)} <b>${esc(me.name)}</b> <button id="sb-not" class="underline text-xs text-gray-400 ml-1">내가 아닌가요?</button></p>`;
+  if (!sbOn()) { sbR().innerHTML = '<p class="text-center text-gray-500 py-10">서버 설정이 되어 있지 않습니다.</p>'; return; }
+  sbRoute();
+}
+async function sbRoute() {
+  const t = tokGet();
+  if (!t) { sbLogin(SP.get('s') ? '이제 개인 QR 대신 아이디와 비밀번호로 로그인합니다.' : ''); return; }
+  try { sbMe = await sbCall('sb_me', {t}); } catch(e) { return sbFail(e); }
+  if (!sbMe) { tokSet(null); sbLogin('로그인이 만료되었습니다. 다시 로그인해 주세요.'); return; }
+  if (sbMe.must_change) { sbChangePw(true); return; }
   const code = (SP.get('e') || '').trim().toUpperCase();
-  const bindNot = () => { $('sb-not').onclick = () => { try { localStorage.removeItem('sb_sid'); } catch(e) {} msg('저장된 정보를 지웠습니다. 내 개인 QR을 다시 스캔하세요.'); }; };
-  if (!code) {
-    R.innerHTML = `<h1 class="text-xl font-bold text-center">📝 답안 입력</h1>${who}<input id="sb-code" type="text" placeholder="시험지 코드 6자리" class="w-full border rounded-lg p-3 bg-white uppercase"><button id="sb-ok" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg">확인</button>`;
-    bindNot(); $('sb-ok').onclick = () => { const v = $('sb-code').value.trim(); if (v) location.search = '?e=' + encodeURIComponent(v); };
-    return;
-  }
-  let info;
-  try { info = ((await sbCall('sb_exam_info', {c: code})) || [])[0]; } catch(e) { msg('서버 연결에 실패했습니다.'); return; }
-  if (!info) { msg('시험지를 찾을 수 없습니다. 코드를 확인하세요.'); return; }
-  const n = info.n, ans = Array(n).fill(0);
-  R.innerHTML = `<h1 class="text-xl font-bold text-center">📝 답안 입력</h1>${who}<p class="text-center text-sm text-gray-500">${esc(info.name)} · ${n}문항</p><div id="sb-rows" class="bg-white rounded-xl shadow p-3 space-y-1"></div><button id="sb-go" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg">제출하기</button><p id="sb-msg" class="text-center text-sm"></p>`;
-  bindNot();
-  for (let i = 0; i < n; i++) {
-    const d = document.createElement('div'); d.className = 'flex items-center gap-2';
-    d.innerHTML = `<span class="w-10 font-bold text-sm">${i+1}번</span>` + [1,2,3,4,5].map(k => `<button type="button" data-k="${k}" class="flex-1 border rounded-lg py-2 text-lg bg-white">${circ(k)}</button>`).join('');
-    d.querySelectorAll('button').forEach(bt => bt.onclick = () => {
-      ans[i] = +bt.dataset.k;
-      d.querySelectorAll('button').forEach(x => { const on = +x.dataset.k === ans[i]; x.style.background = on ? '#4f46e5' : '#fff'; x.style.color = on ? '#fff' : '#111'; });
-    });
-    $('sb-rows').appendChild(d);
-  }
-  const show = res => {
-    const kids = $('sb-rows').children, mk = res.marks || [];
-    for (let i = 0; i < n; i++) {
-      const d = kids[i], a = (res.answers || [])[i] || 0;
-      d.querySelectorAll('button').forEach(x => { x.disabled = true; const on = +x.dataset.k === a; x.style.background = on ? '#4f46e5' : '#fff'; x.style.color = on ? '#fff' : '#111'; });
-      const b = document.createElement('span');
-      b.className = 'w-8 text-center font-bold'; b.textContent = !a ? '-' : mk[i] === 1 ? 'O' : mk[i] === 0 ? 'X' : '';
-      b.style.color = mk[i] === 1 ? '#059669' : '#dc2626';
-      d.appendChild(b);
-    }
-    const ok = mk.filter(x => x === 1).length;
-    $('sb-go').style.display = 'none';
-    $('sb-msg').innerHTML = (res.already ? '이미 제출한 시험지입니다.<br>' : '✅ 제출했습니다.<br>') + (mk.some(x => x >= 0) ? `<b class="text-lg">${ok} / ${n}</b> 문항 정답` : '채점 정보가 아직 없습니다. 선생님께 문의하세요.');
+  code ? sbExam(code) : sbMyPage();
+}
+function sbLogin(note) {
+  const R = sbR(); R.className = 'max-w-sm mx-auto p-4 space-y-4';
+  R.innerHTML = sbTop() + `<form id="sb-login" class="bg-white border rounded-xl p-5 space-y-3"><h1 class="text-xl font-bold">로그인</h1>${note ? `<p class="text-sm text-gray-600">${note}</p>` : ''}
+    <input id="sb-lid" type="text" autocomplete="username" autocapitalize="off" placeholder="아이디 (예: sci홍길동)" class="w-full p-3">
+    <input id="sb-pw" type="password" autocomplete="current-password" placeholder="비밀번호" class="w-full p-3">
+    <button class="w-full sb-primary">로그인</button><p id="sb-err" class="text-sm text-red-600"></p>
+    <p class="text-xs text-gray-400">아이디나 비밀번호를 모르면 선생님께 문의하세요.</p></form>`;
+  $('sb-login').onsubmit = async e => {
+    e.preventDefault();
+    const lid = $('sb-lid').value.trim(), pw = $('sb-pw').value; if (!lid || !pw) return;
+    try {
+      const r = await sbCall('sb_login', {lid, pw});
+      if (!r) { $('sb-err').textContent = '아이디 또는 비밀번호가 맞지 않습니다.'; return; }
+      tokSet(r.token); sbRoute();
+    } catch(err) { $('sb-err').textContent = /locked/.test(err.message) ? '로그인에 여러 번 실패해 10분 동안 잠겼습니다. 잠시 뒤 다시 시도하세요.' : '서버 연결에 실패했습니다. 잠시 뒤 다시 시도하세요.'; }
   };
-  try { const prev = await sbCall('sb_result', {sid, c: code}); if (prev) show(prev); } catch(e) {}
+}
+function sbChangePw(forced) {
+  const R = sbR(); R.className = 'max-w-sm mx-auto p-4 space-y-4';
+  R.innerHTML = sbTop() + `<form id="sb-cpw" class="bg-white border rounded-xl p-5 space-y-3"><h1 class="text-xl font-bold">비밀번호 바꾸기</h1>
+    ${forced ? '<p class="text-sm text-gray-600">처음 로그인했습니다. 나만 아는 새 비밀번호로 바꿔 주세요.</p>' : ''}
+    <input id="sb-old" type="password" autocomplete="current-password" placeholder="${forced ? '임시 비밀번호' : '지금 비밀번호'}" class="w-full p-3">
+    <input id="sb-new" type="password" autocomplete="new-password" placeholder="새 비밀번호 (6자 이상)" class="w-full p-3">
+    <input id="sb-new2" type="password" autocomplete="new-password" placeholder="새 비밀번호 한 번 더" class="w-full p-3">
+    <button class="w-full sb-primary">비밀번호 바꾸기</button>${forced ? '' : '<button type="button" id="sb-cancel" class="w-full sb-ghost">취소</button>'}<p id="sb-err" class="text-sm text-red-600"></p></form>`;
+  sbBindTop();
+  if (!forced) $('sb-cancel').onclick = sbRoute;
+  $('sb-cpw').onsubmit = async e => {
+    e.preventDefault();
+    const o = $('sb-old').value, n1 = $('sb-new').value, n2 = $('sb-new2').value, err = $('sb-err');
+    if (n1.length < 6) { err.textContent = '새 비밀번호는 6자 이상이어야 합니다.'; return; }
+    if (n1 !== n2) { err.textContent = '새 비밀번호가 서로 다릅니다.'; return; }
+    if (n1 === o) { err.textContent = '지금 비밀번호와 다른 비밀번호를 입력하세요.'; return; }
+    try {
+      if (!await sbCall('sb_change_pw', {t: tokGet(), oldpw: o, newpw: n1})) { err.textContent = (forced ? '임시' : '지금') + ' 비밀번호가 맞지 않습니다.'; return; }
+      toast('비밀번호를 바꿨습니다.'); sbRoute();
+    } catch(x) { sbFail(x); }
+  };
+}
+async function sbExam(code) {
+  let st; try { st = await sbCall('sb_exam_open', {t: tokGet(), c: code}); } catch(e) { return sbFail(e); }
+  if (!st) { sbR().innerHTML = sbTop() + '<p class="text-center text-gray-500 py-10">시험지를 찾을 수 없습니다. 시험지 코드를 확인하세요.</p><a href="?me=1" class="block text-center underline text-sm">내 학습 페이지로</a>'; sbBindTop(); return; }
+  st.submitted ? sbResult(code, st) : sbAnswer(code, st);
+}
+const sbOpts = (sel) => [1,2,3,4,5].map(k => `<button type="button" data-k="${k}" class="sb-opt${sel === k ? ' on' : ''}">${circ(k)}</button>`).join('');
+function sbBindOpts(row, arr, i) {
+  row.querySelectorAll('.sb-opt').forEach(bt => bt.onclick = () => {
+    arr[i] = arr[i] === +bt.dataset.k ? 0 : +bt.dataset.k;
+    row.querySelectorAll('.sb-opt').forEach(x => x.classList.toggle('on', +x.dataset.k === arr[i]));
+  });
+}
+function sbAnswer(code, st) {
+  const R = sbR(), n = st.n, ans = Array(n).fill(0);
+  R.className = 'max-w-md mx-auto p-4 space-y-4';
+  R.innerHTML = sbTop() + `<div><h1 class="text-xl font-bold">${esc(st.name)}</h1><p class="text-sm text-gray-500">${n}문항 · 답을 모두 고른 뒤 제출하세요. 다시 누르면 선택이 지워집니다.</p></div>
+    <div id="sb-rows" class="bg-white rounded-xl border p-3 space-y-1.5">${Array.from({length: n}, (_, i) => `<div class="flex items-center gap-2" data-i="${i}"><span class="w-10 font-bold text-sm">${i+1}번</span>${sbOpts(0)}</div>`).join('')}</div>
+    <button id="sb-go" class="w-full sb-primary">제출하기</button><a href="?me=1" class="block text-center underline text-sm text-gray-500">내 학습 페이지</a>`;
+  sbBindTop();
+  [...$('sb-rows').children].forEach((row, i) => sbBindOpts(row, ans, i));
   $('sb-go').onclick = async () => {
-    const blank = ans.filter(x => !x).length;
-    if (!confirm(blank ? `답을 고르지 않은 문항이 ${blank}개 있습니다. 제출 후에는 고칠 수 없습니다. 그래도 제출할까요?` : '제출 후에는 고칠 수 없습니다. 제출할까요?')) return;
-    try { show(await sbCall('sb_submit', {sid, c: code, ans})); }
-    catch(e) { $('sb-msg').textContent = '제출에 실패했습니다. 다시 시도하세요.'; }
+    if (!await sbConfirm('답안을 제출할까요?', '처음 제출한 답으로 점수와 등수가 정해집니다. 제출 후 틀린 문제는 한 번만 다시 풀 수 있습니다.', ans.map((a, i) => ({no: i + 1, a})), '제출하기')) return;
+    try { sbResult(code, await sbCall('sb_submit2', {t: tokGet(), c: code, ans}), '✅ 제출했습니다.'); } catch(e) { sbFail(e); }
   };
+}
+/* 제출 결과: O·X를 누르면 해설, 틀린 문제는 한 번만 다시 풀기 */
+function sbResult(code, st, flash, retrying) {
+  const R = sbR(), n = st.n, mk = st.marks || [], a1 = st.answers || [], hasR = Array.isArray(st.retry), rm = st.retry_marks || [], exp = st.exp || [];
+  const graded = mk.some(x => x >= 0), s1 = mk.filter(x => x === 1).length, s2 = rm.filter(x => x === 1).length;
+  const wrong = mk.map((m, i) => m === 0 ? i : -1).filter(i => i >= 0), re = Array(n).fill(0);
+  const badge = (m, a) => `<button type="button" class="sb-mark ${m === 1 ? 'o' : m === 0 ? 'x' : ''}" title="해설 보기">${m === 1 ? 'O' : m === 0 ? 'X' : '-'}</button>`;
+  R.className = 'max-w-md mx-auto p-4 space-y-4';
+  R.innerHTML = sbTop() + `${flash ? `<p class="text-center font-bold text-emerald-700 bg-emerald-50 rounded-lg py-2">${flash}</p>` : ''}
+    <div><h1 class="text-xl font-bold">${esc(st.name)}</h1><p class="text-sm text-gray-600 mt-1">${graded ? `처음 제출 <b class="text-lg text-gray-900">${s1} / ${n}</b>${hasR ? ` → 다시 풀기 후 <b class="text-lg text-gray-900">${s2} / ${n}</b>` : ''}` : '채점 정보가 아직 없습니다. 선생님께 문의하세요.'}</p>
+    <p class="text-xs text-gray-400 mt-1">${retrying ? '틀린 문제의 답을 다시 고르세요.' : 'O·X를 누르면 해설을 볼 수 있습니다.'}</p></div>
+    <div id="sb-rows" class="bg-white rounded-xl border p-3 space-y-1">${Array.from({length: n}, (_, i) => {
+      const m = mk[i], a = a1[i] || 0, again = hasR && m === 0, ra = again ? st.retry[i] || 0 : 0;
+      const line = retrying && m === 0 ? `<span class="text-xs text-gray-400 w-8">${a ? circ(a) : '-'}</span>${sbOpts(0)}`
+        : `<span class="flex-1 text-lg">${a ? circ(a) : '<span class="text-gray-400 text-sm">답 없음</span>'}${again ? ` <span class="text-sm text-gray-500">→ 다시 푼 답 ${ra ? circ(ra) : '없음'} <b class="${rm[i] === 1 ? 'text-emerald-600' : 'text-red-500'}">${rm[i] === 1 ? 'O' : 'X'}</b></span>` : ''}</span>`;
+      return `<div data-i="${i}"><div class="flex items-center gap-2"><span class="w-10 font-bold text-sm">${i+1}번</span>${line}${badge(m, a)}</div><div class="sb-exp hidden">${exp[i] ? esc(exp[i]) : '해설이 없습니다.'}</div></div>`; }).join('')}</div>
+    <div id="sb-act" class="space-y-2"></div><a href="?me=1" class="block text-center underline text-sm text-gray-500">내 학습 페이지</a>`;
+  sbBindTop();
+  [...$('sb-rows').children].forEach((row, i) => {
+    row.querySelector('.sb-mark').onclick = () => row.querySelector('.sb-exp').classList.toggle('hidden');
+    if (retrying && mk[i] === 0) sbBindOpts(row.firstElementChild, re, i);
+  });
+  const act = $('sb-act');
+  if (retrying) {
+    act.innerHTML = '<button id="sb-re" class="w-full sb-primary">다시 제출하기</button><button id="sb-cancel" class="w-full sb-ghost">취소</button>';
+    $('sb-cancel').onclick = () => sbResult(code, st);
+    $('sb-re').onclick = async () => {
+      if (!await sbConfirm('다시 푼 답을 제출할까요?', '다시 풀기는 한 번만 할 수 있습니다. 점수와 등수는 처음 제출 기준 그대로입니다.', wrong.map(i => ({no: i + 1, a: re[i]})), '다시 제출하기')) return;
+      try { sbResult(code, await sbCall('sb_retry', {t: tokGet(), c: code, ans: a1.map((a, i) => mk[i] === 0 ? re[i] : a)}), '✅ 다시 푼 답을 제출했습니다.'); } catch(e) { sbFail(e); }
+    };
+  } else if (graded && !hasR && wrong.length) {
+    act.innerHTML = `<button id="sb-again" class="w-full sb-primary">틀린 ${wrong.length}문제 다시 풀기 (한 번만 가능)</button>`;
+    $('sb-again').onclick = () => sbResult(code, st, '', true);
+  }
+}
+/* 내 학습 페이지: 보고서 (1)~(4), 인쇄 가능 */
+async function sbMyPage() {
+  const R = sbR(); R.className = 'max-w-3xl mx-auto p-4 space-y-4';
+  let rows; try { rows = await sbCall('sb_my_report', {t: tokGet()}); } catch(e) { return sbFail(e); }
+  const items = (rows || []).map(x => ({name: x.name, at: Date.parse(x.at), answers: x.answers || [], retry: x.retry, rank: x.rank, count: x.count,
+    qs: (x.info || Array.from({length: x.n}, () => ({}))).map((q, i) => ({q: q.q || '', ch: q.ch || [], exp: q.exp || '', unit: q.unit || '', sub: q.sub || '', lv: q.lv || '', type: q.type || '', img: q.img, ans: (x.key || [])[i] || 0}))}));
+  let from = '', to = '';
+  R.innerHTML = sbTop() + `<div class="no-print bg-white border rounded-xl p-4 space-y-3">
+      <form id="sb-goex" class="flex gap-2"><input id="sb-code" type="text" placeholder="시험지 코드 6자리" autocapitalize="characters" class="flex-1 p-3 uppercase"><button class="sb-primary px-5">답안 입력</button></form>
+      <div class="flex flex-wrap items-end gap-2"><label class="text-xs text-gray-500">시작일<input type="date" id="rp-from" class="block p-2 text-sm"></label><label class="text-xs text-gray-500">종료일<input type="date" id="rp-to" class="block p-2 text-sm"></label>
+      <div class="ml-auto flex gap-2"><button id="sb-cpw" class="sb-ghost px-4 text-sm">비밀번호 바꾸기</button><button onclick="window.print()" class="sb-primary px-4 text-sm">🖨 인쇄</button></div></div></div>
+    <div id="rp-box" class="bg-white border rounded-xl p-5"></div>`;
+  sbBindTop();
+  $('sb-goex').onsubmit = e => { e.preventDefault(); const v = $('sb-code').value.trim(); if (v) location.search = '?e=' + encodeURIComponent(v.toUpperCase()); };
+  $('sb-cpw').onclick = () => sbChangePw(false);
+  const draw = () => { from = $('rp-from').value; to = $('rp-to').value; $('rp-box').innerHTML = buildReport(items, {who: `${sbMe.grade} ${sbMe.name}`, from, to}); };
+  $('rp-from').onchange = draw; $('rp-to').onchange = draw; draw();
 }
 
 /* ===== 출제 문제 목록 ===== */
@@ -1417,7 +1678,7 @@ setInterval(syncSB, 30000);
 updateCurriculum();
 $('question-list').addEventListener('input', saveDraft);
 $('exam-name').addEventListener('input', saveDraft);
-if (SP.get('e') || SP.get('s')) renderSbStudent();
+if (SP.get('e') || SP.get('s') || SP.has('me')) renderSbStudent();
 else Promise.all([dbReady, pastReady, stuReady, idbGet(DK).catch(() => null)]).then(([, , , d]) => {
   if (d && Array.isArray(d.questions) && d.questions.length && !currentQuestions.length) {
     currentQuestions = d.questions; curExamId = d.examId || null; pvExtra = d.pvExtra || [];
