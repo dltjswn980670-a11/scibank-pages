@@ -1115,10 +1115,20 @@ function saveExamRecord() {
   let e = stuDB.exams.find(x => x.id === curExamId);
   if (!e) { e = {id: curExamId, at: Date.now()}; stuDB.exams.push(e); }
   e.name = examName(); e.questions = JSON.parse(JSON.stringify(currentQuestions)); stuSave();
-  if (sbOn() && stuDB.pin) {
-    const a = {p: stuDB.pin, c: exCode(curExamId), nm: examName(), cnt: currentQuestions.length, k: currentQuestions.map(q => numAns(q.answer))};
-    sbCall('sb_upsert_exam', {...a, info: qInfo(currentQuestions)}).catch(() => sbCall('sb_upsert_exam', a)).catch(() => {});
-  }
+  if (sbOn() && stuDB.pin) sbPushExam(e).catch(() => {});
+}
+/* 시험지(정답·문항 정보)를 서버에 올리기. 성공하면 infoSent 표시 */
+async function sbPushExam(e) {
+  const a = {p: stuDB.pin, c: exCode(e.id), nm: e.name, cnt: e.questions.length, k: e.questions.map(q => numAns(q.answer))};
+  try { await sbCall('sb_upsert_exam', {...a, info: qInfo(e.questions)}); e.infoSent = true; }
+  catch(x) { await sbCall('sb_upsert_exam', a); }
+}
+/* 문항 정보 기능 이전에 만든 시험지도 한 번씩 서버에 다시 올림 (학생 화면 해설·단원용) */
+async function sbPushOldExams() {
+  let n = 0;
+  for (const e of stuDB.exams) if (!e.infoSent) { try { await sbPushExam(e); if (e.infoSent) n++; } catch(x) {} }
+  if (n) stuSave();
+  return n;
 }
 function stuGo(...v) { stuView = v; renderStu(); bkRefresh(); }
 function renderStu() {
@@ -1315,11 +1325,17 @@ function buildReport(all, o) {
     return `<div class="rp-agg"><div class="rp-agg-t">${title}</div>${rows.map(([k, v]) => `<div class="rp-bar"><span class="tl">${esc(k)}</span><span class="rp-track"><i style="width:${v.w / v.t * 100}%"></i></span><span class="rp-n">${v.w}/${v.t}</span></div>`).join('')}</div>`; };
   h += `<h3 class="rp-h">틀린 유형</h3><p class="rp-note">막대는 분류마다 틀린 비율입니다. 오른쪽 숫자는 틀린 문항/전체 문항이며, 처음 제출한 답 기준입니다.</p><div class="rp-aggs">${agg('대단원', 'unit')}${agg('중단원', 'sub')}${agg('난이도', 'lv')}${agg('문항 유형', 'type')}</div>`;
   // (3) 개념 정리: 틀린 문제를 중단원별로 모아 해설과 정리 칸
-  const g = {}; rec.filter(r => !r.ok).forEach(r => { const k = r.sub ? `${r.unit} › ${r.sub}` : (r.unit || '단원 미분류'); (g[k] = g[k] || []).push(r); });
+  const noInfo = w => !w.q && !w.unit;
+  const card = (w, src) => `<div class="rp-q"><div class="rp-q-src">${src}</div>
+      ${noInfo(w) ? '' : `<div class="rp-q-t">${esc(w.q) || '(문제 내용 없음)'}${w.img ? ' <span class="rp-q-src">(그림은 시험지를 참고하세요)</span>' : ''}</div>${(w.ch || []).length ? `<div class="rp-q-ch">${w.ch.map(c => `<span>${esc(c)}</span>`).join('')}</div>` : ''}`}
+      <div class="rp-q-exp"><b>해설</b> ${esc(w.exp) || (noInfo(w) ? '이 시험지는 아직 문제·해설이 올라오지 않았습니다.' : '해설이 없습니다.')}</div></div>`;
+  const g = {}; rec.filter(r => !r.ok).forEach(r => { const k = noInfo(r) ? '문제 정보가 아직 없는 시험지' : r.sub ? `${r.unit} › ${r.sub}` : (r.unit || '단원 미분류'); (g[k] = g[k] || []).push(r); });
   h += `<div class="rp-break"></div><h3 class="rp-h">틀린 문제 개념 정리</h3>` + (Object.keys(g).length ? Object.entries(g).map(([k, ws]) =>
-    `<div class="rp-grp"><div class="rp-grp-h">${esc(k)}<span>${ws.length}문항</span></div>${ws.map(w => `<div class="rp-q"><div class="rp-q-src">${esc(w.exam)} ${w.no}번 · 내 답 ${w.my ? circ(w.my) : '없음'} · 정답 ${circ(w.ans)}</div>
-      <div class="rp-q-t">${esc(w.q) || '(문제 내용 없음)'}${w.img ? ' <span class="rp-q-src">(그림은 시험지를 참고하세요)</span>' : ''}</div>${(w.ch || []).length ? `<div class="rp-q-ch">${w.ch.map(c => `<span>${esc(c)}</span>`).join('')}</div>` : ''}
-      <div class="rp-q-exp"><b>해설</b> ${esc(w.exp) || '해설이 없습니다.'}</div></div>`).join('')}<div class="rp-memo">나의 정리</div></div>`).join('') : '<p class="rp-empty">틀린 문제가 없습니다.</p>');
+    `<div class="rp-grp"><div class="rp-grp-h">${esc(k)}<span>${ws.length}문항</span></div>${ws.map(w => card(w, `${esc(w.exam)} ${w.no}번 · 내 답 ${w.my ? circ(w.my) : '없음'} · 정답 ${circ(w.ans)}`)).join('')}<div class="rp-memo">나의 정리</div></div>`).join('') : '<p class="rp-empty">틀린 문제가 없습니다.</p>');
+  // 전체 문제 해설: 맞은 문제·틀린 문제 모두 (학생 보고서)
+  if (o.allExp) h += `<div class="rp-break"></div><h3 class="rp-h">전체 문제 해설</h3>` + items.map(x =>
+    `<div class="rp-grp"><div class="rp-grp-h">${esc(x.name)}<span>${d(x.at)}</span></div>${x.qs.map((q, i) => { const a = x.answers[i] || 0, ok = q.ans && a === q.ans;
+      return card(q, `${i+1}번 · <b class="${ok ? 'ok' : 'no'}">${ok ? 'O' : 'X'}</b> · 내 답 ${a ? circ(a) : '없음'} · 정답 ${circ(q.ans) || '-'}${q.sub || q.unit ? ` · ${esc(q.sub || q.unit)}` : ''}`); }).join('')}</div>`).join('');
   return h + '</div>';
 }
 
@@ -1421,6 +1437,8 @@ async function syncSB() {
       });
     } catch(e) {}
     if (n) { stuSave(); if (['detail', 'list'].includes(stuView[0]) && !$('tab-stu').classList.contains('hidden')) renderStu(); }
+    const up = await sbPushOldExams();
+    if (up) toast(`예전 시험지 ${up}개의 해설·단원 정보를 서버에 올렸습니다. 이제 학생 화면에서도 보입니다.`);
     if (st) st.textContent = `☁ 연결됨 · ${new Date().toLocaleTimeString('ko-KR')} 확인` + (n ? ` · 새 답 ${n}건 반영` : '');
   } catch(e) { if (st) st.textContent = '☁ 연결 실패: PIN·서버 설정·인터넷을 확인하세요.'; }
 }
@@ -1582,7 +1600,7 @@ async function sbMyPage() {
   sbBindTop();
   $('sb-goex').onsubmit = e => { e.preventDefault(); const v = $('sb-code').value.trim(); if (v) location.search = '?e=' + encodeURIComponent(v.toUpperCase()); };
   $('sb-cpw').onclick = () => sbChangePw(false);
-  const draw = () => { from = $('rp-from').value; to = $('rp-to').value; $('rp-box').innerHTML = buildReport(items, {who: `${sbMe.grade} ${sbMe.name}`, from, to}); };
+  const draw = () => { from = $('rp-from').value; to = $('rp-to').value; $('rp-box').innerHTML = buildReport(items, {who: `${sbMe.grade} ${sbMe.name}`, from, to, allExp: true}); };
   $('rp-from').onchange = draw; $('rp-to').onchange = draw; draw();
 }
 
