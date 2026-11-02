@@ -4,82 +4,140 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>2022 개정 과학 스마트 문제은행</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <script src="https://cdn.tailwindcss.com/3.4.17"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
-body{font-family:'Noto Sans KR',sans-serif}
-:root{--ink:#1e2340;--line:#e3e7f3;--brand:#4f46e5;--brand2:#7c3aed}
-body{background:radial-gradient(1200px 500px at 50% -120px,#e5e7ff 0%,transparent 70%),#f5f6fb!important;color:var(--ink)}
-header{background:linear-gradient(135deg,#3730a3,#6d28d9)!important;box-shadow:0 6px 24px rgba(79,70,229,.25)!important;position:sticky;top:0;z-index:20}
-header h1{letter-spacing:-.02em;font-weight:700}
-header .space-x-2{background:rgba(255,255,255,.14);padding:4px;border-radius:999px;display:flex;gap:2px}
-header .space-x-2>*{margin:0!important}
-header button{border-radius:999px!important;background:transparent!important;color:#e0e0ff!important;padding:8px 16px!important}
-header button:hover{background:rgba(255,255,255,.12)!important}
-header button.bg-indigo-700{background:#fff!important;color:#4338ca!important;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.15)}
-#tab-selector,#tab-diff{border-radius:20px!important;border:1px solid var(--line);box-shadow:0 10px 30px rgba(40,50,120,.08)!important;padding:32px!important}
-#tab-selector label.block{color:#4a5075!important;font-size:.8rem;letter-spacing:.02em}
-select,input[type=number],input[type=text],textarea{border:1.5px solid #dfe3f1!important;border-radius:12px!important;background:#fbfcff;transition:.15s}
-select:focus,input[type=number]:focus,input[type=text]:focus,textarea:focus{outline:none;border-color:var(--brand)!important;box-shadow:0 0 0 4px rgba(79,70,229,.12)!important;background:#fff}
-button[type=submit]{background:linear-gradient(135deg,var(--brand),var(--brand2))!important;border-radius:14px!important;padding:14px!important;box-shadow:0 8px 20px rgba(79,70,229,.3)!important;transition:.15s}
-button[type=submit]:hover{transform:translateY(-1px);box-shadow:0 12px 26px rgba(79,70,229,.38)!important}
-#tab-selector .flex.flex-wrap{background:#f6f7fd;border:1px solid var(--line);padding:10px;border-radius:14px}
-#tab-selector .flex.flex-wrap>label,#tab-selector .flex.flex-wrap>button{border-radius:10px!important}
-#db-stats{background:#fff;border:1px solid var(--line);padding:4px 10px;border-radius:999px;font-weight:500}
-#tab-editor>div:first-child{border-radius:16px!important;border:1px solid var(--line);position:sticky;top:76px;z-index:10;box-shadow:0 8px 24px rgba(40,50,120,.1)!important}
-#tab-editor button{border-radius:10px!important}
-#question-list>div{border-radius:16px!important;border:1px solid var(--line)!important;border-left:5px solid var(--brand)!important;box-shadow:0 4px 16px rgba(40,50,120,.06)!important}
-#question-list>div:hover{box-shadow:0 8px 24px rgba(40,50,120,.12)!important}
-#question-list img{border-radius:10px;background:#fff}
-footer{background:transparent!important;border:0!important;color:#8a90b0!important}
-@media(max-width:640px){header .max-w-7xl{flex-direction:column;gap:10px}#tab-editor>div:first-child{top:120px}}
-#main-tabs button{padding:14px 8px;border-radius:14px;font-weight:700;background:#fff!important;color:#4338ca;border:1.5px solid var(--line);box-shadow:0 4px 14px rgba(40,50,120,.08)}
-#main-tabs button:hover{border-color:var(--brand)}
-#main-tabs button.bg-indigo-700{background:linear-gradient(135deg,#4f46e5,#7c3aed)!important;color:#fff;border-color:transparent;box-shadow:0 8px 20px rgba(79,70,229,.3)}
-header #main-tabs{display:flex;gap:6px;margin:0;max-width:none;background:rgba(255,255,255,.14);padding:4px;border-radius:999px}
-header #main-tabs button{background:transparent!important;color:#e0e0ff;border:0;box-shadow:none;padding:8px 16px;border-radius:999px;white-space:nowrap}
-header #main-tabs button:hover{background:rgba(255,255,255,.2)!important}
-header #main-tabs button.bg-indigo-700,header #main-tabs button.bg-indigo-700:hover{background:#fff!important;color:#4338ca;box-shadow:0 2px 8px rgba(0,0,0,.15)}
-#hero{min-height:calc(100vh - 100px);display:flex;flex-direction:column;justify-content:center;align-items:center;padding-top:0;padding-bottom:40px}
-#hero #main-tabs{width:100%}
+/* ===== 디자인 토큰: 차분한 바탕 + 탭마다 고유 색 (주기율표 원소 타일 모티프) ===== */
+:root{--bg:#F2F4F7;--surface:#fff;--ink:#16202E;--muted:#5E6878;--line:#DDE2E9;--soft:#EEF1F5;
+  --c-make:#2F6FEB;--c-make-s:#EAF1FE;--c-ex:#0E9F8E;--c-ex-s:#E3F6F3;--c-past:#D98200;--c-past-s:#FDF3E1;
+  --c-var:#DE3F76;--c-var-s:#FDEBF1;--c-stu:#7655DD;--c-stu-s:#F1ECFD;
+  --accent:#2F6FEB;--accent-s:#EAF1FE;--brand:var(--accent)}
+body[data-tab=ex]{--accent:var(--c-ex);--accent-s:var(--c-ex-s)}
+body[data-tab=past]{--accent:var(--c-past);--accent-s:var(--c-past-s)}
+body[data-tab=var]{--accent:var(--c-var);--accent-s:var(--c-var-s)}
+body[data-tab=stu]{--accent:var(--c-stu);--accent-s:var(--c-stu-s)}
+body{font-family:'Pretendard Variable',Pretendard,-apple-system,'Malgun Gothic',sans-serif;background:var(--bg)!important;color:var(--ink);letter-spacing:-.01em;-webkit-font-smoothing:antialiased}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* 로고: Sb(안티모니, 원자번호 51) 원소 타일 */
+.logo{display:inline-flex;align-items:center;gap:10px;font-weight:800;letter-spacing:-.03em}
+.logo-tile{position:relative;display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border:2px solid var(--ink);border-radius:6px;font-size:17px;font-weight:800;line-height:1}
+.logo-tile i{position:absolute;top:2px;left:4px;font-style:normal;font-size:8px;font-weight:600}
+
+/* 헤더: 흰 바탕 + 원소 칩 탭 */
+header{background:rgba(255,255,255,.92)!important;backdrop-filter:blur(8px);color:var(--ink)!important;border-bottom:1px solid var(--line);box-shadow:none!important;position:sticky;top:0;z-index:20}
+header .max-w-7xl{padding-top:10px!important;padding-bottom:10px!important;gap:16px}
+header h1{font-size:1.05rem!important}
+header #main-tabs{display:flex;gap:4px;margin:0;max-width:100%;overflow-x:auto;scrollbar-width:none}
+header #main-tabs::-webkit-scrollbar{display:none}
+header #main-tabs button{display:flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;border-radius:10px;font-weight:600;color:var(--muted);white-space:nowrap;position:relative}
+header #main-tabs button:hover{background:var(--soft);color:var(--ink)}
+header #main-tabs button{font-size:.9rem}
+header #main-tabs button.bg-indigo-700{background:var(--cs)!important;color:var(--ink);font-weight:700;box-shadow:inset 0 -2px 0 var(--c)}
+header .tab-desc{display:none}
+.tab-sym{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:6px;background:var(--cs);color:var(--c);font-weight:800;font-size:13px;flex:none}
+header #main-tabs button.bg-indigo-700 .tab-sym{background:var(--c);color:#fff}
+
+/* 처음 화면: 큰 원소 타일 */
+#hero{min-height:calc(100vh - 90px);display:flex;flex-direction:column;justify-content:center;padding-bottom:48px;text-align:left!important}
+.hero-head{max-width:56rem;width:100%;margin:0 auto}
+.hero-head .logo{font-size:15px}
+.hero-title{font-size:clamp(1.9rem,4.5vw,2.8rem);font-weight:800;letter-spacing:-.04em;line-height:1.15;margin-top:28px}
+.hero-sub{color:var(--muted);margin-top:8px;font-size:1rem}
+#hero #main-tabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;max-width:56rem;width:100%;margin:36px auto 0}
+#hero #main-tabs button{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:6px;min-height:168px;padding:16px;background:var(--surface);border:1px solid var(--line);border-radius:12px;transition:border-color .15s,transform .15s}
+#hero #main-tabs button:hover{border-color:var(--c);transform:translateY(-2px)}
+#hero .tab-sym{width:52px;height:52px;font-size:24px;border-radius:8px;margin-bottom:auto}
+#hero .tab-name{font-size:1rem;font-weight:700;color:var(--ink);margin-top:14px}
+#hero .tab-desc{font-size:.8rem;line-height:1.45;color:var(--muted);word-break:keep-all}
+@media(max-width:768px){#hero #main-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}#hero #main-tabs button{min-height:140px}#hero #main-tabs button:last-child{grid-column:span 2}}
+
+/* 패널·입력 */
+main section>.bg-white,#tab-selector,#tab-diff,#tab-ex,#tab-stu,#pv-controls,#past-controls,#tab-editor>div:first-child{border:1px solid var(--line);box-shadow:none!important;border-radius:14px!important}
+#tab-selector,#tab-diff{padding:28px!important}
+main h2{letter-spacing:-.03em}
+.text-indigo-600,.text-indigo-700,.text-indigo-800{color:var(--accent)!important}
+.bg-indigo-50{background:var(--accent-s)!important}.border-indigo-100,.border-indigo-200{border-color:var(--line)!important}
+.accent-indigo-600{accent-color:var(--accent)}
+.hover\:bg-indigo-50:hover{background:var(--accent-s)!important}
+select,input[type=number],input[type=text],textarea{border:1px solid var(--line)!important;border-radius:8px!important;background:#fff;transition:border-color .15s,box-shadow .15s}
+select:focus,input[type=number]:focus,input[type=text]:focus,textarea:focus{outline:none;border-color:var(--accent)!important;box-shadow:0 0 0 3px var(--accent-s)!important}
+#unit-list label.border{border-color:var(--line);border-radius:8px}
+#db-stats{background:var(--soft);padding:4px 10px;border-radius:999px;font-weight:600;color:var(--muted)}
+
+/* 버튼: 주 동작(탭 색) · 보조(흰 바탕+테두리) · 뒤로(회색) · 위험 */
+main .bg-indigo-600,main .bg-blue-600,button[type=submit],#tab-diff .flex-1.bg-indigo-600{background:var(--accent)!important;color:#fff!important;border:1px solid transparent;box-shadow:none!important;border-radius:8px!important}
+main .bg-indigo-600:hover,main .bg-blue-600:hover,button[type=submit]:hover{filter:brightness(.92)}
+button[type=submit]{padding:13px!important}
+main .bg-emerald-600,main .bg-gray-700,main .bg-gray-600,main label.bg-white,main button.bg-white.border{background:#fff!important;color:var(--ink)!important;border:1px solid var(--line)!important;box-shadow:none!important;border-radius:8px!important}
+main .bg-emerald-600:hover,main .bg-gray-700:hover,main .bg-gray-600:hover,main label.bg-white:hover,main button.bg-white.border:hover{border-color:var(--accent)!important;color:var(--accent)!important}
+main .bg-gray-200,.stu-back{background:var(--soft)!important;color:var(--ink)!important;border-radius:8px!important}
+main .bg-gray-200:hover,.stu-back:hover{background:#E3E7ED!important}
+main .bg-red-100{background:#fff!important;color:#C62F2F!important;border:1px solid #F3CACA}
+#tab-editor button{border-radius:8px!important}
+#tab-editor>div:first-child{position:sticky;top:64px;z-index:10}
+#question-list>div{border-radius:12px!important;border:1px solid var(--line)!important;box-shadow:none!important;position:relative}
+#question-list>div::before{content:'';position:absolute;left:-1px;top:16px;bottom:16px;width:3px;border-radius:0 3px 3px 0;background:var(--accent)}
+#question-list img{border-radius:8px;background:#fff}
+footer{background:transparent!important;border:0!important;color:#9AA3B0!important;font-size:.75rem!important}
+@media(max-width:640px){header .max-w-7xl{flex-direction:column;align-items:stretch!important;gap:8px}#tab-editor>div:first-child{position:static}#tab-selector,#tab-diff{padding:18px!important}}
 .pv-cols{column-count:2;column-gap:36px;column-rule:1px solid #000}.pv-cols .pq{break-inside:avoid}
 .pv-h1{border:1px solid #000;margin-bottom:16px}.pv-h1a{text-align:center;padding:14px 0}.pv-h1b{display:flex;justify-content:space-between;border-top:1px dotted #000;padding:4px 28px;font-size:.75rem}
 .pv-h2{display:flex;border:1px solid #000;font-size:.85rem;margin-bottom:10px}.pv-h2a{flex:1;text-align:center;padding:8px;border-right:1px solid #000}.pv-h2b{width:30px;text-align:center;font-size:.7rem;border-right:1px solid #000;display:flex;align-items:center;justify-content:center}.pv-h2c{display:grid;grid-template-columns:repeat(4,1fr);width:240px;text-align:center;font-size:.75rem}.pv-h2c span{border-left:1px solid #000;padding:4px}.pv-h2c span:first-child{border-left:0}
 .pv-box{border:1px solid #000;display:inline-block;font-size:.75rem;padding:6px 10px;margin-bottom:12px}
 .pv-h3{margin-bottom:14px}.pv-h3a{text-align:center;font-weight:700;font-size:1.05rem}.pv-h3b{text-align:center;font-size:1.9rem;margin:6px 0 10px}.pv-h3c{display:flex;gap:10px;font-size:.8rem;border-bottom:1px solid #000;padding-bottom:12px}.pv-h3c span{border:1px solid #000;padding:3px 10px;flex:1}
 .pvgap{outline:none;cursor:text;position:relative;min-height:14px;border-radius:6px}
-.pvgap:hover{background:#f5f7ff}
-.pvgap:focus{background:#eef2ff;box-shadow:inset 3px 0 0 #6366f1}
-.pvgap:focus::after{content:'↵ Enter: 줄 추가 · Backspace: 줄 삭제';position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:11px;color:#6366f1}
-.stu-btn{padding:16px 8px;border:1.5px solid var(--line);border-radius:14px;background:#fff;font-weight:700;color:#4338ca;transition:.15s;word-break:keep-all}
-.stu-btn:hover{border-color:var(--brand);background:#eef2ff}
-.stu-back{background:#e5e7eb;padding:8px 12px;border-radius:10px;font-size:.85rem;font-weight:600}
+.pvgap:hover{background:var(--soft)}
+.pvgap:focus{background:var(--accent-s);box-shadow:inset 3px 0 0 var(--accent)}
+.pvgap:focus::after{content:'↵ Enter: 줄 추가 · Backspace: 줄 삭제';position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--accent)}
+.stu-btn{padding:16px 8px;border:1px solid var(--line);border-radius:10px;background:#fff;font-weight:700;color:var(--ink);transition:border-color .15s;word-break:keep-all}
+.stu-btn:hover{border-color:var(--accent);color:var(--accent)}
+.stu-back{padding:8px 12px;font-size:.85rem;font-weight:600}
 .stu-tbl{width:100%;font-size:.85rem;text-align:center;border-collapse:collapse}
-.stu-tbl th,.stu-tbl td{border-bottom:1px solid var(--line);padding:6px 4px}
-.stu-tbl th{background:#f6f7fd}
+.stu-tbl th,.stu-tbl td{border-bottom:1px solid var(--line);padding:7px 4px}
+.stu-tbl th{background:var(--soft);font-weight:600;color:var(--muted)}
+.ans-row{outline:none;cursor:pointer}.ans-row:focus{background:var(--accent-s);box-shadow:inset 3px 0 0 var(--accent)}
+.step{background:#fff;color:var(--muted);border:1px solid var(--line)}.step:disabled{opacity:.45;cursor:default}.step:not(:disabled):hover{border-color:var(--accent)}
+.step.step-done{color:var(--accent);background:var(--accent-s);border-color:transparent}.step.step-on{background:var(--accent);color:#fff;border-color:transparent}
+@media print{#steps,#bk-banner{display:none!important}}
+.toast{transition:opacity .2s;animation:tin .2s}@keyframes tin{from{opacity:0;transform:translateY(8px)}}
+@media print{#toast-box{display:none!important}}
+.ans-btn{background:#fff;color:var(--ink);border-color:var(--line)}.ans-btn:hover{background:var(--accent-s)}#tab-editor .ans-btn.ans-on{background:var(--accent);color:#fff;border-color:var(--accent)}
+input.dn-over[type=number]{border-color:#ef4444!important;background:#fef2f2!important}
 @media print{#hero,header,footer,#tab-selector,#tab-editor,#past-controls{display:none!important}body{background:#fff!important}main{padding:0!important;max-width:none!important}#print-area{box-shadow:none!important;border-radius:0!important;padding:0!important;max-width:none!important}.pq{break-inside:avoid}#pv-controls{display:none!important}.pvgap{background:none!important;box-shadow:none!important;min-height:0!important}.pvgap::after{display:none!important}#pv-paper{box-shadow:none!important;border-radius:0!important;padding:0!important;max-width:none!important}}
 </style>
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
 <header class="hidden bg-indigo-600 text-white shadow-md">
   <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-    <h1 class="text-xl font-bold">Sci-Bank</h1>
+    <h1 class="logo cursor-pointer" onclick="goHome()" title="처음 화면으로"><span class="logo-tile"><i>51</i>Sb</span>Sci-Bank</h1>
   </div>
 </header>
 
-<div id="hero" class="max-w-7xl w-full mx-auto px-4 pt-8 text-center">
-  <p class="text-2xl sm:text-3xl font-bold">Sci-Bank</p>
-  <div id="main-tabs" class="mt-6 grid grid-cols-2 sm:grid-cols-5 gap-3 max-w-4xl mx-auto">
-    <button onclick="switchTab('selector')" id="btn-make" class="transition text-sm">단원별 문제</button>
-    <button onclick="switchTab('ex')" id="btn-ex" class="transition text-sm">출제 문제</button>
-    <button onclick="switchTab('past')" id="btn-past" class="transition text-sm">기출 문제</button>
-    <button onclick="switchTab('var')" id="btn-var" class="transition text-sm">기출 변형 문제</button>
-    <button onclick="switchTab('stu')" id="btn-stu" class="transition text-sm">학생</button>
+<div id="hero" class="max-w-7xl w-full mx-auto px-4 pt-8">
+  <div class="hero-head">
+    <span class="logo"><span class="logo-tile"><i>51</i>Sb</span>Sci-Bank</span>
+    <p class="hero-title">과학 문제은행</p>
+    <p class="hero-sub">2022 개정 교육과정 중1부터 고3까지, 시험지 만들기부터 채점까지 한곳에서.</p>
+  </div>
+  <div id="main-tabs">
+    <button onclick="switchTab('selector')" id="btn-make" style="--c:var(--c-make);--cs:var(--c-make-s)"><span class="tab-sym">단</span><span class="tab-name">단원별 문제</span><span class="tab-desc">단원과 난이도를 골라 새 시험지를 만듭니다</span></button>
+    <button onclick="switchTab('ex')" id="btn-ex" style="--c:var(--c-ex);--cs:var(--c-ex-s)"><span class="tab-sym">출</span><span class="tab-name">출제 문제</span><span class="tab-desc">만든 시험지를 다시 열고 제출 현황을 봅니다</span></button>
+    <button onclick="switchTab('past')" id="btn-past" style="--c:var(--c-past);--cs:var(--c-past-s)"><span class="tab-sym">기</span><span class="tab-name">기출 문제</span><span class="tab-desc">학교별 기출 시험지를 보고 인쇄합니다</span></button>
+    <button onclick="switchTab('var')" id="btn-var" style="--c:var(--c-var);--cs:var(--c-var-s)"><span class="tab-sym">변</span><span class="tab-name">기출 변형 문제</span><span class="tab-desc">기출 시험지의 변형 세트를 봅니다</span></button>
+    <button onclick="switchTab('stu')" id="btn-stu" style="--c:var(--c-stu);--cs:var(--c-stu-s)"><span class="tab-sym">학</span><span class="tab-name">학생</span><span class="tab-desc">학생 명단, 답 입력, 정오표를 관리합니다</span></button>
   </div>
 </div>
 
 <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
+  <nav id="steps" class="hidden max-w-4xl mx-auto flex flex-wrap items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm"></nav>
+  <div id="bk-banner" class="hidden max-w-4xl mx-auto flex flex-wrap items-center gap-2 bg-amber-50 border border-amber-300 text-amber-900 rounded-xl px-4 py-3 text-sm">
+    <span class="flex-1 min-w-[12rem]"></span>
+    <button type="button" onclick="exportBackup()" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-2 rounded-lg text-xs font-bold">⬇ 지금 백업</button>
+    <button type="button" onclick="bkSnooze()" class="text-xs text-amber-700 underline">하루 동안 숨기기</button>
+  </div>
   <section id="tab-selector" class="hidden bg-white rounded-xl shadow-md p-6 max-w-3xl mx-auto space-y-6">
     <div class="border-b pb-3 space-y-3">
       <div>
@@ -95,6 +153,12 @@ header #main-tabs button.bg-indigo-700,header #main-tabs button.bg-indigo-700:ho
       </div>
     </div>
 
+    <div id="draft-resume" class="hidden flex flex-wrap items-center gap-2 bg-indigo-50 border border-indigo-200 rounded-xl px-4 py-3 text-sm">
+      <span class="flex-1 font-medium text-indigo-800"></span>
+      <button type="button" onclick="switchTab('preview')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-bold">👁 이어서 보기</button>
+      <button type="button" onclick="switchTab('editor')" class="bg-white hover:bg-gray-100 border px-3 py-2 rounded-lg text-xs font-bold">✏ 편집</button>
+    </div>
+
     <form id="filter-form" onsubmit="goDifficulty(event)" class="space-y-4">
       <div>
         <label class="block text-sm font-semibold text-gray-700 mb-1">학년 / 과목 구획</label>
@@ -108,7 +172,10 @@ header #main-tabs button.bg-indigo-700,header #main-tabs button.bg-indigo-700:ho
         </select>
       </div>
       <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-1">2022 개정 교과 단원 · 문항 수 <span class="font-normal text-gray-400">(단원을 체크하고 문항 수를 입력하세요)</span></label>
+        <div class="flex items-end justify-between gap-2 mb-1 flex-wrap">
+          <label class="block text-sm font-semibold text-gray-700">2022 개정 교과 단원 <span class="font-normal text-gray-400">(단원을 체크하세요 · 문항 수는 다음 단계에서 입력)</span></label>
+          <div class="flex gap-1"><button type="button" onclick="selectAllUnits(true)" class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-2 py-1 rounded font-semibold">전체 선택</button><button type="button" onclick="selectAllUnits(false)" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-2 py-1 rounded font-semibold">선택 해제</button></div>
+        </div>
         <div id="unit-list" class="space-y-2 max-h-96 overflow-y-auto pr-1"></div>
         <p id="unit-total" class="text-right text-sm font-bold text-indigo-600 mt-2"></p>
       </div>
@@ -156,6 +223,7 @@ header #main-tabs button.bg-indigo-700,header #main-tabs button.bg-indigo-700:ho
     <div id="pv-controls" class="bg-white rounded-xl shadow-md p-4 max-w-4xl mx-auto flex flex-wrap items-center gap-4">
       <button onclick="switchTab('diff')" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-2 rounded-lg font-medium text-sm">← 난이도 다시 선택</button>
       <button onclick="switchTab('editor')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg font-medium text-sm">✏ 문항 편집</button>
+      <label class="text-sm flex items-center gap-2 flex-1 min-w-[14rem]">시험지 이름 <input type="text" id="pv-name" oninput="$('exam-name').value=this.value;renderPreview()" class="flex-1 border rounded-lg p-2 text-sm"></label>
       <label class="text-sm flex items-center gap-2">문제 간격 <input type="range" id="pv-gap" min="0" max="200" step="4" value="40" oninput="renderPreview()"><span id="pv-gap-v" class="w-12 text-xs text-gray-500"></span></label>
       <span class="text-xs text-gray-400 w-full order-last">💡 문제 사이 빈 줄을 클릭하고 Enter: 빈 줄 추가 · Backspace: 빈 줄 삭제</span>
       <div class="flex items-center gap-3 text-sm"><span class="font-semibold text-gray-600">시험지 틀</span>
@@ -526,17 +594,28 @@ let masterDB = SEED.slice();
 const idb = () => new Promise((res, rej) => { const r = indexedDB.open('sciBank', 1); r.onupgradeneeded = () => r.result.createObjectStore('kv'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
 const idbGet = async k => { const d = await idb(); return new Promise((res, rej) => { const t = d.transaction('kv').objectStore('kv').get(k); t.onsuccess = () => res(t.result); t.onerror = () => rej(t.error); }); };
 const idbSet = async (k, v) => { const d = await idb(); return new Promise((res, rej) => { const t = d.transaction('kv', 'readwrite'); t.objectStore('kv').put(v, k); t.oncomplete = () => res(); t.onerror = () => rej(t.error); }); };
-(async () => { try { let a = await idbGet(LS);
+const dbReady = (async () => { try { let a = await idbGet(LS);
   if (!Array.isArray(a)) { const s = localStorage.getItem(LS); a = s ? JSON.parse(s) : null; }
   if (Array.isArray(a)) masterDB = a; } catch(e) {} updateStats(); })();
 let currentQuestions = [];
 
 const $ = id => document.getElementById(id);
+/* 알림: 확인 버튼 없이 잠시 뒤 사라짐(클릭하면 바로 닫힘). 실패·부족 안내는 빨간색 */
+function toast(msg) {
+  let box = $('toast-box');
+  if (!box) { box = document.createElement('div'); box.id = 'toast-box'; box.className = 'fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2 w-[min(92vw,32rem)]'; document.body.appendChild(box); }
+  const t = document.createElement('div'), bad = /실패|오류|없습니다|부족|먼저|차단|아닙니다|선택하세요/.test(msg);
+  t.className = `toast w-full rounded-xl px-4 py-3 text-sm text-white shadow-lg whitespace-pre-line cursor-pointer ${bad ? 'bg-red-600' : 'bg-gray-800'}`;
+  t.textContent = msg; t.title = '클릭하면 닫힙니다';
+  const close = () => { t.style.opacity = '0'; setTimeout(() => t.remove(), 200); };
+  t.onclick = close; box.appendChild(t);
+  setTimeout(close, Math.min(10000, 2500 + String(msg).length * 50));
+}
 const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const keyOf = q => q.grade + '|' + q.unit + '|' + q.question.trim();
 const valid = q => q && typeof q.grade==='string' && typeof q.unit==='string' && typeof q.question==='string' && Array.isArray(q.choices) && q.choices.length>0 && q.answer!=null;
 
-function saveDB() { idbSet(LS, masterDB).catch(() => alert('브라우저 저장에 실패했습니다. "DB 내보내기"로 JSON을 따로 보관하세요.')); }
+function saveDB() { idbSet(LS, masterDB).catch(() => toast('브라우저 저장에 실패했습니다. "DB 내보내기"로 JSON을 따로 보관하세요.')); }
 
 function updateCurriculum() {
   const box = $('unit-list'), g = $('filter-grade').value; box.innerHTML = '';
@@ -557,6 +636,10 @@ function subSummary(i) { const p = pickedSubs(i); $('us'+i).textContent = '중�
 function getSel() { const g = $('filter-grade').value; return (curriculum2022[g] || []).map((u, i) => ({u, i})).filter(x => $('uc'+x.i) && $('uc'+x.i).checked).map(x => ({u: x.u, subs: pickedSubs(x.i)})); }
 const dc = (g, u, l, subs) => masterDB.filter(q => q.grade===g && q.unit===u && dif(q)===l && (!subs || !subs.length || subs.includes(q.sub))).length;
 function getUnits() { const g = $('filter-grade').value; return (curriculum2022[g] || []).filter((u, i) => $('uc'+i) && $('uc'+i).checked); }
+function selectAllUnits(on) {
+  (curriculum2022[$('filter-grade').value] || []).forEach((u, i) => { const c = $('uc'+i); if (c) { c.checked = on; $('ud'+i).classList.toggle('hidden', !on); } });
+  updateTotal();
+}
 function updateTotal() { const n = getUnits().length; $('unit-total').textContent = n ? `선택 ${n}개 단원` : ''; }
 function updateStats() {
   const g = $('filter-grade').value;
@@ -575,12 +658,12 @@ function pvKey(e, i) {
 function goDifficulty(e) {
   e.preventDefault();
   diffUnits = getSel();
-  if (!diffUnits.length) { alert('단원을 1개 이상 선택하세요.'); return; }
+  if (!diffUnits.length) { toast('단원을 1개 이상 선택하세요.'); return; }
   const g = $('filter-grade').value, box = $('diff-list'); box.innerHTML = '';
   diffUnits.forEach((x, i) => {
     const r = document.createElement('div');
     r.className = 'flex flex-wrap items-center gap-x-3 gap-y-2 border rounded-lg px-3 py-2';
-    r.innerHTML = `<div class="flex-1 min-w-[10rem] text-sm">${esc(x.u)}${x.subs.length ? `<div class="text-xs text-indigo-600">${x.subs.map(esc).join(' · ')}</div>` : ''}</div>` + LV.map((l, k) => `<span class="text-xs text-gray-500">${l} <span class="text-gray-400">(DB ${dc(g,x.u,l,x.subs)})</span></span><input type="number" id="dn${i}_${k}" value="${[0,1,3,1][k]}" min="0" max="100" class="w-14 border rounded-lg p-1 text-sm text-right">`).join('');
+    r.innerHTML = `<div class="flex-1 min-w-[10rem] text-sm">${esc(x.u)}${x.subs.length ? `<div class="text-xs text-indigo-600">${x.subs.map(esc).join(' · ')}</div>` : ''}</div>` + LV.map((l, k) => { const m = dc(g,x.u,l,x.subs); return `<span class="text-xs text-gray-500">${l} <span class="text-gray-400">(DB ${m})</span></span><input type="number" id="dn${i}_${k}" value="${Math.min([0,1,3,1][k], m)}" min="0" max="${m}" data-max="${m}" title="DB에 ${m}문제" class="w-14 border rounded-lg p-1 text-sm text-right">`; }).join('');
     r.querySelectorAll('input').forEach(n => n.oninput = diffTotal);
     box.appendChild(r);
   });
@@ -589,8 +672,13 @@ function goDifficulty(e) {
 const examName = () => ($('exam-name').value || '').trim() || '과학 맞춤 시험지';
 const examTpl = () => (document.querySelector('input[name=exam-tpl]:checked') || {}).value || '1';
 function diffTotal() {
-  const t = [...$('diff-list').querySelectorAll('input')].reduce((a, n) => a + (parseInt(n.value) || 0), 0);
-  $('diff-total').textContent = `총 ${t}문항`;
+  let t = 0, short = 0;
+  $('diff-list').querySelectorAll('input').forEach(n => {
+    const v = Math.max(0, parseInt(n.value) || 0), m = +n.dataset.max;
+    t += v; if (v > m) short += v - m;
+    n.classList.toggle('dn-over', v > m);
+  });
+  $('diff-total').innerHTML = `총 ${t}문항` + (short ? ` <span class="text-red-500">· DB 부족 ${short}문항 (빨간 칸, 실제 추출 ${t - short}문항)</span>` : '');
 }
 function extractNow() {
   const grade = $('filter-grade').value, out = [], lack = [];
@@ -601,8 +689,8 @@ function extractNow() {
     if (a.length < n) lack.push(`${u}${subs.length ? ' [' + subs.join('·') + ']' : ''} (${lv}): ${a.length}/${n}문제`);
     out.push(...a.slice(0, n));
   }));
-  if (!out.length) { alert('추출할 문제가 없습니다. 문항 수를 입력하거나 DB에 문제를 추가하세요.'); return; }
-  if (lack.length) alert('DB 문제가 부족해 일부만 추출합니다.\n' + lack.join('\n'));
+  if (!out.length) { toast('추출할 문제가 없습니다. 문항 수를 입력하거나 DB에 문제를 추가하세요.'); return; }
+  if (lack.length) toast('DB 문제가 부족해 일부만 추출합니다.\n' + lack.join('\n'));
   currentQuestions = out.map(q => JSON.parse(JSON.stringify(q)));
   pvExtra = []; curExamId = uid('e');
   switchTab('preview');
@@ -615,24 +703,67 @@ function pvHead(tpl, n) {
 }
 function renderPreview() {
   const gap = $('pv-gap').value, ans = $('pv-ans').checked, tpl = examTpl();
-  $('pv-gap-v').textContent = gap + 'px'; $('pv-paper').dataset.tpl = tpl; setTimeout(drawQR, 0);
+  $('pv-gap-v').textContent = gap + 'px'; $('pv-paper').dataset.tpl = tpl; setTimeout(drawQR, 0); saveDraft();
+  if (document.activeElement !== $('pv-name')) $('pv-name').value = examName();
   const qs = currentQuestions;
   $('pv-paper').innerHTML = qrBox() + pvHead(tpl, qs.length) + '<div class="pv-cols">' +
     qs.map((q, i) => `<div class="pq">${i ? `<div class="pvgap" tabindex="0" data-i="${i}" onkeydown="pvKey(event,${i})" style="height:${Math.max(0, +gap + 24*(pvExtra[i]||0))}px"></div>` : ''}<p class="font-bold whitespace-pre-wrap">${i+1}. ${esc(q.question)}</p>${q.image ? `<img src="${esc(q.image)}" class="my-2 max-h-64">` : ''}${(q.choices || []).map(c => `<p class="ml-4 text-sm">${esc(c)}</p>`).join('')}</div>`).join('') + '</div>' +
     (ans ? `<div class="pq border-t pt-4 mt-8"><h3 class="font-bold mb-2">[정답 및 해설]</h3>${qs.map((q, i) => `<p class="text-sm">${i+1}번 정답: ${esc(q.answer)} ${q.explanation ? '해설: ' + esc(q.explanation) : ''}</p>`).join('')}</div>` : '');
 }
-function switchTab(t) {
+const TABS = ['selector','diff','preview','editor','past','var','stu','ex'];
+function switchTab(t, fromHistory) {
+  if (t === 'diff' && !diffUnits.length) t = 'selector';
+  if ((t === 'preview' || t === 'editor') && !currentQuestions.length) t = 'selector';
+  if (!fromHistory && location.hash.slice(1) !== t) history.pushState(null, '', '#' + t);
   if (!document.querySelector('header #main-tabs')) { document.querySelector('header .max-w-7xl').appendChild($('main-tabs')); $('hero').style.display = 'none'; document.querySelector('header').classList.remove('hidden'); }
   if (t === 'past' || t === 'var') { pastMode = t === 'var' ? 'var' : 'orig'; t = 'past'; }
   ['selector','diff','preview','editor','past','stu','ex'].forEach(x => $('tab-'+x).classList.add('hidden'));
   ['make','past','var','stu','ex'].forEach(x => $('btn-'+x).classList.remove('bg-indigo-700'));
   $('tab-'+t).classList.remove('hidden');
-  $('btn-'+(t === 'past' ? (pastMode === 'var' ? 'var' : 'past') : t === 'stu' ? 'stu' : t === 'ex' ? 'ex' : 'make')).classList.add('bg-indigo-700');
+  const bt = t === 'past' ? (pastMode === 'var' ? 'var' : 'past') : t === 'stu' ? 'stu' : t === 'ex' ? 'ex' : 'make';
+  $('btn-'+bt).classList.add('bg-indigo-700'); document.body.dataset.tab = bt;
   if (t === 'editor') renderEditor();
   if (t === 'past') renderPastSelects();
   if (t === 'ex') renderEx();
   if (t === 'preview') { saveExamRecord(); renderPreview(); }
   if (t === 'stu') { stuGo('grade'); syncSB(); }
+  if (t === 'selector') draftBanner();
+  renderSteps(t); bkBanner();
+  const on = document.querySelector('#main-tabs .bg-indigo-700'); if (on) on.scrollIntoView({block: 'nearest', inline: 'center'});
+  window.scrollTo(0, 0);
+}
+/* 진행 단계 표시: 단원 → 난이도 → 미리보기 → 편집 (클릭하면 해당 단계로 이동) */
+const STEPS = [['selector','단원 선택'],['diff','난이도·문항 수'],['preview','미리보기'],['editor','문항 편집']];
+function renderSteps(t) {
+  const el = $('steps'), cur = STEPS.findIndex(s => s[0] === t);
+  el.classList.toggle('hidden', cur < 0); if (cur < 0) return;
+  const can = k => k === 'selector' || (k === 'diff' ? diffUnits.length : currentQuestions.length);
+  el.innerHTML = STEPS.map(([k, n], i) => `${i ? '<span class="text-gray-300">›</span>' : ''}<button type="button" onclick="switchTab('${k}')" ${can(k) ? '' : 'disabled'} class="step px-3 py-1.5 rounded-full font-semibold whitespace-nowrap ${i === cur ? 'step-on' : i < cur ? 'step-done' : ''}">${i + 1}. ${n}</button>`).join('');
+}
+function goHome(fromHistory) {
+  if (!fromHistory && location.hash) history.pushState(null, '', location.pathname + location.search);
+  TABS.forEach(x => { const s = $('tab-'+x); if (s) s.classList.add('hidden'); });
+  ['make','past','var','stu','ex'].forEach(x => $('btn-'+x).classList.remove('bg-indigo-700'));
+  $('hero').appendChild($('main-tabs')); $('hero').style.display = ''; $('steps').classList.add('hidden');
+  document.querySelector('header').classList.add('hidden'); delete document.body.dataset.tab;
+}
+window.addEventListener('popstate', () => { const t = location.hash.slice(1); if (TABS.includes(t)) switchTab(t, true); else goHome(true); });
+
+/* 작성 중인 시험지 자동 저장: 새로고침·탭 닫기 후에도 이어서 작업 */
+const DK = 'sciBankDraft_v1';
+let draftTimer = null;
+function saveDraft() {
+  clearTimeout(draftTimer);
+  draftTimer = setTimeout(() => {
+    if (!currentQuestions.length) return;
+    idbSet(DK, {questions: currentQuestions, examId: curExamId, name: examName(), pvExtra, at: Date.now()}).catch(() => {});
+    if (curExamId && stuDB.exams.some(x => x.id === curExamId)) saveExamRecord();
+  }, 800);
+}
+function draftBanner() {
+  const el = $('draft-resume'); if (!el) return;
+  el.classList.toggle('hidden', !currentQuestions.length);
+  el.querySelector('span').textContent = `작성 중인 시험지: ${examName()} (${currentQuestions.length}문항)`;
 }
 
 async function loadExternalDB(files) {
@@ -653,7 +784,7 @@ async function loadExternalDB(files) {
   }
   $('db-file-input').value = '';
   saveDB(); updateCurriculum();
-  alert(`추가 ${added}문제 · 중복 제외 ${dup} · 형식 오류 ${bad}` + (imgUp ? `\n🖼 기존 문제에 그림 ${imgUp}개 추가` : '') + (unk ? `\n⚠ 단원명이 목록과 다른 문제 ${unk}개 (추출되지 않을 수 있음)` : ''));
+  toast(`추가 ${added}문제 · 중복 제외 ${dup} · 형식 오류 ${bad}` + (imgUp ? `\n🖼 기존 문제에 그림 ${imgUp}개 추가` : '') + (unk ? `\n⚠ 단원명이 목록과 다른 문제 ${unk}개 (추출되지 않을 수 있음)` : ''));
 }
 function exportDB() {
   const a = document.createElement('a');
@@ -670,7 +801,12 @@ function renderEditor() {
     d.innerHTML = `
       <div class="flex justify-between items-center border-b pb-3">
         <span class="font-bold text-indigo-600">문항 ${i+1} (${esc(q.grade)} / ${esc(q.unit)})${q.type ? ` <span class="text-xs bg-indigo-50 text-indigo-600 rounded px-2 py-0.5">${esc(q.type)}</span>` : ''}</span>
-        <button onclick="deleteQuestion(${i})" class="text-red-500 hover:text-red-700 text-sm font-semibold">삭제</button>
+        <div class="flex items-center gap-1 text-sm">
+          <button onclick="moveQuestion(${i},-1)" ${i ? '' : 'disabled'} class="px-2 py-1 bg-gray-100 hover:bg-gray-200 disabled:opacity-30" title="위로">▲</button>
+          <button onclick="moveQuestion(${i},1)" ${i < currentQuestions.length - 1 ? '' : 'disabled'} class="px-2 py-1 bg-gray-100 hover:bg-gray-200 disabled:opacity-30" title="아래로">▼</button>
+          <button onclick="replaceQuestion(${i})" class="px-2 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold" title="같은 단원·난이도의 다른 문제로 교체">🔄 다른 문제</button>
+          <button onclick="deleteQuestion(${i})" class="px-2 py-1 text-red-500 hover:text-red-700 font-semibold">삭제</button>
+        </div>
       </div>
       <div>
         <label class="block text-xs font-bold text-gray-500 mb-1">질문 내용</label>
@@ -688,19 +824,42 @@ function renderEditor() {
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
         <div><label class="block text-xs font-bold text-gray-500 mb-1">정답</label>
-          <input type="text" value="${esc(q.answer)}" oninput="currentQuestions[${i}].answer=this.value" class="w-full border rounded-lg p-2 text-sm"></div>
+          <div class="flex gap-1">${[1,2,3,4,5].map(n => `<button type="button" data-n="${n}" onclick="setAnswer(${i},${n},this)" class="ans-btn flex-1 border py-1.5 text-lg ${numAns(q.answer) === n ? 'ans-on' : ''}">${circ(n)}</button>`).join('')}</div>
+          ${numAns(q.answer) ? '' : `<input type="text" value="${esc(q.answer)}" oninput="currentQuestions[${i}].answer=this.value" placeholder="주관식 정답" class="w-full border rounded-lg p-2 text-sm mt-1">`}</div>
         <div><label class="block text-xs font-bold text-gray-500 mb-1">해설</label>
           <input type="text" value="${esc(q.explanation)}" oninput="currentQuestions[${i}].explanation=this.value" class="w-full border rounded-lg p-2 text-sm"></div>
       </div>`;
     c.appendChild(d);
   });
+  saveDraft();
 }
 function addNewQuestion() {
   currentQuestions.push({ grade:$('filter-grade').value, unit:getUnits()[0] || (curriculum2022[$('filter-grade').value] || [])[0], question:"새로운 문제를 입력하세요.",
     choices:["① 보기 1","② 보기 2","③ 보기 3","④ 보기 4","⑤ 보기 5"], answer:"①", explanation:"해설을 입력하세요." });
   renderEditor();
 }
-function deleteQuestion(i) { currentQuestions.splice(i, 1); renderEditor(); }
+function deleteQuestion(i) { if (!confirm(`문항 ${i+1}을(를) 삭제할까요?`)) return; currentQuestions.splice(i, 1); renderEditor(); }
+function setAnswer(i, n, btn) {
+  currentQuestions[i].answer = circ(n);
+  btn.parentElement.querySelectorAll('.ans-btn').forEach(b => b.classList.toggle('ans-on', +b.dataset.n === n));
+  const free = btn.parentElement.nextElementSibling; if (free && free.tagName === 'INPUT') free.remove();
+  saveDraft();
+}
+function moveQuestion(i, d) {
+  const j = i + d; if (j < 0 || j >= currentQuestions.length) return;
+  [currentQuestions[i], currentQuestions[j]] = [currentQuestions[j], currentQuestions[i]];
+  renderEditor();
+}
+function replaceQuestion(i) {
+  const q = currentQuestions[i], used = new Set(currentQuestions.map(keyOf));
+  const pool = masterDB.filter(x => x.grade === q.grade && x.unit === q.unit && dif(x) === dif(q) && !used.has(keyOf(x)));
+  const same = q.sub ? pool.filter(x => x.sub === q.sub) : [];
+  const from = same.length ? same : pool;
+  if (!from.length) { toast('같은 단원·난이도에 바꿀 수 있는 문제가 DB에 없습니다.'); return; }
+  currentQuestions[i] = JSON.parse(JSON.stringify(from[Math.floor(Math.random() * from.length)]));
+  renderEditor();
+  const card = $('question-list').children[i]; if (card) card.scrollIntoView({block: 'center'});
+}
 
 /* 그림 첨부: 가로 900px 이하로 줄여 PNG/JPEG data URL로 저장 */
 function loadImg(src) { return new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = src; }); }
@@ -808,8 +967,8 @@ async function buildHwpx(qs, dims, o) {
 /*HWPX_END*/
 
 async function exportHwpx() {
-  if (!currentQuestions.length) { alert('저장할 문제가 없습니다.'); return; }
-  if (typeof DecompressionStream === 'undefined') { alert('이 브라우저는 .hwpx 저장을 지원하지 않습니다. 최신 Chrome/Edge/Safari를 사용하세요.'); return; }
+  if (!currentQuestions.length) { toast('저장할 문제가 없습니다.'); return; }
+  if (typeof DecompressionStream === 'undefined') { toast('이 브라우저는 .hwpx 저장을 지원하지 않습니다. 최신 Chrome/Edge/Safari를 사용하세요.'); return; }
   const dims = [];
   for (let i = 0; i < currentQuestions.length; i++) {
     const q = currentQuestions[i];
@@ -820,7 +979,7 @@ async function exportHwpx() {
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = examName().replace(/[\\/:*?"<>|]/g, '_') + '.hwpx'; a.click();
-  } catch (e) { alert('시험지(.hwpx) 저장 중 오류가 발생했습니다: ' + e.message); }
+  } catch (e) { toast('시험지(.hwpx) 저장 중 오류가 발생했습니다: ' + e.message); }
 }
 
 /* ===== 기출 문제 ===== */
@@ -829,7 +988,7 @@ const PK = 'sciBankPast_v1', PF = ['school','grade','subject','year','semester',
 const PL = {school:'학교',grade:'학년',subject:'과목',year:'년도',semester:'학기',round:'차수'}, PD = {year:'년',semester:'학기',round:'차'};
 const sfx = (v, s) => String(v).endsWith(s) ? String(v) : v + s;
 let pastDB = [], pastSel = {}, curPast, pastMode = 'orig';
-(async () => { try { const a = await idbGet(PK); if (Array.isArray(a)) pastDB = a; } catch(e) {} renderPastSelects(); })();
+const pastReady = (async () => { try { const a = await idbGet(PK); if (Array.isArray(a)) pastDB = a; } catch(e) {} renderPastSelects(); })();
 const pastValid = x => x && PF.every(f => x[f] != null && String(x[f]).trim() !== '') && Array.isArray(x.questions) && x.questions.every(q => q && typeof q.question === 'string');
 async function loadPastFiles(files) {
   let add = 0, rep = 0, bad = 0;
@@ -845,9 +1004,9 @@ async function loadPastFiles(files) {
     } catch(e) { bad++; }
   }
   $('past-file-input').value = '';
-  idbSet(PK, pastDB).catch(() => alert('브라우저 저장에 실패했습니다.'));
+  idbSet(PK, pastDB).catch(() => toast('브라우저 저장에 실패했습니다.'));
   renderPastSelects();
-  alert(`시험지 추가 ${add} · 덮어쓰기 ${rep} · 형식 오류 ${bad}`);
+  toast(`시험지 추가 ${add} · 덮어쓰기 ${rep} · 형식 오류 ${bad}`);
 }
 function renderPastSelects() {
   const box = $('past-selects'); box.innerHTML = '';
@@ -901,8 +1060,8 @@ function renderPast(x) {
 /* ===== 학생 ===== */
 const SK = 'sciBankStu_v1', GR = ['중1','중2','중3','고1','고2','고3'];
 let stuDB = {students:[], exams:[], results:[]}, stuView = ['grade'], curExamId = null;
-(async () => { try { const a = await idbGet(SK); if (a && Array.isArray(a.students)) stuDB = a; } catch(e) {} })();
-const stuSave = () => idbSet(SK, stuDB).catch(() => alert('브라우저 저장에 실패했습니다.'));
+const stuReady = (async () => { try { const a = await idbGet(SK); if (a && Array.isArray(a.students)) stuDB = a; } catch(e) {} })();
+const stuSave = () => idbSet(SK, stuDB).catch(() => toast('브라우저 저장에 실패했습니다.'));
 const uid = p => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
 const numAns = a => { const t = String(a ?? '').trim(), k = '①②③④⑤'.indexOf(t[0]); return k >= 0 ? k + 1 : (parseInt(t) || 0); };
 const circ = n => '①②③④⑤'[n-1] || '';
@@ -936,18 +1095,23 @@ function renderStu() {
     b.innerHTML = `<div class="flex items-center gap-3 mb-4 flex-wrap"><button onclick="stuGo('grade')" class="stu-back">← 학년 선택</button><h2 class="text-xl font-bold">${a} 학생 (${ss.length}명)</h2>
       <button onclick="printQRCards(stuDB.students.filter(s => s.grade==='${a}').map(s => s.id))" class="stu-back ml-auto">🖨 QR 카드</button>
       <form onsubmit="stuAdd(event,'${a}')" class="flex gap-2"><input id="stu-new" type="text" placeholder="학생 이름" class="border rounded-lg p-2 text-sm w-36"><button class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-sm font-bold">➕ 등록</button></form></div>` +
-      (ss.length ? `<div class="grid grid-cols-5 gap-2">${ss.map(s => `<button onclick="stuGo('detail','${s.id}')" class="stu-btn">${esc(s.name)}</button>`).join('')}</div>` : '<p class="text-center text-gray-400 py-12">등록된 학생이 없습니다. 위에서 학생을 등록하세요.</p>');
+      (ss.length ? `<div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-2">${ss.map(s => `<button onclick="stuGo('detail','${s.id}')" class="stu-btn">${esc(s.name)}</button>`).join('')}</div>` : '<p class="text-center text-gray-400 py-12">등록된 학생이 없습니다. 위에서 학생을 등록하세요.</p>');
   } else {
     const s = stuDB.students.find(x => x.id === a);
     if (!s) { stuGo('grade'); return; }
     const head = `<div class="flex items-center gap-3 mb-4 flex-wrap"><button onclick="stuGo('list','${s.grade}')" class="stu-back">← ${s.grade} 학생 목록</button><h2 class="text-xl font-bold">${s.grade} ${esc(s.name)}</h2><button onclick="printQRCards(['${s.id}'])" class="stu-back ml-auto">🖨 개인 QR</button><button onclick="stuDel('${s.id}')" class="text-xs text-red-500">학생 삭제</button></div>`;
     if (v === 'entry') {
       const e = stuDB.exams.find(x => x.id === c);
-      if (!e) { alert('답을 입력할 시험지를 선택하세요.'); stuGo('detail', a); return; }
+      if (!e) { toast('답을 입력할 시험지를 선택하세요.'); stuGo('detail', a); return; }
       const old = (stuDB.results.find(r => r.studentId === a && r.examId === c) || {}).answers || [];
-      b.innerHTML = head + `<h3 class="font-bold mb-2">${esc(e.name)} · 답 입력</h3><form onsubmit="stuSaveAns(event,'${a}','${c}')">` +
-        e.questions.map((q, i) => `<div class="flex items-center gap-3 border-b py-2"><span class="w-12 font-bold">${i+1}번</span>${[1,2,3,4,5].map(n => `<label class="cursor-pointer text-lg"><input type="radio" name="a${i}" value="${n}" ${old[i] === n ? 'checked' : ''} class="mr-0.5 accent-indigo-600">${circ(n)}</label>`).join('')}</div>`).join('') +
+      b.innerHTML = head + `<h3 class="font-bold mb-2">${esc(e.name)} · 답 입력 <span id="ans-count" class="text-sm font-normal text-gray-500"></span></h3>
+        <div class="p-3 mb-3 bg-indigo-50 rounded-xl border border-indigo-100 space-y-2">
+          <input id="ans-quick" type="text" inputmode="numeric" autocomplete="off" placeholder="한 번에 입력: 예) 24153 31245 (0 또는 - 는 빈 답)" class="w-full border rounded-lg p-2 text-sm tracking-widest">
+          <p class="text-xs text-gray-500">⌨ 문항 줄을 클릭한 뒤 숫자 <b>1~5</b>를 누르면 답이 체크되고 다음 문항으로 넘어갑니다 · <b>Backspace</b>: 지우고 이전 문항 · <b>↑↓</b>: 이동</p>
+        </div><form onsubmit="stuSaveAns(event,'${a}','${c}')">` +
+        e.questions.map((q, i) => `<div class="ans-row flex items-center gap-3 border-b py-2 px-2 rounded" tabindex="0" data-i="${i}"><span class="w-12 font-bold">${i+1}번</span>${[1,2,3,4,5].map(n => `<label class="cursor-pointer text-lg"><input type="radio" name="a${i}" value="${n}" ${old[i] === n ? 'checked' : ''} tabindex="-1" class="mr-0.5 accent-indigo-600">${circ(n)}</label>`).join('')}</div>`).join('') +
         `<button class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg">저장</button></form>`;
+      bindAnsEntry(e.questions.length);
     } else {
       const rs = stuDB.results.filter(r => r.studentId === a).sort((x, y) => y.at - x.at);
       const opts = stuDB.exams.slice().sort((x, y) => y.at - x.at).map(e => `<option value="${e.id}">${esc(e.name)} (${new Date(e.at).toLocaleDateString('ko-KR')} · ${e.questions.length}문항)</option>`).join('');
@@ -966,10 +1130,35 @@ function renderStu() {
     }
   }
 }
+/* 답 입력: 숫자 키로 빠르게 입력, 문자열 붙여넣기로 한 번에 채우기 */
+function bindAnsEntry(n) {
+  const rows = [...document.querySelectorAll('.ans-row')];
+  const setAns = (i, v) => document.querySelectorAll(`input[name=a${i}]`).forEach(r => r.checked = +r.value === v);
+  const count = () => { const k = rows.filter((_, i) => document.querySelector(`input[name=a${i}]:checked`)).length; $('ans-count').textContent = `(${k}/${n} 입력)`; };
+  const go = i => { const r = rows[Math.max(0, Math.min(n - 1, i))]; if (r) { r.focus(); r.scrollIntoView({block: 'nearest'}); } };
+  rows.forEach((r, i) => {
+    r.addEventListener('keydown', e => {
+      if (e.key >= '1' && e.key <= '5') { setAns(i, +e.key); go(i + 1); }
+      else if (e.key === '0' || e.key === '-' || e.key === ' ') { setAns(i, 0); go(i + 1); }
+      else if (e.key === 'Backspace' || e.key === 'Delete') { setAns(i, 0); go(i - 1); }
+      else if (e.key === 'ArrowDown' || e.key === 'Enter') go(i + 1);
+      else if (e.key === 'ArrowUp') go(i - 1);
+      else return;
+      e.preventDefault(); count();
+    });
+    r.addEventListener('change', count);
+  });
+  $('ans-quick').addEventListener('input', e => {
+    const ch = e.target.value.replace(/\s/g, '').split('');
+    ch.slice(0, n).forEach((c, i) => setAns(i, /[1-5]/.test(c) ? +c : 0));
+    count();
+  });
+  count(); go(0);
+}
 function stuAdd(e, g) {
   e.preventDefault();
   const n = $('stu-new').value.trim(); if (!n) return;
-  if (stuDB.students.some(s => s.grade === g && s.name === n)) { alert('이미 등록된 학생입니다.'); return; }
+  if (stuDB.students.some(s => s.grade === g && s.name === n)) { toast('이미 등록된 학생입니다.'); return; }
   stuDB.students.push({id: 's' + (window.crypto && crypto.randomUUID ? crypto.randomUUID().replace(/-/g, '').slice(0, 14) : uid('s')), grade: g, name: n}); stuSave(); renderStu(); sbSyncStudents();
 }
 function stuDel(id) {
@@ -977,6 +1166,8 @@ function stuDel(id) {
   if (!s || !confirm(`${s.name} 학생과 풀이 기록을 삭제할까요?`)) return;
   stuDB.students = stuDB.students.filter(x => x.id !== id); stuDB.results = stuDB.results.filter(r => r.studentId !== id);
   stuSave(); stuGo('list', s.grade);
+  if (sbOn() && stuDB.pin) sbCall('sb_delete_student', {p: stuDB.pin, sid: id})
+    .catch(() => toast('이 컴퓨터에서는 삭제했지만 서버 삭제에 실패했습니다.\nSupabase에서 supabase-update2.sql을 실행했는지 확인하세요.'));
 }
 function stuSaveAns(e, sid, eid) {
   e.preventDefault();
@@ -998,8 +1189,8 @@ function stuVariant(eid) {
     const pick = pool[0];
     if (pick) { used.add(keyOf(pick)); out.push(JSON.parse(JSON.stringify(pick))); } else lack++;
   });
-  if (!out.length) { alert('같은 단원·난이도의 변형 문제가 DB에 없습니다.'); return; }
-  if (lack) alert(`같은 단원·난이도 문제가 부족해 ${out.length}/${ex.questions.length}문항만 출제합니다.`);
+  if (!out.length) { toast('같은 단원·난이도의 변형 문제가 DB에 없습니다.'); return; }
+  if (lack) toast(`같은 단원·난이도 문제가 부족해 ${out.length}/${ex.questions.length}문항만 출제합니다.`);
   currentQuestions = out; pvExtra = []; curExamId = uid('e');
   $('exam-name').value = ex.name + ' (변형)';
   switchTab('preview');
@@ -1032,11 +1223,11 @@ async function sbCall(fn, args) {
   return t ? JSON.parse(t) : null;
 }
 async function sbSyncStudents(manual) {
-  if (!sbOn() || !stuDB.pin) { if (manual) alert('먼저 PIN을 설정하세요. (SB_CONFIG 입력도 확인)'); return; }
+  if (!sbOn() || !stuDB.pin) { if (manual) toast('먼저 PIN을 설정하세요. (SB_CONFIG 입력도 확인)'); return; }
   try {
     await sbCall('sb_upsert_students', {p: stuDB.pin, payload: stuDB.students.map(s => ({id: s.id, grade: s.grade, name: s.name}))});
-    if (manual) alert('학생 명단을 서버에 동기화했습니다.');
-  } catch(e) { if (manual) alert('동기화 실패: ' + e.message); }
+    if (manual) toast('학생 명단을 서버에 동기화했습니다.');
+  } catch(e) { if (manual) toast('동기화 실패: ' + e.message); }
 }
 function sbSetPin() {
   const v = prompt('Supabase SQL에서 설정한 PIN을 입력하세요.', stuDB.pin || '');
@@ -1061,10 +1252,10 @@ async function syncSB() {
   } catch(e) { if (st) st.textContent = '☁ 연결 실패: PIN·서버 설정·인터넷을 확인하세요.'; }
 }
 function printQRCards(ids) {
-  if (!sbReady()) { alert('파일 맨 위 SB_CONFIG에 Supabase 주소·키·페이지 주소를 먼저 입력하세요.'); return; }
-  if (typeof QRCode === 'undefined') { alert('QR 라이브러리를 불러오지 못했습니다. 인터넷 연결을 확인하세요.'); return; }
+  if (!sbReady()) { toast('파일 맨 위 SB_CONFIG에 Supabase 주소·키·페이지 주소를 먼저 입력하세요.'); return; }
+  if (typeof QRCode === 'undefined') { toast('QR 라이브러리를 불러오지 못했습니다. 인터넷 연결을 확인하세요.'); return; }
   const list = stuDB.students.filter(s => ids.includes(s.id)).sort((x, y) => x.name.localeCompare(y.name, 'ko'));
-  if (!list.length) { alert('QR을 만들 학생이 없습니다.'); return; }
+  if (!list.length) { toast('QR을 만들 학생이 없습니다.'); return; }
   const tmp = document.createElement('div'); tmp.style.display = 'none'; document.body.appendChild(tmp);
   const base = SB_CONFIG.pageUrl.split('#')[0].split('?')[0];
   const cards = list.map(s => {
@@ -1073,7 +1264,7 @@ function printQRCards(ids) {
   }).join('');
   tmp.remove();
   const w = window.open('', '_blank');
-  if (!w) { alert('팝업이 차단되어 있습니다. 허용 후 다시 눌러 주세요.'); return; }
+  if (!w) { toast('팝업이 차단되어 있습니다. 허용 후 다시 눌러 주세요.'); return; }
   w.document.write(`<!DOCTYPE html><meta charset="utf-8"><title>학생 QR 카드</title><style>body{font-family:'Noto Sans KR',sans-serif}.g{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.c{border:1px dashed #999;padding:10px;text-align:center;break-inside:avoid}.c img{width:100%;max-width:140px}</style><div class="g">${cards}</div>`);
   w.document.close(); w.focus(); setTimeout(() => w.print(), 400);
 }
@@ -1168,6 +1359,9 @@ function exDel(id) {
   if (!e || !confirm(`"${e.name}" 시험지와 이 시험지의 학생 풀이 기록을 삭제할까요? (되돌릴 수 없습니다)`)) return;
   stuDB.exams = stuDB.exams.filter(x => x.id !== id); stuDB.results = stuDB.results.filter(r => r.examId !== id);
   stuSave(); renderEx();
+  if (sbOn() && stuDB.pin) sbCall('sb_delete_exam', {p: stuDB.pin, c: exCode(id)})
+    .then(() => toast('서버에서도 시험지를 삭제했습니다.'))
+    .catch(() => toast('이 컴퓨터에서는 삭제했지만 서버 삭제에 실패했습니다.\nSupabase에서 supabase-update2.sql을 실행했는지 확인하세요.'));
 }
 
 /* ===== 백업 ===== */
@@ -1177,6 +1371,16 @@ function bkRefresh() {
   e.textContent = t ? `마지막 백업: ${new Date(t).toLocaleString('ko-KR')}` : '아직 백업한 적이 없습니다.';
   e.style.color = (!t || Date.now() - t > 7 * 864e5) ? '#dc2626' : '#6b7280';
 }
+/* 모든 화면 상단: 데이터가 있는데 7일 넘게 백업하지 않았으면 안내 */
+function bkBanner() {
+  const el = $('bk-banner'); if (!el) return;
+  const t = stuDB.lastBackup, has = stuDB.students.length || stuDB.exams.length || masterDB.length > SEED.length || pastDB.length;
+  let snooze = 0; try { snooze = +localStorage.getItem('sciBankBkSnooze') || 0; } catch(e) {}
+  const show = has && (!t || Date.now() - t > 7 * 864e5) && Date.now() > snooze;
+  el.classList.toggle('hidden', !show); if (!show) return;
+  el.querySelector('span').innerHTML = `💾 <b>${t ? `마지막 백업 후 ${Math.floor((Date.now() - t) / 864e5)}일이 지났습니다.` : '아직 백업한 적이 없습니다.'}</b> 문제·학생 기록은 이 브라우저에만 저장되어 OneDrive로 동기화되지 않습니다.`;
+}
+function bkSnooze() { try { localStorage.setItem('sciBankBkSnooze', Date.now() + 864e5); } catch(e) {} bkBanner(); }
 function exportBackup() {
   const {pin, ...rest} = stuDB;
   const data = {app: 'sci-bank', version: 1, savedAt: Date.now(), stuDB: rest, masterDB, pastDB};
@@ -1184,14 +1388,14 @@ function exportBackup() {
   a.href = URL.createObjectURL(new Blob([JSON.stringify(data)], {type: 'application/json'}));
   const d = new Date(), z = n => String(n).padStart(2, '0');
   a.download = `SciBank-백업-${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}.json`; a.click();
-  stuDB.lastBackup = Date.now(); stuSave(); bkRefresh();
+  stuDB.lastBackup = Date.now(); stuSave(); bkRefresh(); bkBanner();
 }
 async function importBackup(file) {
   if (!file) return;
   $('bk-file').value = '';
   let d;
-  try { d = JSON.parse(await file.text()); } catch(e) { alert('백업 파일을 읽을 수 없습니다.'); return; }
-  if (!d || d.app !== 'sci-bank' || !d.stuDB) { alert('Sci-Bank 백업 파일이 아닙니다.'); return; }
+  try { d = JSON.parse(await file.text()); } catch(e) { toast('백업 파일을 읽을 수 없습니다.'); return; }
+  if (!d || d.app !== 'sci-bank' || !d.stuDB) { toast('Sci-Bank 백업 파일이 아닙니다.'); return; }
   const S = d.stuDB, c = {st: 0, ex: 0, rs: 0, q: 0, ps: 0};
   (S.students || []).forEach(s => { if (!stuDB.students.some(x => x.id === s.id)) { stuDB.students.push(s); c.st++; } });
   (S.exams || []).forEach(e => { if (!stuDB.exams.some(x => x.id === e.id)) { stuDB.exams.push(e); c.ex++; } });
@@ -1205,13 +1409,24 @@ async function importBackup(file) {
   stuSave(); saveDB(); idbSet(PK, pastDB).catch(() => {});
   updateCurriculum(); renderStu(); bkRefresh();
   if (stuDB.pin) sbSyncStudents();
-  alert(`불러오기 완료 (이미 있는 항목은 건너뜀)\n학생 +${c.st} · 시험지 +${c.ex} · 풀이 기록 +${c.rs} · 문제 +${c.q} · 기출 시험지 +${c.ps}`);
+  toast(`불러오기 완료 (이미 있는 항목은 건너뜀)\n학생 +${c.st} · 시험지 +${c.ex} · 풀이 기록 +${c.rs} · 문제 +${c.q} · 기출 시험지 +${c.ps}`);
 }
 
 setInterval(syncSB, 30000);
 
 updateCurriculum();
+$('question-list').addEventListener('input', saveDraft);
+$('exam-name').addEventListener('input', saveDraft);
 if (SP.get('e') || SP.get('s')) renderSbStudent();
+else Promise.all([dbReady, pastReady, stuReady, idbGet(DK).catch(() => null)]).then(([, , , d]) => {
+  if (d && Array.isArray(d.questions) && d.questions.length && !currentQuestions.length) {
+    currentQuestions = d.questions; curExamId = d.examId || null; pvExtra = d.pvExtra || [];
+    if (d.name) $('exam-name').value = d.name;
+  }
+  const t = location.hash.slice(1);
+  if (TABS.includes(t)) switchTab(t, true);
+  bkBanner();
+});
 </script>
 </body>
 </html>
