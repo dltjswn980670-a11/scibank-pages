@@ -230,13 +230,14 @@ input.dn-over[type=number]{border-color:#ef4444!important;background:#fef2f2!imp
     <div class="flex flex-col sm:flex-row justify-between items-center bg-white p-4 rounded-xl shadow-md gap-4">
       <div>
         <h2 class="text-lg font-bold text-gray-900">📝 추출 문제 검수 및 시험지 저장</h2>
-        <p class="text-sm text-gray-500">문항·그림을 수정하거나 새 문항을 추가할 수 있습니다. 저장한 .hwpx는 한글에서 바로 열립니다. (시험지 틀은 미리보기에서 선택)</p>
+        <p class="text-sm text-gray-500">문항·그림을 고친 뒤 <b>시험지 저장</b>을 누르면 이 브라우저의 출제 문제에 저장됩니다. 한글 파일이 필요하면 <b>다운로드</b>를 누르세요. (시험지 틀은 미리보기에서 선택)</p>
       </div>
       <div class="space-x-2">
         <button onclick="switchTab('selector')" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg font-medium transition text-sm">← 조건 다시 선택</button>
         <button onclick="switchTab('preview')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition text-sm">👁 미리보기</button>
         <button onclick="addNewQuestion()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium transition text-sm">➕ 문제 추가</button>
-        <button onclick="exportHwpx()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition text-sm">💾 시험지 저장 (.hwpx)</button>
+        <button onclick="saveExamNow()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition text-sm">💾 시험지 저장</button>
+        <button onclick="exportHwpx()" class="bg-gray-700 text-white px-4 py-2 rounded-lg font-medium transition text-sm">⬇ 다운로드 (.hwpx)</button>
       </div>
     </div>
     <div id="question-list" class="space-y-4"></div>
@@ -275,7 +276,8 @@ input.dn-over[type=number]{border-color:#ef4444!important;background:#fef2f2!imp
         <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="exam-tpl" value="3" onchange="renderPreview()" class="w-4 h-4 accent-indigo-600">시험지3(모의평가)</label>
       </div>
       <label class="text-sm cursor-pointer"><input type="checkbox" id="pv-ans" onchange="renderPreview()" class="mr-1">정답·해설 포함</label>
-      <button onclick="exportHwpx()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium text-sm">💾 시험지 저장 (.hwpx)</button>
+      <button onclick="saveExamNow()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium text-sm">💾 시험지 저장</button>
+      <button onclick="exportHwpx()" class="bg-gray-700 text-white px-4 py-2 rounded-lg font-medium text-sm">⬇ 다운로드 (.hwpx)</button>
       <button onclick="window.print()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium text-sm">🖨 인쇄</button>
     </div>
     <div id="pv-paper" class="bg-white rounded-xl shadow-md p-8 max-w-4xl mx-auto"></div>
@@ -998,7 +1000,7 @@ async function buildHwpx(qs, dims, o) {
   }
   let sec = txt('Contents/section0.xml');
   sec = sec.replace('</hs:sec>', body + '</hs:sec>');
-  const rep = s => s.replace(/@@TITLE@@/g, X(examName())).replace(/@@GRADE@@/g, X(tpl === '1' ? examGradeText(qs) : (examGradeText(qs) + ' ' + subjectLabel(qs)))).replace(/@@SUBJ@@/g, X(subjectLabel(qs))).replace(/@@N@@/g, String(qs.length));
+  const rep = s => s.replace(/@@TITLE@@/g, X(o.name || examName())).replace(/@@GRADE@@/g, X(tpl === '1' ? examGradeText(qs) : (examGradeText(qs) + ' ' + subjectLabel(qs)))).replace(/@@SUBJ@@/g, X(subjectLabel(qs))).replace(/@@N@@/g, String(qs.length));
   put('Contents/section0.xml', rep(sec));
   put('Preview/PrvText.txt', rep(txt('Preview/PrvText.txt')).replace(/&amp;/g,'&'));
   if (imgs.length) {
@@ -1009,20 +1011,27 @@ async function buildHwpx(qs, dims, o) {
 }
 /*HWPX_END*/
 
-async function exportHwpx() {
+/* 시험지 저장: 이 브라우저의 출제 문제 목록에 저장 (한글 파일은 다운로드 버튼으로 따로) */
+function saveExamNow() {
   if (!currentQuestions.length) { toast('저장할 문제가 없습니다.'); return; }
-  if (typeof DecompressionStream === 'undefined') { toast('이 브라우저는 .hwpx 저장을 지원하지 않습니다. 최신 Chrome/Edge/Safari를 사용하세요.'); return; }
+  if (!curExamId) curExamId = uid('e');
+  saveExamRecord();
+  toast(`"${examName()}" 시험지를 저장했습니다. 출제 문제에서 다시 열거나 다운로드할 수 있습니다.`);
+}
+async function exportHwpx(qs = currentQuestions, name = examName()) {
+  if (!qs.length) { toast('다운로드할 문제가 없습니다.'); return; }
+  if (typeof DecompressionStream === 'undefined') { toast('이 브라우저는 .hwpx 다운로드를 지원하지 않습니다. 최신 Chrome/Edge/Safari를 사용하세요.'); return; }
   const dims = [];
-  for (let i = 0; i < currentQuestions.length; i++) {
-    const q = currentQuestions[i];
+  for (let i = 0; i < qs.length; i++) {
+    const q = qs[i];
     if (q.image) { try { const im = await loadImg(q.image); dims[i] = {w:im.naturalWidth, h:im.naturalHeight}; } catch(e) {} }
   }
   try {
-    const blob = await buildHwpx(currentQuestions, dims, {tpl: examTpl(), ans: $('pv-ans').checked, gap: +$('pv-gap').value || 0});
+    const blob = await buildHwpx(qs, dims, {tpl: examTpl(), ans: $('pv-ans').checked, gap: +$('pv-gap').value || 0, name});
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = examName().replace(/[\\/:*?"<>|]/g, '_') + '.hwpx'; a.click();
-  } catch (e) { toast('시험지(.hwpx) 저장 중 오류가 발생했습니다: ' + e.message); }
+    a.download = name.replace(/[\\/:*?"<>|]/g, '_') + '.hwpx'; a.click();
+  } catch (e) { toast('한글 파일(.hwpx) 다운로드 중 오류가 발생했습니다: ' + e.message); }
 }
 
 /* ===== 기출 문제 ===== */
@@ -1609,7 +1618,7 @@ function renderEx() {
   const b = $('ex-body'), list = stuDB.exams.slice().sort((x, y) => y.at - x.at);
   b.innerHTML = `<h2 class="text-xl font-bold mb-4">📋 출제한 시험지 (${list.length})</h2>` + (list.length
     ? `<div class="space-y-2">${list.map(e => { const n = stuDB.results.filter(r => r.examId === e.id).length;
-        return `<div><div class="flex items-center gap-3 border rounded-xl px-4 py-3 flex-wrap"><div class="flex-1 min-w-[12rem]"><div class="font-bold">${esc(e.name)}</div><div class="text-xs text-gray-500">${new Date(e.at).toLocaleString('ko-KR')} · ${e.questions.length}문항 · 코드 ${exCode(e.id)} · 제출 ${n}명</div></div><button onclick="exOpen('${e.id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-sm font-bold">문제 보기·인쇄</button><button onclick="exSub('${e.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-sm font-bold">제출 현황</button><button onclick="exDel('${e.id}')" class="text-xs text-red-500">삭제</button></div><div id="ex-sub-${e.id}" class="hidden"></div></div>`; }).join('')}</div>`
+        return `<div><div class="flex items-center gap-3 border rounded-xl px-4 py-3 flex-wrap"><div class="flex-1 min-w-[12rem]"><div class="font-bold">${esc(e.name)}</div><div class="text-xs text-gray-500">${new Date(e.at).toLocaleString('ko-KR')} · ${e.questions.length}문항 · 코드 ${exCode(e.id)} · 제출 ${n}명</div></div><button onclick="exOpen('${e.id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-sm font-bold">문제 보기·인쇄</button><button onclick="exDownload('${e.id}')" class="bg-gray-700 text-white px-3 py-2 rounded-lg text-sm font-bold">⬇ 다운로드 (.hwpx)</button><button onclick="exSub('${e.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-sm font-bold">제출 현황</button><button onclick="exDel('${e.id}')" class="text-xs text-red-500">삭제</button></div><div id="ex-sub-${e.id}" class="hidden"></div></div>`; }).join('')}</div>`
     : '<p class="text-center text-gray-400 py-12">아직 출제한 시험지가 없습니다. 단원별 문제에서 시험지를 만들어 보세요.</p>');
 }
 function exSub(id) {
@@ -1632,6 +1641,10 @@ function exOpen(id) {
   const e = stuDB.exams.find(x => x.id === id); if (!e) return;
   currentQuestions = JSON.parse(JSON.stringify(e.questions)); pvExtra = []; curExamId = id;
   $('exam-name').value = e.name; switchTab('preview');
+}
+function exDownload(id) {
+  const e = stuDB.exams.find(x => x.id === id); if (!e) return;
+  exportHwpx(e.questions, e.name);
 }
 function exDel(id) {
   const e = stuDB.exams.find(x => x.id === id);
