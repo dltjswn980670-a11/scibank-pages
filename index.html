@@ -11,8 +11,9 @@
 /* ===== 디자인 토큰: 차분한 바탕 + 탭마다 고유 색 (주기율표 원소 타일 모티프) ===== */
 :root{--bg:#F2F4F7;--surface:#fff;--ink:#16202E;--muted:#5E6878;--line:#DDE2E9;--soft:#EEF1F5;
   --c-make:#2F6FEB;--c-make-s:#EAF1FE;--c-ex:#0E9F8E;--c-ex-s:#E3F6F3;--c-past:#D98200;--c-past-s:#FDF3E1;
-  --c-var:#DE3F76;--c-var-s:#FDEBF1;--c-stu:#7655DD;--c-stu-s:#F1ECFD;
+  --c-var:#DE3F76;--c-var-s:#FDEBF1;--c-stu:#7655DD;--c-stu-s:#F1ECFD;--c-book:#3E8E2F;--c-book-s:#EAF5E6;
   --accent:#2F6FEB;--accent-s:#EAF1FE;--brand:var(--accent)}
+body[data-tab=book]{--accent:var(--c-book);--accent-s:var(--c-book-s)}
 body[data-tab=ex]{--accent:var(--c-ex);--accent-s:var(--c-ex-s)}
 body[data-tab=past]{--accent:var(--c-past);--accent-s:var(--c-past-s)}
 body[data-tab=var]{--accent:var(--c-var);--accent-s:var(--c-var-s)}
@@ -46,17 +47,17 @@ header #main-tabs button.bg-indigo-700 .tab-sym{background:var(--c);color:#fff}
 .hero-head .logo{font-size:15px}
 .hero-title{font-size:clamp(1.9rem,4.5vw,2.8rem);font-weight:800;letter-spacing:-.04em;line-height:1.15;margin-top:28px}
 .hero-sub{color:var(--muted);margin-top:8px;font-size:1rem}
-#hero #main-tabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;max-width:56rem;width:100%;margin:36px auto 0}
+#hero #main-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;max-width:56rem;width:100%;margin:36px auto 0}
 #hero #main-tabs button{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:6px;min-height:168px;padding:16px;background:var(--surface);border:1px solid var(--line);border-radius:12px;transition:border-color .15s,transform .15s}
 #hero #main-tabs button:hover{border-color:var(--c);transform:translateY(-2px)}
 #hero .tab-sym{width:52px;height:52px;font-size:24px;border-radius:8px;margin-bottom:auto}
 #hero .tab-name{font-size:1rem;font-weight:700;color:var(--ink);margin-top:14px}
 #hero .tab-desc{font-size:.8rem;line-height:1.45;color:var(--muted);word-break:keep-all}
-@media(max-width:768px){#hero #main-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}#hero #main-tabs button{min-height:140px}#hero #main-tabs button:last-child{grid-column:span 2}}
+@media(max-width:768px){#hero #main-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}#hero #main-tabs button{min-height:140px}}
 
 /* 패널·입력 */
-main section>.bg-white,#tab-selector,#tab-diff,#tab-ex,#tab-stu,#pv-controls,#past-controls,#tab-editor>div:first-child{border:1px solid var(--line);box-shadow:none!important;border-radius:14px!important}
-#tab-selector,#tab-diff{padding:28px!important}
+main section>.bg-white,#tab-selector,#tab-book,#tab-diff,#tab-ex,#tab-stu,#pv-controls,#past-controls,#tab-editor>div:first-child{border:1px solid var(--line);box-shadow:none!important;border-radius:14px!important}
+#tab-selector,#tab-book,#tab-diff{padding:28px!important}
 main h2{letter-spacing:-.03em}
 .text-indigo-600,.text-indigo-700,.text-indigo-800{color:var(--accent)!important}
 .bg-indigo-50{background:var(--accent-s)!important}.border-indigo-100,.border-indigo-200{border-color:var(--line)!important}
@@ -64,8 +65,10 @@ main h2{letter-spacing:-.03em}
 .hover\:bg-indigo-50:hover{background:var(--accent-s)!important}
 select,input[type=number],input[type=text],textarea{border:1px solid var(--line)!important;border-radius:8px!important;background:#fff;transition:border-color .15s,box-shadow .15s}
 select:focus,input[type=number]:focus,input[type=text]:focus,textarea:focus{outline:none;border-color:var(--accent)!important;box-shadow:0 0 0 3px var(--accent-s)!important}
-#unit-list label.border{border-color:var(--line);border-radius:8px}
-#db-stats{background:var(--soft);padding:4px 10px;border-radius:999px;font-weight:600;color:var(--muted)}
+#unit-list label.border,#bunit-list label.border{border-color:var(--line);border-radius:8px}
+#book-list label{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:.85rem;cursor:pointer}
+#book-list label:has(input:checked){border-color:var(--accent);background:var(--accent-s)}
+#db-stats,#book-stats{background:var(--soft);padding:4px 10px;border-radius:999px;font-weight:600;color:var(--muted)}
 
 /* 버튼: 주 동작(탭 색) · 보조(흰 바탕+테두리) · 뒤로(회색) · 위험 */
 main .bg-indigo-600,main .bg-blue-600,button[type=submit],#tab-diff .flex-1.bg-indigo-600{background:var(--accent)!important;color:#fff!important;border:1px solid transparent;box-shadow:none!important;border-radius:8px!important}
@@ -82,7 +85,7 @@ main .bg-red-100{background:#fff!important;color:#C62F2F!important;border:1px so
 #question-list>div::before{content:'';position:absolute;left:-1px;top:16px;bottom:16px;width:3px;border-radius:0 3px 3px 0;background:var(--accent)}
 #question-list img{border-radius:8px;background:#fff}
 footer{background:transparent!important;border:0!important;color:#9AA3B0!important;font-size:.75rem!important}
-@media(max-width:640px){header .max-w-7xl{flex-direction:column;align-items:stretch!important;gap:8px}#tab-editor>div:first-child{position:static}#tab-selector,#tab-diff{padding:18px!important}}
+@media(max-width:640px){header .max-w-7xl{flex-direction:column;align-items:stretch!important;gap:8px}#tab-editor>div:first-child{position:static}#tab-selector,#tab-book,#tab-diff{padding:18px!important}}
 .pv-cols{column-count:2;column-gap:36px;column-rule:1px solid #000}.pv-cols .pq{break-inside:avoid}
 .pv-h1{border:1px solid #000;margin-bottom:16px}.pv-h1a{text-align:center;padding:14px 0}.pv-h1b{display:flex;justify-content:space-between;border-top:1px dotted #000;padding:4px 28px;font-size:.75rem}
 .pv-h2{display:flex;border:1px solid #000;font-size:.85rem;margin-bottom:10px}.pv-h2a{flex:1;text-align:center;padding:8px;border-right:1px solid #000}.pv-h2b{width:30px;text-align:center;font-size:.7rem;border-right:1px solid #000;display:flex;align-items:center;justify-content:center}.pv-h2c{display:grid;grid-template-columns:repeat(4,1fr);width:240px;text-align:center;font-size:.75rem}.pv-h2c span{border-left:1px solid #000;padding:4px}.pv-h2c span:first-child{border-left:0}
@@ -149,7 +152,7 @@ input[type=password]:focus,input[type=date]:focus{outline:none;border-color:var(
 .sb-grid div b{display:block;font-size:1.1rem;color:var(--ink)}
 .sb-grid div.blank{border-color:#F3B4B4;background:#FDF2F2;color:#C62F2F}.sb-grid div.blank b{color:#C62F2F}
 input.dn-over[type=number]{border-color:#ef4444!important;background:#fef2f2!important}
-@media print{#hero,header,footer,#tab-selector,#tab-editor,#past-controls{display:none!important}body{background:#fff!important}main{padding:0!important;max-width:none!important}#print-area{box-shadow:none!important;border-radius:0!important;padding:0!important;max-width:none!important}.pq{break-inside:avoid}#pv-controls{display:none!important}.pvgap{background:none!important;box-shadow:none!important;min-height:0!important}.pvgap::after{display:none!important}#pv-paper{box-shadow:none!important;border-radius:0!important;padding:0!important;max-width:none!important}}
+@media print{#hero,header,footer,#tab-selector,#tab-book,#tab-editor,#past-controls{display:none!important}body{background:#fff!important}main{padding:0!important;max-width:none!important}#print-area{box-shadow:none!important;border-radius:0!important;padding:0!important;max-width:none!important}.pq{break-inside:avoid}#pv-controls{display:none!important}.pvgap{background:none!important;box-shadow:none!important;min-height:0!important}.pvgap::after{display:none!important}#pv-paper{box-shadow:none!important;border-radius:0!important;padding:0!important;max-width:none!important}}
 </style>
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
@@ -167,6 +170,7 @@ input.dn-over[type=number]{border-color:#ef4444!important;background:#fef2f2!imp
   </div>
   <div id="main-tabs">
     <button onclick="switchTab('selector')" id="btn-make" style="--c:var(--c-make);--cs:var(--c-make-s)"><span class="tab-sym">단</span><span class="tab-name">단원별 문제</span><span class="tab-desc">단원과 난이도를 골라 새 시험지를 만듭니다</span></button>
+    <button onclick="switchTab('book')" id="btn-book" style="--c:var(--c-book);--cs:var(--c-book-s)"><span class="tab-sym">교</span><span class="tab-name">시중 교재</span><span class="tab-desc">교과·교재를 골라 시중 교재 문제로 시험지를 만듭니다</span></button>
     <button onclick="switchTab('ex')" id="btn-ex" style="--c:var(--c-ex);--cs:var(--c-ex-s)"><span class="tab-sym">출</span><span class="tab-name">출제 문제</span><span class="tab-desc">만든 시험지를 다시 열고 제출 현황을 봅니다</span></button>
     <button onclick="switchTab('past')" id="btn-past" style="--c:var(--c-past);--cs:var(--c-past-s)"><span class="tab-sym">기</span><span class="tab-name">기출 문제</span><span class="tab-desc">학교별 기출 시험지를 보고 인쇄합니다</span></button>
     <button onclick="switchTab('var')" id="btn-var" style="--c:var(--c-var);--cs:var(--c-var-s)"><span class="tab-sym">변</span><span class="tab-name">기출 변형 문제</span><span class="tab-desc">기출 시험지의 변형 세트를 봅니다</span></button>
@@ -204,15 +208,8 @@ input.dn-over[type=number]{border-color:#ef4444!important;background:#fef2f2!imp
 
     <form id="filter-form" onsubmit="goDifficulty(event)" class="space-y-4">
       <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-1">학년 / 과목 구획</label>
-        <select id="filter-grade" onchange="updateCurriculum()" class="w-full border rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 font-medium">
-          <option value="중1">중학교 1학년 (과학 1)</option>
-          <option value="중2">중학교 2학년 (과학 2)</option>
-          <option value="중3">중학교 3학년 (과학 3)</option>
-          <option value="고1">고등학교 1학년 (통합과학1, 2)</option>
-          <option value="고2_일반">고2·3 일반선택 (물리학, 화학, 생명과학)</option>
-          <option value="고3_진로">고2·3 진로선택 (역학과 에너지, 물질과 에너지 등)</option>
-        </select>
+        <label class="block text-sm font-semibold text-gray-700 mb-1">교과</label>
+        <select id="filter-grade" onchange="updateCurriculum()" class="w-full border rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 font-medium"></select>
       </div>
       <div>
         <div class="flex items-end justify-between gap-2 mb-1 flex-wrap">
@@ -226,6 +223,42 @@ input.dn-over[type=number]{border-color:#ef4444!important;background:#fef2f2!imp
     </form>
   </section>
 
+  <section id="tab-book" class="hidden bg-white rounded-xl shadow-md p-6 max-w-3xl mx-auto space-y-6">
+    <div class="border-b pb-3 space-y-3">
+      <div>
+        <h2 class="text-xl font-bold text-gray-900">📘 시중 교재 문제</h2>
+        <p class="text-sm text-gray-500 mt-1">변환한 교재 폴더(<b>OneDrive\Claude\JSON변환</b>)를 한 번 연결하면 교과 → 교재 → 단원 순서로 문제를 고를 수 있습니다. 문제는 폴더에서 바로 읽으므로 브라우저에 따로 복사되지 않습니다.</p>
+      </div>
+      <div class="flex flex-wrap gap-2 items-center">
+        <input type="file" id="book-dir-input" webkitdirectory multiple class="hidden" onchange="bookPickFiles(this.files)">
+        <button type="button" onclick="bookConnect()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-bold shadow">📁 교재 폴더 연결</button>
+        <span id="book-stats" class="text-xs text-gray-600 ml-auto"></span>
+      </div>
+    </div>
+    <form id="book-form" onsubmit="goDifficulty(event,'b')" class="space-y-4">
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-1">교과</label>
+        <select id="book-subj" onchange="bookSubj()" class="w-full border rounded-lg p-3 font-medium"></select>
+      </div>
+      <div>
+        <div class="flex items-end justify-between gap-2 mb-1 flex-wrap">
+          <label class="block text-sm font-semibold text-gray-700">교재 <span class="font-normal text-gray-400">(여러 권 선택 가능)</span></label>
+          <div class="flex gap-1"><button type="button" onclick="bookAll(true)" class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-2 py-1 rounded font-semibold">전체 선택</button><button type="button" onclick="bookAll(false)" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-2 py-1 rounded font-semibold">선택 해제</button></div>
+        </div>
+        <div id="book-list" class="flex flex-wrap gap-2"></div>
+      </div>
+      <div>
+        <div class="flex items-end justify-between gap-2 mb-1 flex-wrap">
+          <label class="block text-sm font-semibold text-gray-700">단원 <span class="font-normal text-gray-400">(단원을 체크하세요 · 문항 수는 다음 단계에서 입력)</span></label>
+          <div class="flex gap-1"><button type="button" onclick="selectAllUnits(true,'b')" class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-2 py-1 rounded font-semibold">전체 선택</button><button type="button" onclick="selectAllUnits(false,'b')" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-2 py-1 rounded font-semibold">선택 해제</button></div>
+        </div>
+        <div id="bunit-list" class="space-y-2 max-h-96 overflow-y-auto pr-1"></div>
+        <p id="bunit-total" class="text-right text-sm font-bold text-indigo-600 mt-2"></p>
+      </div>
+      <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition shadow-md">다음: 난이도·문항 수 선택 ➔</button>
+    </form>
+  </section>
+
   <section id="tab-editor" class="hidden space-y-6">
     <div class="flex flex-col sm:flex-row justify-between items-center bg-white p-4 rounded-xl shadow-md gap-4">
       <div>
@@ -233,7 +266,7 @@ input.dn-over[type=number]{border-color:#ef4444!important;background:#fef2f2!imp
         <p class="text-sm text-gray-500">문항·그림을 고친 뒤 <b>시험지 저장</b>을 누르면 이 브라우저의 출제 문제에 저장됩니다. 한글 파일이 필요하면 <b>다운로드</b>를 누르세요. (시험지 틀은 미리보기에서 선택)</p>
       </div>
       <div class="space-x-2">
-        <button onclick="switchTab('selector')" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg font-medium transition text-sm">← 조건 다시 선택</button>
+        <button onclick="switchTab(srcTab())" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg font-medium transition text-sm">← 조건 다시 선택</button>
         <button onclick="switchTab('preview')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition text-sm">👁 미리보기</button>
         <button onclick="addNewQuestion()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium transition text-sm">➕ 문제 추가</button>
         <button onclick="saveExamNow()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition text-sm">💾 시험지 저장</button>
@@ -258,7 +291,7 @@ input.dn-over[type=number]{border-color:#ef4444!important;background:#fef2f2!imp
     <div id="diff-list" class="space-y-2"></div>
     <p id="diff-total" class="text-right text-sm font-bold text-indigo-600"></p>
     <div class="flex gap-2">
-      <button onclick="switchTab('selector')" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-3 rounded-lg font-medium text-sm">← 단원 다시 선택</button>
+      <button onclick="switchTab(srcTab())" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-3 rounded-lg font-medium text-sm">← 단원 다시 선택</button>
       <button onclick="extractNow()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg shadow-md">문제 추출 및 미리보기 ➔</button>
     </div>
   </section>
@@ -658,39 +691,153 @@ function toast(msg) {
 }
 const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const keyOf = q => q.grade + '|' + q.unit + '|' + q.question.trim();
+/* PDF에서 가져온 그림 문항(imageOnly): 문제 글은 분류·검색용, 화면·한글 파일에는 그림만. 선택지가 ①~⑤ 기호뿐이면 그림 안에 있으므로 생략 */
+const bareChoices = q => q.imageOnly && (q.choices || []).every(c => String(c).trim().length <= 1);
 const valid = q => q && typeof q.grade==='string' && typeof q.unit==='string' && typeof q.question==='string' && Array.isArray(q.choices) && q.choices.length>0 && q.answer!=null;
 
 function saveDB() { idbSet(LS, masterDB).catch(() => toast('브라우저 저장에 실패했습니다. "DB 내보내기"로 JSON을 따로 보관하세요.')); }
 
-function updateCurriculum() {
-  const box = $('unit-list'), g = $('filter-grade').value; box.innerHTML = '';
-  (curriculum2022[g] || []).forEach((u, i) => {
-    const subs = subsOf(g, u), w = document.createElement('div');
-    w.innerHTML = `<label class="flex items-center gap-3 border rounded-lg px-3 py-2 cursor-pointer hover:bg-indigo-50"><input type="checkbox" id="uc${i}" class="w-4 h-4 accent-indigo-600"><span class="flex-1 text-sm">${esc(u)}</span><span id="uk${i}" class="text-xs text-gray-400"></span></label>
-      <details id="ud${i}" class="hidden ml-7 mt-1 border rounded-lg bg-gray-50 text-sm"><summary id="us${i}" class="cursor-pointer px-3 py-2">중단원: 전체</summary><div class="px-3 pb-2 space-y-1">${subs.length ? subs.map((m, k) => `<label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="sb${i}_${k}" value="${esc(m)}" class="accent-indigo-600"> ${esc(m)} <span class="text-xs text-gray-400">(DB ${subCount(g, u, m)})</span></label>`).join('') : '<p class="text-xs text-gray-400 py-1">등록된 중단원이 없습니다 (이 단원은 대단원 전체에서 추출됩니다)</p>'}</div></details>`;
-    w.querySelector('#uc'+i).onchange = e => { $('ud'+i).classList.toggle('hidden', !e.target.checked); updateTotal(); };
-    w.querySelectorAll('#ud'+i+' input').forEach(x => x.onchange = () => subSummary(i));
+/* 교과: 단원 이름의 [물리학]·[화학]… 앞머리로 나눔 (중학교는 학년별 과학). 선택 값은 "학년|교과" */
+const SUBJ = Object.entries(curriculum2022).flatMap(([g, us]) => [...new Set(us.map(u => subjOfU(u)))].map(s => ({v: g + '|' + s, g, s, label: s || `과학 (${g})`})));
+const GL = {'중1':'중학교 1학년','중2':'중학교 2학년','중3':'중학교 3학년','고1':'고등학교 1학년','고2_일반':'고2·3 일반선택','고3_진로':'고2·3 진로선택'};
+function subjOfU(u) { const m = /^\[([^\]]+)\]/.exec(u || ''); return m ? m[1] : ''; }
+const subjOpts = cnt => Object.keys(curriculum2022).map(g => `<optgroup label="${esc(GL[g] || g)}">` + SUBJ.filter(x => x.g === g).map(x => `<option value="${esc(x.v)}">${esc(x.label)}${cnt ? ` (${cnt(x)}문제)` : ''}</option>`).join('') + '</optgroup>').join('');
+const gOf = v => String(v || '').split('|')[0];
+const unitsOf = v => { const [g, s] = String(v || '').split('|'); return (curriculum2022[g] || []).filter(u => !s || subjOfU(u) === s); };
+const uName = u => String(u).replace(/^\[[^\]]+\]\s*/, '');
+/* 단원 고르기 화면은 단원별 문제(P='')와 시중 교재(P='b') 두 곳: 같은 틀, 문제 모음만 다름 */
+const selV = P => $(P ? 'book-subj' : 'filter-grade').value;
+const poolP = P => P ? bookPoolC : masterDB;
+function updateCurriculum(P = '') {
+  const box = $(P + 'unit-list'), v = selV(P), g = gOf(v), pool = poolP(P); box.innerHTML = '';
+  unitsOf(v).forEach((u, i) => {
+    const subs = subsOf(g, u, pool).filter(m => !P || subCount(g, u, m, pool)), w = document.createElement('div');
+    w.innerHTML = `<label class="flex items-center gap-3 border rounded-lg px-3 py-2 cursor-pointer hover:bg-indigo-50"><input type="checkbox" id="${P}uc${i}" class="w-4 h-4 accent-indigo-600"><span class="flex-1 text-sm">${esc(uName(u))}</span><span id="${P}uk${i}" class="text-xs text-gray-400"></span></label>
+      <details id="${P}ud${i}" class="hidden ml-7 mt-1 border rounded-lg bg-gray-50 text-sm"><summary id="${P}us${i}" class="cursor-pointer px-3 py-2">중단원: 전체</summary><div class="px-3 pb-2 space-y-1">${subs.length ? subs.map((m, k) => `<label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="${P}sb${i}_${k}" value="${esc(m)}" class="accent-indigo-600"> ${esc(m)} <span class="text-xs text-gray-400">(${P ? '' : 'DB '}${subCount(g, u, m, pool)})</span></label>`).join('') : '<p class="text-xs text-gray-400 py-1">등록된 중단원이 없습니다 (이 단원은 대단원 전체에서 추출됩니다)</p>'}</div></details>`;
+    w.querySelector('#'+P+'uc'+i).onchange = e => { $(P+'ud'+i).classList.toggle('hidden', !e.target.checked); updateTotal(P); };
+    w.querySelectorAll('#'+P+'ud'+i+' input').forEach(x => x.onchange = () => subSummary(i, P));
     box.appendChild(w);
   });
-  updateStats();
+  updateStats(P);
 }
-const subsOf = (g, u) => { const a = ((subCurriculum[g] || {})[u] || []).slice(); masterDB.forEach(q => { if (q.grade === g && q.unit === u && q.sub && !a.includes(q.sub)) a.push(q.sub); }); return a; };
-const subCount = (g, u, m) => masterDB.filter(q => q.grade === g && q.unit === u && q.sub === m).length;
-const pickedSubs = i => [...document.querySelectorAll(`#ud${i} input:checked`)].map(x => x.value);
-function subSummary(i) { const p = pickedSubs(i); $('us'+i).textContent = '중단원: ' + (p.length ? `${p.length}개 선택` : '전체'); }
-function getSel() { const g = $('filter-grade').value; return (curriculum2022[g] || []).map((u, i) => ({u, i})).filter(x => $('uc'+x.i) && $('uc'+x.i).checked).map(x => ({u: x.u, subs: pickedSubs(x.i)})); }
-const dc = (g, u, l, subs) => masterDB.filter(q => q.grade===g && q.unit===u && dif(q)===l && (!subs || !subs.length || subs.includes(q.sub))).length;
-function getUnits() { const g = $('filter-grade').value; return (curriculum2022[g] || []).filter((u, i) => $('uc'+i) && $('uc'+i).checked); }
-function selectAllUnits(on) {
-  (curriculum2022[$('filter-grade').value] || []).forEach((u, i) => { const c = $('uc'+i); if (c) { c.checked = on; $('ud'+i).classList.toggle('hidden', !on); } });
-  updateTotal();
+const subsOf = (g, u, pool = masterDB) => { const a = ((subCurriculum[g] || {})[u] || []).slice(); pool.forEach(q => { if (q.grade === g && q.unit === u && q.sub && !a.includes(q.sub)) a.push(q.sub); }); return a; };
+const subCount = (g, u, m, pool = masterDB) => pool.filter(q => q.grade === g && q.unit === u && q.sub === m).length;
+const pickedSubs = (i, P = '') => [...document.querySelectorAll(`#${P}ud${i} input:checked`)].map(x => x.value);
+function subSummary(i, P = '') { const p = pickedSubs(i, P); $(P+'us'+i).textContent = '중단원: ' + (p.length ? `${p.length}개 선택` : '전체'); }
+function getSel(P = '') { return unitsOf(selV(P)).map((u, i) => ({u, i})).filter(x => $(P+'uc'+x.i) && $(P+'uc'+x.i).checked).map(x => ({u: x.u, subs: pickedSubs(x.i, P)})); }
+const dc = (g, u, l, subs, pool = srcPool()) => pool.filter(q => q.grade===g && q.unit===u && dif(q)===l && (!subs || !subs.length || subs.includes(q.sub))).length;
+function getUnits(P = '') { return unitsOf(selV(P)).filter((u, i) => $(P+'uc'+i) && $(P+'uc'+i).checked); }
+function selectAllUnits(on, P = '') {
+  unitsOf(selV(P)).forEach((u, i) => { const c = $(P+'uc'+i); if (c) { c.checked = on; $(P+'ud'+i).classList.toggle('hidden', !on); } });
+  updateTotal(P);
 }
-function updateTotal() { const n = getUnits().length; $('unit-total').textContent = n ? `선택 ${n}개 단원` : ''; }
-function updateStats() {
-  const g = $('filter-grade').value;
-  (curriculum2022[g] || []).forEach((u, i) => { const e = $('uk'+i); if (e) e.textContent = `DB 최상${dc(g,u,'최상')} · 상${dc(g,u,'상')} · 중${dc(g,u,'중')} · 하${dc(g,u,'하')}`; });
-  $('db-stats').textContent = `전체 ${masterDB.length}문제`;
-  updateTotal();
+function updateTotal(P = '') { const n = getUnits(P).length; $(P+'unit-total').textContent = n ? `선택 ${n}개 단원` : ''; }
+function updateStats(P = '') {
+  const v = selV(P), g = gOf(v), pool = poolP(P);
+  unitsOf(v).forEach((u, i) => { const e = $(P+'uk'+i); if (e) e.textContent = `${P ? '' : 'DB '}최상${dc(g,u,'최상',null,pool)} · 상${dc(g,u,'상',null,pool)} · 중${dc(g,u,'중',null,pool)} · 하${dc(g,u,'하',null,pool)}`; });
+  if (!P) $('db-stats').textContent = `전체 ${masterDB.length}문제`;
+  updateTotal(P);
+}
+/* 지금 만드는 시험지가 어디서 왔는지: 'db'(단원별 문제) 또는 'book'(시중 교재) */
+let src = 'db', srcGrade = '';
+const srcPool = () => src === 'book' ? bookPoolC : masterDB;
+const srcTab = () => src === 'book' ? 'book' : 'selector';
+
+/* ===== 시중 교재: JSON변환 폴더를 연결해 목록(가벼운 색인)만 브라우저에 저장, 문제는 뽑을 때 파일에서 읽음 ===== */
+const BIK = 'sciBankBookIdx_v1', BDK = 'sciBankBookDir_v1';
+let bookIdx = {recs: [], files: 0, at: 0}, bookDir = null, bookFiles = null, bookPoolC = [];
+const bookReady = (async () => { try { const a = await idbGet(BIK); if (a && Array.isArray(a.recs)) bookIdx = a; bookDir = (await idbGet(BDK)) || null; } catch(e) {} })();
+/* 교재 이름: 출처에서 쪽·번호·회차를 떼어 냄 (예: "오투 고등화학 시험대비 p50 3번" → "오투 고등화학 시험대비") */
+function bookOf(q) {
+  const s = String(q.source || '').replace(/\s*\d+번$/, '').replace(/\s*p\.?\d+$/, '').trim(); let m;
+  if ((m = /^족보닷컴 \[([^\]]+)\]/.exec(s))) return '족보닷컴 ' + m[1];
+  if (/^족보닷컴 .*프리미엄/.test(s)) return '족보닷컴 프리미엄';
+  if (/^족보닷컴 /.test(s)) return s.replace(/\s*\(\d+세트\)$/, '');
+  if ((m = /^(중\d) (\S+)/.exec(s))) return m[1] + ' ' + m[2];
+  return s || '(출처 없음)';
+}
+function renderBook() {
+  const sel = $('book-subj'), cur = sel.value, n = bookIdx.recs.length;
+  const cnt = x => bookIdx.recs.filter(r => r.grade === x.g && subjOfU(r.unit) === x.s).length;
+  sel.innerHTML = subjOpts(cnt);
+  sel.value = cur && SUBJ.some(x => x.v === cur) ? cur : ((SUBJ.find(x => cnt(x)) || SUBJ[0]).v);
+  $('book-stats').textContent = n ? `교재 문제 ${n}개 · 파일 ${bookIdx.files}개` : '아직 연결한 교재 폴더가 없습니다';
+  bookSubj();
+}
+function bookSubj() {
+  const v = $('book-subj').value, g = gOf(v), s = v.split('|')[1] || '', by = {};
+  bookIdx.recs.forEach(r => { if (r.grade === g && subjOfU(r.unit) === s) by[r.book] = (by[r.book] || 0) + 1; });
+  const names = Object.keys(by).sort((a, b) => a.localeCompare(b, 'ko'));
+  $('book-list').innerHTML = names.length ? names.map(b => `<label><input type="checkbox" value="${esc(b)}" checked onchange="bookPick()" class="accent-indigo-600">${esc(b)} <span class="text-xs text-gray-400">${by[b]}</span></label>`).join('')
+    : `<p class="text-sm text-gray-400">${bookIdx.recs.length ? '이 교과의 교재 문제가 없습니다.' : '먼저 📁 교재 폴더 연결을 눌러 JSON변환 폴더를 고르세요.'}</p>`;
+  bookPick();
+}
+function bookAll(on) { $('book-list').querySelectorAll('input').forEach(x => x.checked = on); bookPick(); }
+function bookPick() {
+  const on = new Set([...$('book-list').querySelectorAll('input:checked')].map(x => x.value));
+  bookPoolC = bookIdx.recs.filter(r => on.has(r.book));
+  updateCurriculum('b');
+}
+async function bookConnect() {
+  if (!window.showDirectoryPicker) { $('book-dir-input').click(); return; }
+  try {
+    const h = await showDirectoryPicker({id: 'scibank-books', mode: 'read'}), list = [];
+    await bookWalk(h, '', list);
+    bookDir = h; bookFiles = null; idbSet(BDK, h).catch(() => {});
+    await bookIndex(list);
+  } catch(e) { if (e.name !== 'AbortError') toast('폴더를 읽지 못했습니다: ' + e.message); }
+}
+async function bookWalk(h, pre, out) {
+  for await (const [n, x] of h.entries()) {
+    if (x.kind === 'directory') await bookWalk(x, pre + n + '/', out);
+    else if (/\.json$/i.test(n)) out.push({path: pre + n, get: () => x.getFile()});
+  }
+}
+/* 폴더 선택 창을 못 쓰는 브라우저: 파일 목록은 이번 접속 동안만 기억(다시 열면 폴더를 다시 골라야 함) */
+async function bookPickFiles(files) {
+  const list = [...files].filter(f => /\.json$/i.test(f.name)).map(f => ({path: (f.webkitRelativePath || f.name).split('/').slice(1).join('/') || f.name, file: f}));
+  $('book-dir-input').value = '';
+  if (!list.length) { toast('JSON 파일이 없습니다. JSON변환 폴더를 고르세요.'); return; }
+  bookFiles = new Map(list.map(x => [x.path, x.file])); bookDir = null; idbSet(BDK, null).catch(() => {});
+  await bookIndex(list.map(x => ({path: x.path, get: async () => x.file})));
+}
+async function bookIndex(list) {
+  const recs = []; let files = 0, bad = 0;
+  for (const [k, x] of list.entries()) {
+    $('book-stats').textContent = `읽는 중… ${k + 1}/${list.length}`;
+    try {
+      const arr = JSON.parse(await (await x.get()).text());
+      if (!Array.isArray(arr)) { bad++; continue; }
+      let ok = 0;
+      arr.forEach((q, i) => { if (valid(q)) { ok++; recs.push({f: x.path, i, grade: q.grade, unit: q.unit, sub: q.sub || '', difficulty: dif(q), book: bookOf(q)}); } });
+      if (ok) files++;
+    } catch(e) { bad++; }
+  }
+  bookIdx = {recs, files, at: Date.now()};
+  await idbSet(BIK, bookIdx).catch(() => toast('교재 목록을 브라우저에 저장하지 못했습니다.'));
+  renderBook();
+  toast(`교재 문제 ${recs.length}개를 불러왔습니다 (파일 ${files}개${bad ? ` · 읽지 못한 파일 ${bad}개` : ''}).`);
+}
+async function bookFile(path) {
+  if (bookFiles) { if (bookFiles.has(path)) return bookFiles.get(path); throw new Error('nofile'); }
+  if (!bookDir) throw new Error('nodir');
+  if (await bookDir.queryPermission({mode: 'read'}) !== 'granted' && await bookDir.requestPermission({mode: 'read'}) !== 'granted') throw new Error('perm');
+  let h = bookDir; const seg = path.split('/');
+  for (const s of seg.slice(0, -1)) h = await h.getDirectoryHandle(s);
+  return (await h.getFileHandle(seg[seg.length - 1])).getFile();
+}
+/* 뽑힌 색인 → 실제 문제(그림·해설 포함). 같은 파일은 한 번만 읽음 */
+async function bookLoad(recs) {
+  const by = new Map(), got = new Map();
+  recs.forEach(r => { if (!by.has(r.f)) by.set(r.f, []); by.get(r.f).push(r); });
+  try {
+    for (const [f, rs] of by) {
+      const arr = JSON.parse(await (await bookFile(f)).text());
+      rs.forEach(r => { const q = arr[r.i]; if (q && q.unit === r.unit && valid(q)) got.set(r, q); });
+    }
+  } catch(e) { toast('교재 파일을 읽지 못했습니다. 시중 교재 탭에서 📁 교재 폴더 연결을 다시 눌러 주세요.'); return null; }
+  if (got.size < recs.length) toast(`교재 파일이 바뀌어 ${recs.length - got.size}문항을 찾지 못했습니다. 교재 폴더를 다시 연결하면 목록이 새로 만들어집니다.`);
+  return recs.map(r => got.get(r)).filter(Boolean);
 }
 let diffUnits = [], pvExtra = [];
 function pvKey(e, i) {
@@ -700,15 +847,17 @@ function pvKey(e, i) {
   e.preventDefault(); renderPreview();
   const el = document.querySelector(`.pvgap[data-i="${i}"]`); if (el) el.focus();
 }
-function goDifficulty(e) {
+function goDifficulty(e, P = '') {
   e.preventDefault();
-  diffUnits = getSel();
+  if (P && !bookPoolC.length) { toast('교재를 1권 이상 선택하세요.'); return; }
+  diffUnits = getSel(P);
   if (!diffUnits.length) { toast('단원을 1개 이상 선택하세요.'); return; }
-  const g = $('filter-grade').value, box = $('diff-list'); box.innerHTML = '';
+  src = P ? 'book' : 'db'; srcGrade = gOf(selV(P));
+  const g = srcGrade, box = $('diff-list'); box.innerHTML = '';
   diffUnits.forEach((x, i) => {
     const r = document.createElement('div');
     r.className = 'flex flex-wrap items-center gap-x-3 gap-y-2 border rounded-lg px-3 py-2';
-    r.innerHTML = `<div class="flex-1 min-w-[10rem] text-sm">${esc(x.u)}${x.subs.length ? `<div class="text-xs text-indigo-600">${x.subs.map(esc).join(' · ')}</div>` : ''}</div>` + LV.map((l, k) => { const m = dc(g,x.u,l,x.subs); return `<span class="text-xs text-gray-500">${l} <span class="text-gray-400">(DB ${m})</span></span><input type="number" id="dn${i}_${k}" value="${Math.min([0,1,3,1][k], m)}" min="0" max="${m}" data-max="${m}" title="DB에 ${m}문제" class="w-14 border rounded-lg p-1 text-sm text-right">`; }).join('');
+    r.innerHTML = `<div class="flex-1 min-w-[10rem] text-sm">${esc(x.u)}${x.subs.length ? `<div class="text-xs text-indigo-600">${x.subs.map(esc).join(' · ')}</div>` : ''}</div>` + LV.map((l, k) => { const m = dc(g,x.u,l,x.subs); return `<span class="text-xs text-gray-500">${l} <span class="text-gray-400">(${P ? '교재' : 'DB'} ${m})</span></span><input type="number" id="dn${i}_${k}" value="${Math.min([0,1,3,1][k], m)}" min="0" max="${m}" data-max="${m}" title="${P ? '교재' : 'DB'}에 ${m}문제" class="w-14 border rounded-lg p-1 text-sm text-right">`; }).join('');
     r.querySelectorAll('input').forEach(n => n.oninput = diffTotal);
     box.appendChild(r);
   });
@@ -725,16 +874,18 @@ function diffTotal() {
   });
   $('diff-total').innerHTML = `총 ${t}문항` + (short ? ` <span class="text-red-500">· DB 부족 ${short}문항 (빨간 칸, 실제 추출 ${t - short}문항)</span>` : '');
 }
-function extractNow() {
-  const grade = $('filter-grade').value, out = [], lack = [];
+async function extractNow() {
+  const grade = srcGrade, pool = srcPool(), lack = [];
+  let out = [];
   diffUnits.forEach(({u, subs}, i) => LV.forEach((lv, k) => {
     const n = Math.max(0, parseInt($(`dn${i}_${k}`).value) || 0); if (!n) return;
-    const a = masterDB.filter(q => q.grade===grade && q.unit===u && dif(q)===lv && (!subs.length || subs.includes(q.sub)));
+    const a = pool.filter(q => q.grade===grade && q.unit===u && dif(q)===lv && (!subs.length || subs.includes(q.sub)));
     for (let x = a.length-1; x > 0; x--) { const j = Math.floor(Math.random()*(x+1)); [a[x],a[j]] = [a[j],a[x]]; }
     if (a.length < n) lack.push(`${u}${subs.length ? ' [' + subs.join('·') + ']' : ''} (${lv}): ${a.length}/${n}문제`);
     out.push(...a.slice(0, n));
   }));
   if (!out.length) { toast('추출할 문제가 없습니다. 문항 수를 입력하거나 DB에 문제를 추가하세요.'); return; }
+  if (src === 'book') { out = await bookLoad(out); if (!out || !out.length) return; }
   if (lack.length) toast('DB 문제가 부족해 일부만 추출합니다.\n' + lack.join('\n'));
   currentQuestions = out.map(q => JSON.parse(JSON.stringify(q)));
   pvExtra = []; curExamId = uid('e');
@@ -752,21 +903,22 @@ function renderPreview() {
   if (document.activeElement !== $('pv-name')) $('pv-name').value = examName();
   const qs = currentQuestions;
   $('pv-paper').innerHTML = qrBox() + pvHead(tpl, qs.length) + '<div class="pv-cols">' +
-    qs.map((q, i) => `<div class="pq">${i ? `<div class="pvgap" tabindex="0" data-i="${i}" onkeydown="pvKey(event,${i})" style="height:${Math.max(0, +gap + 24*(pvExtra[i]||0))}px"></div>` : ''}<p class="font-bold whitespace-pre-wrap">${i+1}. ${esc(q.question)}</p>${q.image ? `<img src="${esc(q.image)}" class="my-2 max-h-64">` : ''}${(q.choices || []).map(c => `<p class="ml-4 text-sm">${esc(c)}</p>`).join('')}</div>`).join('') + '</div>' +
+    qs.map((q, i) => `<div class="pq">${i ? `<div class="pvgap" tabindex="0" data-i="${i}" onkeydown="pvKey(event,${i})" style="height:${Math.max(0, +gap + 24*(pvExtra[i]||0))}px"></div>` : ''}<p class="font-bold whitespace-pre-wrap">${i+1}. ${q.imageOnly ? '' : esc(q.question)}</p>${q.image ? `<img src="${esc(q.image)}" class="${q.imageOnly ? 'my-1 w-full' : 'my-2 max-h-64'}">` : ''}${bareChoices(q) ? '' : (q.choices || []).map(c => `<p class="ml-4 text-sm">${esc(c)}</p>`).join('')}</div>`).join('') + '</div>' +
     (ans ? `<div class="pq border-t pt-4 mt-8"><h3 class="font-bold mb-2">[정답 및 해설]</h3>${qs.map((q, i) => `<p class="text-sm">${i+1}번 정답: ${esc(q.answer)} ${q.explanation ? '해설: ' + esc(q.explanation) : ''}</p>`).join('')}</div>` : '');
 }
-const TABS = ['selector','diff','preview','editor','past','var','stu','ex'];
+const TABS = ['selector','book','diff','preview','editor','past','var','stu','ex'];
 function switchTab(t, fromHistory) {
-  if (t === 'diff' && !diffUnits.length) t = 'selector';
-  if ((t === 'preview' || t === 'editor') && !currentQuestions.length) t = 'selector';
+  if (t === 'diff' && !diffUnits.length) t = srcTab();
+  if ((t === 'preview' || t === 'editor') && !currentQuestions.length) t = srcTab();
   if (!fromHistory && location.hash.slice(1) !== t) history.pushState(null, '', '#' + t);
   if (!document.querySelector('header #main-tabs')) { document.querySelector('header .max-w-7xl').appendChild($('main-tabs')); $('hero').style.display = 'none'; document.querySelector('header').classList.remove('hidden'); }
   if (t === 'past' || t === 'var') { pastMode = t === 'var' ? 'var' : 'orig'; t = 'past'; }
-  ['selector','diff','preview','editor','past','stu','ex'].forEach(x => $('tab-'+x).classList.add('hidden'));
-  ['make','past','var','stu','ex'].forEach(x => $('btn-'+x).classList.remove('bg-indigo-700'));
+  ['selector','book','diff','preview','editor','past','stu','ex'].forEach(x => $('tab-'+x).classList.add('hidden'));
+  ['make','book','past','var','stu','ex'].forEach(x => $('btn-'+x).classList.remove('bg-indigo-700'));
   $('tab-'+t).classList.remove('hidden');
-  const bt = t === 'past' ? (pastMode === 'var' ? 'var' : 'past') : t === 'stu' ? 'stu' : t === 'ex' ? 'ex' : 'make';
+  const bt = t === 'past' ? (pastMode === 'var' ? 'var' : 'past') : t === 'stu' ? 'stu' : t === 'ex' ? 'ex' : t === 'book' || (t !== 'selector' && src === 'book') ? 'book' : 'make';
   $('btn-'+bt).classList.add('bg-indigo-700'); document.body.dataset.tab = bt;
+  if (t === 'book') bookReady.then(renderBook);
   if (t === 'editor') renderEditor();
   if (t === 'past') renderPastSelects();
   if (t === 'ex') renderEx();
@@ -780,15 +932,16 @@ function switchTab(t, fromHistory) {
 /* 진행 단계 표시: 단원 → 난이도 → 미리보기 → 편집 (클릭하면 해당 단계로 이동) */
 const STEPS = [['selector','단원 선택'],['diff','난이도·문항 수'],['preview','미리보기'],['editor','문항 편집']];
 function renderSteps(t) {
-  const el = $('steps'), cur = STEPS.findIndex(s => s[0] === t);
+  const steps = [t === 'book' || (t !== 'selector' && src === 'book') ? ['book','교재·단원 선택'] : STEPS[0], ...STEPS.slice(1)];
+  const el = $('steps'), cur = steps.findIndex(s => s[0] === t);
   el.classList.toggle('hidden', cur < 0); if (cur < 0) return;
-  const can = k => k === 'selector' || (k === 'diff' ? diffUnits.length : currentQuestions.length);
-  el.innerHTML = STEPS.map(([k, n], i) => `${i ? '<span class="text-gray-300">›</span>' : ''}<button type="button" onclick="switchTab('${k}')" ${can(k) ? '' : 'disabled'} class="step px-3 py-1.5 rounded-full font-semibold whitespace-nowrap ${i === cur ? 'step-on' : i < cur ? 'step-done' : ''}">${i + 1}. ${n}</button>`).join('');
+  const can = k => k === 'selector' || k === 'book' || (k === 'diff' ? diffUnits.length : currentQuestions.length);
+  el.innerHTML = steps.map(([k, n], i) => `${i ? '<span class="text-gray-300">›</span>' : ''}<button type="button" onclick="switchTab('${k}')" ${can(k) ? '' : 'disabled'} class="step px-3 py-1.5 rounded-full font-semibold whitespace-nowrap ${i === cur ? 'step-on' : i < cur ? 'step-done' : ''}">${i + 1}. ${n}</button>`).join('');
 }
 function goHome(fromHistory) {
   if (!fromHistory && location.hash) history.pushState(null, '', location.pathname + location.search);
   TABS.forEach(x => { const s = $('tab-'+x); if (s) s.classList.add('hidden'); });
-  ['make','past','var','stu','ex'].forEach(x => $('btn-'+x).classList.remove('bg-indigo-700'));
+  ['make','book','past','var','stu','ex'].forEach(x => $('btn-'+x).classList.remove('bg-indigo-700'));
   $('hero').appendChild($('main-tabs')); $('hero').style.display = ''; $('steps').classList.add('hidden');
   document.querySelector('header').classList.add('hidden'); delete document.body.dataset.tab;
 }
@@ -879,7 +1032,8 @@ function renderEditor() {
   saveDraft();
 }
 function addNewQuestion() {
-  currentQuestions.push({ grade:$('filter-grade').value, unit:getUnits()[0] || (curriculum2022[$('filter-grade').value] || [])[0], question:"새로운 문제를 입력하세요.",
+  const last = currentQuestions[currentQuestions.length - 1], v = $('filter-grade').value;
+  currentQuestions.push({ grade: last ? last.grade : gOf(v), unit: last ? last.unit : (getUnits()[0] || unitsOf(v)[0]), question:"새로운 문제를 입력하세요.",
     choices:["① 보기 1","② 보기 2","③ 보기 3","④ 보기 4","⑤ 보기 5"], answer:"①", explanation:"해설을 입력하세요." });
   renderEditor();
 }
@@ -985,14 +1139,14 @@ async function buildHwpx(qs, dims, o) {
   const imgs = []; let body = '';
   qs.forEach((q, i) => {
     if (i) { const n = Math.max(0, Math.round((o.gap + 24 * ((pvExtra[i]) || 0)) / 28)); for (let k = 0; k < n; k++) body += hxP('', BC); }
-    String(q.question ?? '').split('\n').forEach((l, k) => body += hxP(k ? l : `${i+1}. ${l}`, QC(i)));
+    String(q.imageOnly ? '' : q.question ?? '').split('\n').forEach((l, k) => body += hxP(k ? l : `${i+1}. ${l}`, QC(i)));
     const m = q.image && dims[i] && /^data:image\/(png|jpeg);base64,(.+)$/.exec(q.image);
     if (m) {
       const n = imgs.length + 1, ext = m[1] === 'jpeg' ? 'jpg' : 'png', s = Math.min(1, 28000 / (dims[i].w * 75), 20000 / (dims[i].h * 75));
       imgs.push({n, ext, mime: m[1], data: b64(m[2])});
       body += hxPic(n, Math.round(dims[i].w * 75 * s), Math.round(dims[i].h * 75 * s), BC);
     }
-    (q.choices || []).forEach(c => body += hxP(c, CC));
+    if (!bareChoices(q)) (q.choices || []).forEach(c => body += hxP(c, CC));
   });
   if (o.ans) {
     body += hxP('[정답 및 해설]', QC(0), true);
@@ -1706,6 +1860,7 @@ async function importBackup(file) {
 
 setInterval(syncSB, 30000);
 
+$('filter-grade').innerHTML = subjOpts();
 updateCurriculum();
 $('question-list').addEventListener('input', saveDraft);
 $('exam-name').addEventListener('input', saveDraft);
