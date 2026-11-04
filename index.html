@@ -190,6 +190,8 @@ input.dn-over[type=number]{border-color:#ef4444!important;background:#fef2f2!imp
 #tab-img textarea{width:100%;min-height:420px;padding:10px;font:12.5px/1.5 ui-monospace,Consolas,monospace;resize:vertical}
 #tab-img .ig-save{display:grid;gap:12px;max-width:560px}#tab-img .ig-save .ig-box{border:1px solid var(--line);border-radius:10px;padding:14px}
 #tab-img .ig-save h3{margin:0 0 4px;font-size:.95rem;font-weight:700}#tab-img .ig-save p{margin:0 0 10px;color:var(--muted);font-size:.8rem}
+#tab-img .ig-pmeta{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-bottom:10px}#tab-img .ig-pmeta label{display:flex;flex-direction:column;gap:2px;font-size:.75rem;color:var(--muted)}
+#tab-img .ig-pmeta input,#tab-img .ig-pmeta select{border:1px solid var(--line);border-radius:6px;padding:5px 7px;font-size:.85rem;color:inherit;background:transparent;min-width:0}
 #tab-img .ig-empty{text-align:center;color:var(--muted);padding:40px 10px}
 @media(max-width:640px){#tab-img .ig-paper{padding:24px 18px}}
 @media print{#hero,header,footer,#tab-selector,#tab-book,#tab-editor,#past-controls{display:none!important}body{background:#fff!important}main{padding:0!important;max-width:none!important}#print-area{box-shadow:none!important;border-radius:0!important;padding:0!important;max-width:none!important}.pq{break-inside:avoid}#pv-controls{display:none!important}.pvgap{background:none!important;box-shadow:none!important;min-height:0!important}.pvgap::after{display:none!important}#pv-paper{box-shadow:none!important;border-radius:0!important;padding:0!important;max-width:none!important}}
@@ -405,6 +407,21 @@ input.dn-over[type=number]{border-color:#ef4444!important;background:#fef2f2!imp
             <h3>그림 PNG 전체</h3>
             <p>생성된 흑백 이미지를 문항 id 이름의 PNG로 하나씩 내려받습니다.</p>
             <button type="button" class="ig-btn" id="ig-saveAllPng">PNG 전체 저장</button>
+          </div>
+          <div class="ig-box">
+            <h3>기출 문제 · 기출 변형 문제 탭에 넣기</h3>
+            <p>미리보기의 문항과 그림을 기출 문제 탭에 시험지로 저장합니다. API 키가 있으면 Gemini가 정답·해설을 달고, 변형 세트 수만큼 변형 문제를 만들어 기출 변형 문제 탭에 넣습니다. 그림이 있는 문항의 변형은 원본 그림을 그대로 씁니다. 만든 정답·해설·변형 문제는 꼭 검토해 주세요.</p>
+            <div class="ig-pmeta">
+              <label>학교<input type="text" id="ig-p-school" list="ig-p-schools" placeholder="○○고등학교"></label>
+              <label>학년<select id="ig-p-grade"><option>중1</option><option>중2</option><option>중3</option><option selected>고1</option><option>고2</option><option>고3</option></select></label>
+              <label>과목<input type="text" id="ig-p-subject" list="ig-p-subjects" placeholder="통합과학"></label>
+              <label>년도<input type="text" id="ig-p-year" inputmode="numeric" placeholder="2025"></label>
+              <label>학기<select id="ig-p-semester"><option>1</option><option>2</option></select></label>
+              <label>차수<select id="ig-p-round"><option>1</option><option>2</option><option>3</option></select></label>
+              <label>변형 세트<select id="ig-p-var"><option value="0">만들지 않음</option><option value="1" selected>1세트</option><option value="2">2세트</option><option value="3">3세트</option><option value="4">4세트</option><option value="5">5세트</option></select></label>
+            </div>
+            <datalist id="ig-p-schools"></datalist><datalist id="ig-p-subjects"></datalist>
+            <button type="button" class="ig-btn pri" id="ig-toPast">기출 문제에 넣기</button>
           </div>
         </div>
       </div>
@@ -2127,7 +2144,7 @@ async function withModel(inputId, kind, apiKey, call0) {
   return res;
 }
 function setStatus(msg, kind = '') { const el = q$('#ig-status'); el.textContent = msg; el.className = kind; }
-function setBusy(b) { busy = b; ['#ig-pdfFile', '#ig-applyJson', '#ig-saveHwpx', '#ig-saveAllPng'].forEach(s => { q$(s).disabled = b; }); q$('#ig-pdfLabel').classList.toggle('off', b); }
+function setBusy(b) { busy = b; ['#ig-pdfFile', '#ig-applyJson', '#ig-saveHwpx', '#ig-saveAllPng', '#ig-toPast'].forEach(s => { q$(s).disabled = b; }); q$('#ig-pdfLabel').classList.toggle('off', b); }
 const toBlob = c => new Promise(r => c.toBlob(r, 'image/png'));
 
 /* ----- 흑백 그래프 (create_graph_from_json) ----- */
@@ -2410,6 +2427,7 @@ function showTab(name) {
   document.querySelectorAll('#tab-img .ig-pane').forEach(p => p.classList.toggle('on', p.id === 'ig-pane-' + name));
   if (name === 'json' && !jsonDirty) q$('#ig-jsonText').value = S.questions.length || S.title ? toJsonText() : q$('#ig-jsonText').value;
   if (name === 'save' && S.title && q$('#ig-fileName').dataset.auto !== '0') q$('#ig-fileName').value = S.title.replace(/[\\/:*?"<>|]/g, '').slice(0, 60) || '시험지';
+  if (name === 'save') fillMeta(false);
 }
 document.querySelectorAll('#tab-img .ig-tab').forEach(t => t.addEventListener('click', () => showTab(t.dataset.tab)));
 q$('#ig-fileName').addEventListener('input', e => { e.target.dataset.auto = '0'; });
@@ -2461,14 +2479,13 @@ function b64FromBuffer(buf) {
   return btoa(s);
 }
 async function pdfToJson(file, apiKey) {
-  const b64 = b64FromBuffer(await file.arrayBuffer());
+  return geminiJson(apiKey, [{ inline_data: { mime_type: 'application/pdf', data: b64FromBuffer(await file.arrayBuffer()) } }, { text: PDF_PROMPT }]);
+}
+async function geminiJson(apiKey, parts, temperature = 0) {
   const res = await withModel('ig-textModel', 'text', apiKey, model => fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
-    body: JSON.stringify({
-      contents: [{ parts: [{ inline_data: { mime_type: 'application/pdf', data: b64 } }, { text: PDF_PROMPT }] }],
-      generationConfig: { responseMimeType: 'application/json', temperature: 0 }
-    })
+    body: JSON.stringify({ contents: [{ parts }], generationConfig: { responseMimeType: 'application/json', temperature } })
   }));
   if (!res.ok) throw new Error(`${res.status} ${(await res.text()).slice(0, 300)}`);
   const j = await res.json();
@@ -2488,12 +2505,108 @@ q$('#ig-pdfFile').addEventListener('change', async e => {
     setStatus(`PDF를 JSON으로 변환 중… (${file.name})`);
     const data = await pdfToJson(file, apiKey);
     q$('#ig-jsonText').value = JSON.stringify(data, null, 2);
+    S.file = file.name;
     await applyData(data);
+    fillMeta(true);
     setStatus(`완료: ${S.questions.length}개 문항, 그림 ${S.questions.filter(q => q.figure).length}개. 그래프 좌표는 PDF에서 읽은 근삿값이니 확인해 주세요.`, 'ok');
     showTab('preview');
   } catch (err) { setStatus('오류: ' + err.message, 'err'); }
   setBusy(false);
 });
+
+/* ----- 기출 문제(정답·해설) · 기출 변형 문제 탭으로 보내기 -----
+   문제은행의 pastDB·addPast·PF·PK·idbSet·renderPastSelects·switchTab(앞 script의 전역)을 씀 */
+const blobB64 = b => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(b); });
+const pastText = q => { const p = String(q.passage || '').trim(); return !p ? String(q.question || '') : /^ㄱ\./.test(p) ? `${q.question} <보기> ${p}` : `${q.question}\n${p}`; };
+const pastChoices = cs => (cs || []).map((c, i) => `${CIRCLED[i] || `(${i + 1})`} ${String(c).replace(/^\s*[①-⑩]\s*/, '')}`);
+const circAns = a => { const n = parseInt(String(a ?? '').replace(/[①-⑤]/, m => '①②③④⑤'.indexOf(m) + 1)); return n >= 1 && n <= 5 ? CIRCLED[n - 1] : String(a ?? ''); };
+/* 파일 이름(마석고1-2025-1-1)·시험지 제목(2025학년도 1학기 제1차 … 통합과학)에서 기출 정보 짐작 */
+function guessMeta() {
+  const t = `${S.file || ''} ${S.title || ''}`, o = {};
+  const m = /([가-힣]+?)([1-3])[\s_-]*(20\d\d)[\s_-]+([12])[\s_-]+([1-4])/.exec(t);
+  if (m) { const s = m[1]; o.school = /고$/.test(s) ? s + '등학교' : /중$/.test(s) ? s + '학교' : s; o.grade = (/중/.test(s) ? '중' : '고') + m[2]; o.year = m[3]; o.semester = m[4]; o.round = m[5]; }
+  const y = /(20\d\d)\s*학년도/.exec(t), se = /([12])\s*학기/.exec(t), r = /제?\s*([1-4])\s*차/.exec(t), g = /([1-3])\s*학년/.exec(t);
+  if (y && !o.year) o.year = y[1]; if (se && !o.semester) o.semester = se[1]; if (r && !o.round) o.round = r[1];
+  if (g && !o.grade) o.grade = (/중학교/.test(t) ? '중' : '고') + g[1];
+  const sc = /([가-힣]+(?:고등학교|중학교))/.exec(t); if (sc && !o.school) o.school = sc[1];
+  const sb = /(통합과학\s*[12]?|물리학\s*[ⅠⅡ12]?|화학\s*[ⅠⅡ12]?|생명과학\s*[ⅠⅡ12]?|지구과학\s*[ⅠⅡ12]?)/.exec(t); if (sb) o.subject = sb[1].replace(/\s+/g, '');
+  return o;
+}
+function fillMeta(force) {
+  const o = guessMeta();
+  PF.forEach(k => { const e = q$('#ig-p-' + k); if (o[k] && (force || !e.value.trim())) e.value = o[k]; });
+  const opts = (id, f) => { q$(id).innerHTML = [...new Set(pastDB.map(x => x[f]))].map(v => `<option value="${xesc(v)}">`).join(''); };
+  opts('#ig-p-schools', 'school'); opts('#ig-p-subjects', 'subject');
+}
+/* Gemini에 보낼 문항(글)과 그림(PNG) */
+async function examParts() {
+  const qs = S.questions.map(q => ({ number: q.number, question: q.question, passage: q.passage, choices: q.choices,
+    figure: q.figure ? (q.figure.type === 'graph' ? { type: 'graph', title: q.figure.title, x_label: q.figure.x_label, y_label: q.figure.y_label, series: q.figure.series } : { type: 'diagram', title: q.figure.title, description: q.figure.description }) : null }));
+  const parts = [{ text: '문항 JSON:\n' + JSON.stringify(qs) }];
+  for (const q of S.questions) if (q.figure && S.figs[q.id]) parts.push({ text: `[${q.number}번 문항 그림]` }, { inline_data: { mime_type: 'image/png', data: (await blobB64(S.figs[q.id].blob)).split(',')[1] } });
+  return parts;
+}
+const SOLVE_PROMPT = `위는 과학 시험지의 문항(JSON)과 문항 그림입니다. 각 문항의 정답과 해설을 만드세요. 설명 없이 JSON만 출력합니다.
+- answer는 정답 선택지 번호(1~5)입니다.
+- explanation은 한국어 1~3문장으로, 정답인 이유와 틀린 보기·선택지가 틀린 이유의 핵심만 적습니다.
+출력 형식: {"answers":[{"number":1,"answer":3,"explanation":""}]}`;
+const VAR_PROMPT = (k, prev) => `위는 과학 시험지의 문항(JSON)과 문항 그림입니다. 문항마다 변형 문항을 하나씩 만들어 변형 ${k}세트를 구성하세요. 설명 없이 JSON만 출력합니다.
+규칙
+- 원본과 같은 개념·난이도를 묻되 조건·수치·<보기> 진술·선택지를 바꿔, 원본과 정답이나 풀이가 그대로 같지 않게 합니다.
+- 그림이 있는 문항은 원본 그림을 그대로 다시 씁니다("same_figure": true). 그림에 실제로 나타난 내용과 맞게 질문·보기·선택지만 바꾸고, 그림에 없는 값이나 대상을 지어내지 않습니다. 그림 없이 풀 수 있는 문항으로 바꾸면 "same_figure": false 입니다.
+- 선택지는 원본과 같은 개수로, 번호 기호 없이 내용만 넣습니다. <보기>가 있는 문항은 passage에 "ㄱ. … ㄴ. … ㄷ. …" 형식으로 넣습니다.
+- 과학적으로 정확해야 하고 정답은 하나입니다. explanation은 한국어 1~3문장입니다.${prev ? `\n- 앞 세트와 겹치지 않게 다른 방식으로 바꿉니다. 앞 세트 문항:\n${prev}` : ''}
+출력 형식: {"questions":[{"number":1,"question":"","passage":"","choices":["",""],"answer":1,"explanation":"","same_figure":false}]}`;
+async function toPast() {
+  if (busy) return;
+  if (!S.questions.length) { setStatus('먼저 PDF를 변환하거나 [JSON] 탭에서 JSON을 적용해 주세요.', 'err'); return; }
+  const meta = {}; PF.forEach(k => { meta[k] = q$('#ig-p-' + k).value.trim(); });
+  const miss = PF.filter(k => !meta[k]);
+  if (miss.length) { setStatus(`기출 정보를 채워 주세요: ${miss.map(k => PL[k]).join(', ')}`, 'err'); return; }
+  const apiKey = q$('#ig-apiKey').value.trim(), nv = apiKey ? +q$('#ig-p-var').value || 0 : 0;
+  if (!apiKey && !confirm('API 키가 없어 정답·해설과 변형 문제 없이 문항과 그림만 넣습니다. 계속할까요?')) return;
+  const title = `${meta.school} ${meta.grade} ${meta.subject} ${meta.year}-${meta.semester}-${meta.round}`;
+  if (pastDB.some(y => PF.every(k => String(y[k]) === meta[k])) && !confirm(`${title} 시험지가 이미 있습니다. 새 내용(변형 문제 포함)으로 바꿀까요?`)) return;
+  setBusy(true);
+  const warn = [];
+  try {
+    const imgs = {};
+    for (const q of S.questions) if (q.figure && S.figs[q.id]) imgs[q.id] = await blobB64(S.figs[q.id].blob);
+    const base = S.questions.map(q => ({ question: pastText(q), choices: pastChoices(q.choices), answer: '', explanation: '', ...(imgs[q.id] ? { image: imgs[q.id] } : {}) }));
+    const idx = (n, i) => { const k = S.questions.findIndex(q => String(q.number) === String(n)); return k >= 0 ? k : i; };
+    const sets = [];
+    if (apiKey) {
+      const parts = await examParts();
+      setStatus(`${title}: 원본 문항의 정답·해설을 만드는 중…`);
+      try {
+        const r = await geminiJson(apiKey, [...parts, { text: SOLVE_PROMPT }]);
+        (r.answers || []).forEach((a, i) => { const b = base[idx(a.number, i)]; if (b) { b.answer = circAns(a.answer); b.explanation = String(a.explanation || ''); } });
+      } catch (e) { warn.push('정답·해설 실패: ' + e.message); }
+      for (let k = 1; k <= nv; k++) {
+        setStatus(`${title}: 변형 문제 ${k}/${nv}세트 만드는 중…`);
+        const prev = sets.flat().map(v => `-${v.question.slice(0, 60)}`).join('\n');
+        try {
+          const r = await geminiJson(apiKey, [...parts, { text: VAR_PROMPT(k, prev) }], 0.7);
+          const qs = (r.questions || []).map((v, i) => {
+            const o = S.questions[idx(v.number, i)] || {};
+            return { question: pastText(v), choices: pastChoices(v.choices), answer: circAns(v.answer), explanation: String(v.explanation || ''), ...(v.same_figure && imgs[o.id] ? { image: imgs[o.id] } : {}) };
+          }).filter(v => v.question.trim());
+          if (qs.length) sets.push(qs); else warn.push(`변형 ${k}세트: 문항이 비어 있음`);
+        } catch (e) { warn.push(`변형 ${k}세트 실패: ${e.message}`); }
+      }
+    }
+    const c = { past: 0, prep: 0, bad: 0 };
+    addPast([{ ...meta, questions: base, ...(sets.length ? { variants: sets.map(qs => ({ questions: qs })) } : {}) }], c);
+    if (c.bad) throw new Error('시험지 형식이 올바르지 않습니다');
+    await idbSet(PK, pastDB);
+    PF.forEach(k => { pastSel[k] = meta[k]; });
+    setStatus(`${title}: 기출 문제 ${base.length}문항${apiKey ? '(정답·해설 포함)' : ''}${sets.length ? ` · 변형 ${sets.length}세트` : ''}를 넣었습니다.${warn.length ? '\n⚠ ' + warn.join('\n⚠ ') : ''}`, warn.length ? 'err' : 'ok');
+    toast(`기출 문제${sets.length ? '·기출 변형 문제' : ''} 탭에 넣었습니다`);
+    switchTab(sets.length ? 'var' : 'past');
+  } catch (e) { setStatus('오류: ' + e.message, 'err'); }
+  setBusy(false);
+}
+q$('#ig-toPast').addEventListener('click', toPast);
 
 /* ----- ZIP / HWPX ----- */
 const crcTable = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
