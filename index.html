@@ -342,8 +342,9 @@ input.dn-over[type=number]{border-color:#ef4444!important;background:#fef2f2!imp
         <p>PDF를 고르면 JSON으로 변환하고, 그림·그래프를 흑백 이미지(PNG)로 만든 뒤 시험지 미리보기에 끼워 넣습니다. 미리보기에서 바로 수정하고 HWPX로 저장합니다.</p>
       </div>
       <div class="ig-set">
-        <label>Gemini API 키 (PDF 변환·그림 생성에 필요, 저장되지 않음)
+        <label>Gemini API 키 (PDF 변환·그림 생성에 필요)
           <input type="password" id="ig-apiKey" placeholder="AIza..." autocomplete="off">
+          <span class="flex items-center gap-2 mt-1"><input type="checkbox" id="ig-keyRemember" class="accent-indigo-600"><span>이 브라우저에 기억 (개인 PC에서만)</span><button type="button" id="ig-keyClear" class="ig-btn" style="padding:2px 8px;font-size:.7rem">지우기</button></span>
         </label>
         <label>PDF 변환 모델
           <input type="text" id="ig-textModel" value="gemini-2.5-flash">
@@ -2044,6 +2045,17 @@ const W = 1500, H = 1200;       // figsize (5, 4) × dpi 300
 const S = { title: '', questions: [], figs: {} };   // figs[id] = {key, blob, url, w, h, note}
 let busy = false, jsonDirty = false;
 
+/* API 키: '기억'을 켜면 이 브라우저(localStorage)에만 둠. HTML·GitHub·학생 기기에는 들어가지 않음 */
+const KEY_LS = 'sciBankGeminiKey';
+const lsGet = () => { try { return localStorage.getItem(KEY_LS) || ''; } catch (e) { return ''; } };
+const lsSet = v => { try { v ? localStorage.setItem(KEY_LS, v) : localStorage.removeItem(KEY_LS); } catch (e) {} };
+{
+  const k = q$('#ig-apiKey'), rm = q$('#ig-keyRemember'), saved = lsGet();
+  if (saved) { k.value = saved; rm.checked = true; }
+  k.addEventListener('input', () => { if (rm.checked) lsSet(k.value.trim()); });
+  rm.addEventListener('change', () => { lsSet(rm.checked ? k.value.trim() : ''); toast(rm.checked ? (k.value.trim() ? 'API 키를 이 브라우저에 기억합니다' : '키를 입력하면 이 브라우저에 기억합니다') : '기억한 API 키를 지웠습니다'); });
+  q$('#ig-keyClear').addEventListener('click', () => { k.value = ''; rm.checked = false; lsSet(''); toast('API 키를 지웠습니다'); });
+}
 function setStatus(msg, kind = '') { const el = q$('#ig-status'); el.textContent = msg; el.className = kind; }
 function setBusy(b) { busy = b; ['#ig-pdfFile', '#ig-applyJson', '#ig-saveHwpx', '#ig-saveAllPng'].forEach(s => { q$(s).disabled = b; }); q$('#ig-pdfLabel').classList.toggle('off', b); }
 const toBlob = c => new Promise(r => c.toBlob(r, 'image/png'));
