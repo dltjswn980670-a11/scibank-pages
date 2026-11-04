@@ -2081,8 +2081,19 @@ async function replacementModel(errText, apiKey, kind) {
   ok.sort((a, b) => ver(b.name) - ver(a.name));
   return ok[0] ? ok[0].name.replace(/^models\//, '') : '';
 }
-async function withModel(inputId, kind, apiKey, call) {
-  const inp = q$('#' + inputId);
+// 서버 혼잡(503)·요청 한도(429)는 잠깐 기다렸다가 다시 시도 (5초 → 10초 → 20초 → 40초)
+async function retryBusy(call) {
+  const waits = [5, 10, 20, 40];
+  for (let i = 0; ; i++) {
+    const res = await call();
+    if (![429, 500, 503].includes(res.status) || i >= waits.length) return res;
+    const prev = q$('#ig-status').textContent.replace(/\s*⏳.*$/s, '');
+    for (let s = waits[i]; s > 0; s--) { setStatus(`${prev}\n⏳ Gemini 서버가 혼잡해서 ${s}초 뒤 다시 시도합니다 (${i + 1}/${waits.length})`); await new Promise(r => setTimeout(r, 1000)); }
+    setStatus(prev);
+  }
+}
+async function withModel(inputId, kind, apiKey, call0) {
+  const inp = q$('#' + inputId), call = m => retryBusy(() => call0(m));
   let res = await call(inp.value.trim());
   if (res.status === 404) {
     const t = await res.clone().text(), alt = await replacementModel(t, apiKey, kind);
