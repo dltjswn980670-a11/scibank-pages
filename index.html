@@ -166,6 +166,7 @@ input.dn-over[type=number]{border-color:#ef4444!important;background:#fef2f2!imp
 #tab-img .ig-set{padding:14px 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px 14px}
 #tab-img .ig-set label{display:flex;flex-direction:column;gap:3px;font-size:.75rem;color:var(--muted)}
 #tab-img .ig-set input{padding:7px 9px;font-size:.85rem;color:var(--ink)}
+#tab-img .ig-set select{padding:7px 9px;font-size:.85rem;color:var(--ink);border:1px solid var(--line);border-radius:6px;background:transparent}
 #tab-img .ig-row{padding:0 20px 14px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 #tab-img .ig-btn{font-size:.85rem;font-weight:600;padding:7px 13px;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:8px;cursor:pointer}
 #tab-img .ig-btn:hover{border-color:var(--accent);color:var(--accent)}
@@ -353,6 +354,9 @@ input.dn-over[type=number]{border-color:#ef4444!important;background:#fef2f2!imp
         </label>
         <label>그림 생성 모델
           <input type="text" id="ig-imageModel" value="imagen-3.0-generate-002">
+        </label>
+        <label>그림 만들기
+          <select id="ig-figMode"><option value="crop">원본 PDF에서 잘라 내기 (권장)</option><option value="ai">AI로 새로 그리기</option></select>
         </label>
       </div>
       <div class="ig-row">
@@ -2074,7 +2078,7 @@ const lsSet = v => { try { v ? localStorage.setItem(KEY_LS, v) : localStorage.re
   q$('#ig-keyClear').addEventListener('click', () => { k.value = ''; rm.checked = false; lsSet(''); toast('API 키를 지웠습니다'); });
 }
 /* 모델 이름: 고친 값은 이 브라우저에 기억. 없어진 모델이면(404) 쓸 수 있는 모델을 찾아 바꾼 뒤 다시 시도 */
-['ig-textModel', 'ig-imageModel'].forEach(id => {
+['ig-textModel', 'ig-imageModel', 'ig-figMode'].forEach(id => {
   const e = q$('#' + id), k = 'sciBank_' + id;
   try { const v = localStorage.getItem(k); if (v) e.value = v; } catch (err) {}
   e.addEventListener('change', () => { try { localStorage.setItem(k, e.value.trim()); } catch (err) {} });
@@ -2088,24 +2092,26 @@ async function listModels(apiKey) {
   } while (tok);
   return out;
 }
+// 그림 모델: imagen(:predict) 또는 gemini-…-image(:generateContent)
+const imgModelOk = x => { const m = x.supportedGenerationMethods || []; return /imagen/.test(x.name) ? m.includes('predict') : /^models\/gemini.*image/.test(x.name) && m.includes('generateContent'); };
 // 404 응답에서 대신 쓸 모델을 고름: 오류 글에 권장 모델이 있으면 그것, 없으면 목록에서 같은 종류의 가장 새 모델
 async function replacementModel(errText, apiKey, kind) {
   const m = /use (?:models\/)?([a-z0-9][\w.\-]*)/i.exec(errText); if (m && m[1] !== 'the') return m[1].replace(/[.,]$/, '');
   const ms = await listModels(apiKey).catch(() => []);
-  const ok = ms.filter(x => kind === 'image' ? /imagen/.test(x.name) && (x.supportedGenerationMethods || []).includes('predict')
+  const ok = ms.filter(x => kind === 'image' ? imgModelOk(x)
     : /gemini-[\d.]+-flash$/.test(x.name) && (x.supportedGenerationMethods || []).includes('generateContent'));
   const ver = n => (/(\d+(?:\.\d+)?)/.exec(n.replace(/^models\/\D*/, '')) || [0, 0])[1] * 1;
-  ok.sort((a, b) => ver(b.name) - ver(a.name));
+  ok.sort((a, b) => (kind === 'image' ? /imagen/.test(b.name) - /imagen/.test(a.name) : 0) || ver(b.name) - ver(a.name));
   return ok[0] ? ok[0].name.replace(/^models\//, '') : '';
 }
 // 같은 종류의 다른 모델들 (서버 혼잡이 계속될 때 차례로 시도): flash → flash-lite → pro, 각각 새 버전부터
 async function otherModels(apiKey, kind, cur) {
   const ms = await listModels(apiKey).catch(() => []);
   const ver = n => (/(\d+(?:\.\d+)?)/.exec(n) || [0, 0])[1] * 1;
-  const tier = n => kind === 'image' ? 0 : /-flash$/.test(n) ? 0 : /-flash-lite$/.test(n) ? 1 : 2;
-  return ms.filter(x => (x.supportedGenerationMethods || []).includes(kind === 'image' ? 'predict' : 'generateContent'))
+  const tier = n => kind === 'image' ? (/^imagen/.test(n) ? 0 : 1) : /-flash$/.test(n) ? 0 : /-flash-lite$/.test(n) ? 1 : 2;
+  return ms.filter(x => kind === 'image' ? imgModelOk(x) : (x.supportedGenerationMethods || []).includes('generateContent'))
     .map(x => x.name.replace(/^models\//, ''))
-    .filter(n => n !== cur && (kind === 'image' ? /^imagen-/.test(n) : /^gemini-[\d.]+-(flash|flash-lite|pro)$/.test(n)))
+    .filter(n => n !== cur && (kind === 'image' || /^gemini-[\d.]+-(flash|flash-lite|pro)$/.test(n)))
     .sort((a, b) => tier(a) - tier(b) || ver(b) - ver(a)).slice(0, 4);
 }
 // 서버 혼잡(503)·요청 한도(429)는 잠깐 기다렸다가 다시 시도 (5초 → 10초 → 20초 → 40초)
@@ -2129,16 +2135,22 @@ async function withModel(inputId, kind, apiKey, call0) {
       res = await call(alt);
     }
   }
-  // 기다려도 계속 혼잡하면 다른 모델로 (설정은 그대로 두고 이번 요청만)
-  if ([429, 500, 503].includes(res.status)) {
-    const cur = inp.value.trim();
+  // 기다려도 계속 혼잡하면 다른 모델로 (설정은 그대로 두고 이번 요청만).
+  // 그림 모델은 이 키로 못 쓰는 경우(400 유료 전용·403·404)도 다른 그림 모델을 찾아 쓰고, 되면 설정을 그 모델로 바꿈
+  const BUSY = [429, 500, 503], HARD = kind === 'image' ? [400, 403, 404] : [];
+  if ([...BUSY, ...HARD].includes(res.status)) {
+    const cur = inp.value.trim(), hard = HARD.includes(res.status);
     for (const m of await otherModels(apiKey, kind, cur)) {
       const prev = q$('#ig-status').textContent.replace(/\s*⏳.*$/s, '');
-      setStatus(`${prev}\n⏳ '${cur}' 모델이 계속 혼잡해서 '${m}'(으)로 시도합니다`);
+      setStatus(`${prev}\n⏳ '${cur}' 모델이 ${hard ? '이 키로 쓸 수 없어' : '계속 혼잡해서'} '${m}'(으)로 시도합니다`);
       const r = await retryBusy(() => call0(m), [5]);
       setStatus(prev);
-      if (r.ok) { toast(`'${cur}' 모델이 혼잡해서 이번에는 '${m}'(으)로 처리했습니다`); return r; }
-      if (![404, 429, 500, 503].includes(r.status)) return r;
+      if (r.ok) {
+        if (hard) { inp.value = m; try { localStorage.setItem('sciBank_' + inputId, m); } catch (e) {} toast(`'${cur}' 모델을 쓸 수 없어 '${m}'(으)로 바꿉니다`); }
+        else toast(`'${cur}' 모델이 혼잡해서 이번에는 '${m}'(으)로 처리했습니다`);
+        return r;
+      }
+      if (![404, ...BUSY, ...HARD].includes(r.status)) return r;
     }
   }
   return res;
@@ -2271,6 +2283,35 @@ function renderGraph(item) {
   return c;
 }
 
+/* ----- 원본 PDF에서 그림 잘라 내기: Gemini가 알려 준 page·box_2d(0~1000)를 pdf.js로 그려서 자름 ----- */
+let pdfjsP = null;
+const loadPdfjs = () => pdfjsP || (pdfjsP = new Promise((res, rej) => {
+  const s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+  s.onload = () => { pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'; res(pdfjsLib); };
+  s.onerror = () => { pdfjsP = null; rej(new Error('pdf.js를 불러오지 못했습니다')); };
+  document.head.appendChild(s);
+}));
+const pageCache = {};
+async function cropFig(f) {
+  const lib = await loadPdfjs();
+  if (!S.pdfDoc) { S.pdfDoc = await lib.getDocument({ data: S.pdf.slice(0) }).promise; Object.keys(pageCache).forEach(k => delete pageCache[k]); }
+  const p = Math.round(+f.page);
+  if (!(p >= 1 && p <= S.pdfDoc.numPages)) throw new Error(`${f.page}쪽이 없습니다`);
+  if (!pageCache[p]) {
+    const pg = await S.pdfDoc.getPage(p), vp0 = pg.getViewport({ scale: 1 }), vp = pg.getViewport({ scale: Math.min(4, 2400 / vp0.width) });
+    const c = document.createElement('canvas'); c.width = vp.width; c.height = vp.height;
+    // intent 'print': 화면 그리기(requestAnimationFrame)에 기대지 않아 창이 가려져 있어도 끝까지 그림
+    await pg.render({ canvasContext: c.getContext('2d'), viewport: vp, intent: 'print' }).promise; pageCache[p] = c;
+  }
+  const pc = pageCache[p], [y0, x0, y1, x1] = f.box_2d.map(Number), pad = 6;
+  if (![y0, x0, y1, x1].every(isFinite) || y1 - y0 < 20 || x1 - x0 < 20) throw new Error('그림 위치가 올바르지 않습니다');
+  const L = Math.max(0, (x0 - pad) / 1000 * pc.width), T = Math.max(0, (y0 - pad) / 1000 * pc.height);
+  const w = Math.min(pc.width, (x1 + pad) / 1000 * pc.width) - L, h = Math.min(pc.height, (y1 + pad) / 1000 * pc.height) - T;
+  const c = document.createElement('canvas'); c.width = Math.round(w); c.height = Math.round(h);
+  const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(pc, L, T, w, h, 0, 0, c.width, c.height);
+  return c;
+}
+
 /* ----- AI 라인아트 / 텍스트 대체 (generate_ai_lineart) ----- */
 const AI_SYSTEM_PROMPT =
   'Black and white line art vector diagram for a high school science exam paper. ' +
@@ -2278,15 +2319,20 @@ const AI_SYSTEM_PROMPT =
   'Scientific, educational, clear structure: ';
 const AI_NO_EXTRA = ' Draw only the elements and labels described above; do not add anything else.';
 
+/* imagen-* 은 :predict, gemini-*-image 는 :generateContent(응답의 inlineData)로 그림을 받음 */
+const isGemImg = m => /^gemini/.test(m);
 async function generateAI(prompt, apiKey) {
-  const res = await withModel('ig-imageModel', 'image', apiKey, model => fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:predict`, {
+  const text = AI_SYSTEM_PROMPT + prompt + AI_NO_EXTRA;
+  const res = await withModel('ig-imageModel', 'image', apiKey, model => fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:${isGemImg(model) ? 'generateContent' : 'predict'}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
-    body: JSON.stringify({ instances: [{ prompt: AI_SYSTEM_PROMPT + prompt + AI_NO_EXTRA }], parameters: { sampleCount: 1, aspectRatio: '1:1' } })
+    body: JSON.stringify(isGemImg(model) ? { contents: [{ parts: [{ text }] }], generationConfig: { responseModalities: ['TEXT', 'IMAGE'] } }
+      : { instances: [{ prompt: text }], parameters: { sampleCount: 1, aspectRatio: '1:1' } })
   }));
   if (!res.ok) throw new Error(`${res.status} ${(await res.text()).slice(0, 200)}`);
   const j = await res.json();
-  const p = j.predictions && j.predictions[0];
+  const ip = ((((j.candidates || [])[0] || {}).content || {}).parts || []).map(x => x.inlineData || x.inline_data).find(Boolean);
+  const p = ip ? { bytesBase64Encoded: ip.data, mimeType: ip.mimeType || ip.mime_type } : j.predictions && j.predictions[0];
   if (!p || !p.bytesBase64Encoded) throw new Error('이미지 응답이 비어 있습니다');
   const bin = atob(p.bytesBase64Encoded), u8 = new Uint8Array(bin.length);
   for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
@@ -2341,26 +2387,29 @@ const toJsonText = () => JSON.stringify({ exam_title: S.title, questions: S.ques
 
 /* ----- 이미지 생성 ----- */
 async function ensureFigures() {
-  const apiKey = q$('#ig-apiKey').value.trim(), model = q$('#ig-imageModel').value.trim();
+  const apiKey = q$('#ig-apiKey').value.trim(), model = q$('#ig-imageModel').value.trim(), mode = q$('#ig-figMode').value;
   const targets = S.questions.filter(q => q.figure);
   const alive = new Set(targets.map(q => q.id));
   Object.keys(S.figs).forEach(id => { if (!alive.has(id)) { URL.revokeObjectURL(S.figs[id].url); delete S.figs[id]; } });
   let n = 0;
   for (const q of targets) {
     n++;
-    const f = q.figure, key = JSON.stringify(f) + '|' + (f.type === 'graph' ? '' : (apiKey ? model : 'nokey'));
+    const f = q.figure, key = JSON.stringify(f) + '|' + mode + (S.pdf ? '|pdf' : '') + '|' + (f.type === 'graph' ? '' : (apiKey ? model : 'nokey'));
     if (S.figs[q.id] && S.figs[q.id].key === key) continue;
     setStatus(`[${n}/${targets.length}] 이미지 생성 중: ${q.id} (${f.title || '제목 없음'})`);
     let canvas, note = '';
-    if (f.type === 'graph') canvas = renderGraph(f);
-    else {
+    if (mode === 'crop' && S.pdf && f.page && Array.isArray(f.box_2d)) {
+      try { canvas = await cropFig(f); } catch (e) { note = `원본에서 잘라 내지 못함 → ${f.type === 'graph' ? '그래프를 다시 그림' : 'AI 그림'} (${e.message})`; }
+    }
+    if (!canvas && f.type === 'graph') canvas = renderGraph(f);
+    else if (!canvas) {
       const desc = f.description || f.title || '';
       try {
         if (!apiKey) throw new Error('API 키가 없습니다');
         canvas = await generateAI(desc, apiKey);
       } catch (e) {
         canvas = renderTextFallback(q.id, desc);
-        note = `AI 그림 생성 실패 → 텍스트 대체 이미지 (${e.message})`;
+        note = (note ? note + ' · ' : '') + `AI 그림 생성 실패 → 텍스트 대체 이미지 (${e.message})`;
       }
     }
     const blob = await toBlob(canvas);
@@ -2468,10 +2517,11 @@ const PDF_PROMPT = `첨부된 PDF는 시험지입니다. 시험지 전체를 아
   · 축과 값이 있는 데이터 그래프: "type":"graph". x_label, y_label, series를 채웁니다. series의 각 항목은 {"name":"","x":[숫자...],"y":[숫자...],"linestyle":"-"} 이고 linestyle은 "-", "--", ":" 중 하나입니다. 점 좌표는 그래프에서 읽은 값입니다.
   · 그 외의 그림(모식도, 실험 장치, 도식 등): "type":"diagram". description에는 그림에 실제로 보이는 대상과 그림 안의 글자(라벨)만 영어로 구체적으로 적습니다. 그림에 없는 요소는 쓰지 않습니다.
 - figure.title에는 그림에 붙은 제목이나 캡션이 있을 때만 적고, 없으면 빈 문자열입니다.
+- figure에는 그림의 위치도 넣습니다. page는 그림이 있는 PDF 쪽 번호(1부터), box_2d는 그 쪽 전체를 0~1000으로 본 [ymin, xmin, ymax, xmax]입니다. 그림과 그림 안의 글자·라벨만 감싸고, 문제 글·<보기>·선택지는 넣지 않습니다.
 
 출력 형식
 {"exam_title":"","questions":[{"id":"q01","number":1,"question":"","passage":"","choices":["",""],"figure":null}]}
-figure가 있을 때: {"id":"q01","type":"graph 또는 diagram","title":"","x_label":"","y_label":"","series":[],"description":""}`;
+figure가 있을 때: {"id":"q01","type":"graph 또는 diagram","title":"","x_label":"","y_label":"","series":[],"description":"","page":1,"box_2d":[0,0,1000,1000]}`;
 
 function b64FromBuffer(buf) {
   const u8 = new Uint8Array(buf); let s = ''; const CH = 0x8000;
@@ -2503,9 +2553,9 @@ q$('#ig-pdfFile').addEventListener('change', async e => {
   setBusy(true);
   try {
     setStatus(`PDF를 JSON으로 변환 중… (${file.name})`);
-    const data = await pdfToJson(file, apiKey);
+    const pdfBuf = await file.arrayBuffer(), data = await pdfToJson(file, apiKey);
     q$('#ig-jsonText').value = JSON.stringify(data, null, 2);
-    S.file = file.name;
+    S.file = file.name; S.pdf = pdfBuf; S.pdfDoc = null;
     await applyData(data);
     fillMeta(true);
     setStatus(`완료: ${S.questions.length}개 문항, 그림 ${S.questions.filter(q => q.figure).length}개. 그래프 좌표는 PDF에서 읽은 근삿값이니 확인해 주세요.`, 'ok');
@@ -2517,6 +2567,14 @@ q$('#ig-pdfFile').addEventListener('change', async e => {
 /* ----- 기출 문제(정답·해설) · 기출 변형 문제 탭으로 보내기 -----
    문제은행의 pastDB·addPast·PF·PK·idbSet·renderPastSelects·switchTab(앞 script의 전역)을 씀 */
 const blobB64 = b => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(b); });
+/* 기출 DB에 넣을 그림: 큰 그림(원본 스캔을 자른 것 등)은 폭 1200px 이하 JPEG로 줄임 */
+async function smallImg(b) {
+  if (b.size < 150000) return blobB64(b);
+  const bm = await createImageBitmap(b), k = Math.min(1, 1200 / bm.width), c = document.createElement('canvas');
+  c.width = Math.round(bm.width * k); c.height = Math.round(bm.height * k);
+  const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(bm, 0, 0, c.width, c.height);
+  return c.toDataURL('image/jpeg', 0.85);
+}
 const pastText = q => { const p = String(q.passage || '').trim(); return !p ? String(q.question || '') : /^ㄱ\./.test(p) ? `${q.question} <보기> ${p}` : `${q.question}\n${p}`; };
 const pastChoices = cs => (cs || []).map((c, i) => `${CIRCLED[i] || `(${i + 1})`} ${String(c).replace(/^\s*[①-⑩]\s*/, '')}`);
 const circAns = a => { const n = parseInt(String(a ?? '').replace(/[①-⑤]/, m => '①②③④⑤'.indexOf(m) + 1)); return n >= 1 && n <= 5 ? CIRCLED[n - 1] : String(a ?? ''); };
@@ -2571,7 +2629,7 @@ async function toPast() {
   const warn = [];
   try {
     const imgs = {};
-    for (const q of S.questions) if (q.figure && S.figs[q.id]) imgs[q.id] = await blobB64(S.figs[q.id].blob);
+    for (const q of S.questions) if (q.figure && S.figs[q.id]) imgs[q.id] = await smallImg(S.figs[q.id].blob);
     const base = S.questions.map(q => ({ question: pastText(q), choices: pastChoices(q.choices), answer: '', explanation: '', ...(imgs[q.id] ? { image: imgs[q.id] } : {}) }));
     const idx = (n, i) => { const k = S.questions.findIndex(q => String(q.number) === String(n)); return k >= 0 ? k : i; };
     const sets = [];
