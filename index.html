@@ -2081,9 +2081,18 @@ async function replacementModel(errText, apiKey, kind) {
   ok.sort((a, b) => ver(b.name) - ver(a.name));
   return ok[0] ? ok[0].name.replace(/^models\//, '') : '';
 }
+// 같은 종류의 다른 모델들 (서버 혼잡이 계속될 때 차례로 시도): flash → flash-lite → pro, 각각 새 버전부터
+async function otherModels(apiKey, kind, cur) {
+  const ms = await listModels(apiKey).catch(() => []);
+  const ver = n => (/(\d+(?:\.\d+)?)/.exec(n) || [0, 0])[1] * 1;
+  const tier = n => kind === 'image' ? 0 : /-flash$/.test(n) ? 0 : /-flash-lite$/.test(n) ? 1 : 2;
+  return ms.filter(x => (x.supportedGenerationMethods || []).includes(kind === 'image' ? 'predict' : 'generateContent'))
+    .map(x => x.name.replace(/^models\//, ''))
+    .filter(n => n !== cur && (kind === 'image' ? /^imagen-/.test(n) : /^gemini-[\d.]+-(flash|flash-lite|pro)$/.test(n)))
+    .sort((a, b) => tier(a) - tier(b) || ver(b) - ver(a)).slice(0, 4);
+}
 // 서버 혼잡(503)·요청 한도(429)는 잠깐 기다렸다가 다시 시도 (5초 → 10초 → 20초 → 40초)
-async function retryBusy(call) {
-  const waits = [5, 10, 20, 40];
+async function retryBusy(call, waits = [5, 10, 20, 40]) {
   for (let i = 0; ; i++) {
     const res = await call();
     if (![429, 500, 503].includes(res.status) || i >= waits.length) return res;
@@ -2101,6 +2110,18 @@ async function withModel(inputId, kind, apiKey, call0) {
       toast(`'${inp.value.trim()}' 모델을 쓸 수 없어 '${alt}'(으)로 바꿉니다`);
       inp.value = alt; try { localStorage.setItem('sciBank_' + inputId, alt); } catch (e) {}
       res = await call(alt);
+    }
+  }
+  // 기다려도 계속 혼잡하면 다른 모델로 (설정은 그대로 두고 이번 요청만)
+  if ([429, 500, 503].includes(res.status)) {
+    const cur = inp.value.trim();
+    for (const m of await otherModels(apiKey, kind, cur)) {
+      const prev = q$('#ig-status').textContent.replace(/\s*⏳.*$/s, '');
+      setStatus(`${prev}\n⏳ '${cur}' 모델이 계속 혼잡해서 '${m}'(으)로 시도합니다`);
+      const r = await retryBusy(() => call0(m), [5]);
+      setStatus(prev);
+      if (r.ok) { toast(`'${cur}' 모델이 혼잡해서 이번에는 '${m}'(으)로 처리했습니다`); return r; }
+      if (![404, 429, 500, 503].includes(r.status)) return r;
     }
   }
   return res;
