@@ -347,7 +347,7 @@ input.dn-over[type=number]{border-color:#ef4444!important;background:#fef2f2!imp
           <span class="flex items-center gap-2 mt-1"><input type="checkbox" id="ig-keyRemember" class="accent-indigo-600"><span>이 브라우저에 기억 (개인 PC에서만)</span><button type="button" id="ig-keyClear" class="ig-btn" style="padding:2px 8px;font-size:.7rem">지우기</button></span>
         </label>
         <label>PDF 변환 모델
-          <input type="text" id="ig-textModel" value="gemini-2.5-flash">
+          <input type="text" id="ig-textModel" value="gemini-3.8-flash">
         </label>
         <label>그림 생성 모델
           <input type="text" id="ig-imageModel" value="imagen-3.0-generate-002">
@@ -2056,6 +2056,44 @@ const lsSet = v => { try { v ? localStorage.setItem(KEY_LS, v) : localStorage.re
   rm.addEventListener('change', () => { lsSet(rm.checked ? k.value.trim() : ''); toast(rm.checked ? (k.value.trim() ? 'API 키를 이 브라우저에 기억합니다' : '키를 입력하면 이 브라우저에 기억합니다') : '기억한 API 키를 지웠습니다'); });
   q$('#ig-keyClear').addEventListener('click', () => { k.value = ''; rm.checked = false; lsSet(''); toast('API 키를 지웠습니다'); });
 }
+/* 모델 이름: 고친 값은 이 브라우저에 기억. 없어진 모델이면(404) 쓸 수 있는 모델을 찾아 바꾼 뒤 다시 시도 */
+['ig-textModel', 'ig-imageModel'].forEach(id => {
+  const e = q$('#' + id), k = 'sciBank_' + id;
+  try { const v = localStorage.getItem(k); if (v) e.value = v; } catch (err) {}
+  e.addEventListener('change', () => { try { localStorage.setItem(k, e.value.trim()); } catch (err) {} });
+});
+async function listModels(apiKey) {
+  const out = []; let tok = '';
+  do {
+    const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=1000' + (tok ? '&pageToken=' + tok : ''), { headers: { 'x-goog-api-key': apiKey } });
+    if (!res.ok) break;
+    const j = await res.json(); (j.models || []).forEach(m => out.push(m)); tok = j.nextPageToken || '';
+  } while (tok);
+  return out;
+}
+// 404 응답에서 대신 쓸 모델을 고름: 오류 글에 권장 모델이 있으면 그것, 없으면 목록에서 같은 종류의 가장 새 모델
+async function replacementModel(errText, apiKey, kind) {
+  const m = /use (?:models\/)?([a-z0-9][\w.\-]*)/i.exec(errText); if (m && m[1] !== 'the') return m[1].replace(/[.,]$/, '');
+  const ms = await listModels(apiKey).catch(() => []);
+  const ok = ms.filter(x => kind === 'image' ? /imagen/.test(x.name) && (x.supportedGenerationMethods || []).includes('predict')
+    : /gemini-[\d.]+-flash$/.test(x.name) && (x.supportedGenerationMethods || []).includes('generateContent'));
+  const ver = n => (/(\d+(?:\.\d+)?)/.exec(n.replace(/^models\/\D*/, '')) || [0, 0])[1] * 1;
+  ok.sort((a, b) => ver(b.name) - ver(a.name));
+  return ok[0] ? ok[0].name.replace(/^models\//, '') : '';
+}
+async function withModel(inputId, kind, apiKey, call) {
+  const inp = q$('#' + inputId);
+  let res = await call(inp.value.trim());
+  if (res.status === 404) {
+    const t = await res.clone().text(), alt = await replacementModel(t, apiKey, kind);
+    if (alt && alt !== inp.value.trim()) {
+      toast(`'${inp.value.trim()}' 모델을 쓸 수 없어 '${alt}'(으)로 바꿉니다`);
+      inp.value = alt; try { localStorage.setItem('sciBank_' + inputId, alt); } catch (e) {}
+      res = await call(alt);
+    }
+  }
+  return res;
+}
 function setStatus(msg, kind = '') { const el = q$('#ig-status'); el.textContent = msg; el.className = kind; }
 function setBusy(b) { busy = b; ['#ig-pdfFile', '#ig-applyJson', '#ig-saveHwpx', '#ig-saveAllPng'].forEach(s => { q$(s).disabled = b; }); q$('#ig-pdfLabel').classList.toggle('off', b); }
 const toBlob = c => new Promise(r => c.toBlob(r, 'image/png'));
@@ -2191,12 +2229,12 @@ const AI_SYSTEM_PROMPT =
   'Scientific, educational, clear structure: ';
 const AI_NO_EXTRA = ' Draw only the elements and labels described above; do not add anything else.';
 
-async function generateAI(prompt, apiKey, model) {
-  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:predict`, {
+async function generateAI(prompt, apiKey) {
+  const res = await withModel('ig-imageModel', 'image', apiKey, model => fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:predict`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
     body: JSON.stringify({ instances: [{ prompt: AI_SYSTEM_PROMPT + prompt + AI_NO_EXTRA }], parameters: { sampleCount: 1, aspectRatio: '1:1' } })
-  });
+  }));
   if (!res.ok) throw new Error(`${res.status} ${(await res.text()).slice(0, 200)}`);
   const j = await res.json();
   const p = j.predictions && j.predictions[0];
@@ -2270,7 +2308,7 @@ async function ensureFigures() {
       const desc = f.description || f.title || '';
       try {
         if (!apiKey) throw new Error('API 키가 없습니다');
-        canvas = await generateAI(desc, apiKey, model);
+        canvas = await generateAI(desc, apiKey);
       } catch (e) {
         canvas = renderTextFallback(q.id, desc);
         note = `AI 그림 생성 실패 → 텍스트 대체 이미지 (${e.message})`;
@@ -2390,16 +2428,16 @@ function b64FromBuffer(buf) {
   for (let i = 0; i < u8.length; i += CH) s += String.fromCharCode.apply(null, u8.subarray(i, i + CH));
   return btoa(s);
 }
-async function pdfToJson(file, apiKey, model) {
+async function pdfToJson(file, apiKey) {
   const b64 = b64FromBuffer(await file.arrayBuffer());
-  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
+  const res = await withModel('ig-textModel', 'text', apiKey, model => fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
     body: JSON.stringify({
       contents: [{ parts: [{ inline_data: { mime_type: 'application/pdf', data: b64 } }, { text: PDF_PROMPT }] }],
       generationConfig: { responseMimeType: 'application/json', temperature: 0 }
     })
-  });
+  }));
   if (!res.ok) throw new Error(`${res.status} ${(await res.text()).slice(0, 300)}`);
   const j = await res.json();
   const cand = j.candidates && j.candidates[0];
@@ -2416,7 +2454,7 @@ q$('#ig-pdfFile').addEventListener('change', async e => {
   setBusy(true);
   try {
     setStatus(`PDF를 JSON으로 변환 중… (${file.name})`);
-    const data = await pdfToJson(file, apiKey, q$('#ig-textModel').value.trim());
+    const data = await pdfToJson(file, apiKey);
     q$('#ig-jsonText').value = JSON.stringify(data, null, 2);
     await applyData(data);
     setStatus(`완료: ${S.questions.length}개 문항, 그림 ${S.questions.filter(q => q.figure).length}개. 그래프 좌표는 PDF에서 읽은 근삿값이니 확인해 주세요.`, 'ok');
