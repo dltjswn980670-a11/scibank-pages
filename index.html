@@ -360,18 +360,7 @@ input.dn-over[type=number]{border-color:#ef4444!important;background:#fef2f2!imp
         <label class="text-sm cursor-pointer"><input type="checkbox" id="past-edit" onchange="renderPast(curPast)" class="mr-1">🖼 그림 넣기·바꾸기</label>
         <label for="past-figs" class="cursor-pointer bg-white hover:bg-gray-50 border px-3 py-2 rounded-lg text-xs font-bold" title="파일 이름의 숫자를 문항 번호로 봅니다 (예: 5.png, q05.png, 5번.jpg)">🖼 그림 파일 한꺼번에 넣기</label>
         <input type="file" id="past-figs" accept="image/*" multiple class="hidden" onchange="pastFigFiles(this)">
-        <span class="flex-1"></span>
-        <select id="past-vn" class="border rounded-lg p-2 text-sm"><option value="1">변형 1세트</option><option value="2">2세트</option><option value="3">3세트</option></select>
-        <button onclick="pastMakeVariants()" class="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-lg font-medium transition text-sm" title="이 시험지의 원본 문항으로 Gemini가 변형 문제를 만들어 기출 변형 문제에 넣습니다. 그림이 있는 문항은 같은 그림을 씁니다">🔄 변형 문제 만들기</button>
       </div>
-      <details class="text-sm"><summary class="cursor-pointer text-gray-500 text-xs">⚙ Gemini 설정 (변형 문제 만들기에 필요)</summary>
-        <div class="grid sm:grid-cols-2 gap-3 mt-2">
-          <label class="text-xs text-gray-500">Gemini API 키<input type="password" id="past-key" autocomplete="off" placeholder="AIza..." class="block w-full border rounded-lg p-2 text-sm mt-1">
-            <span class="flex items-center gap-2 mt-1"><input type="checkbox" id="past-keyrm" class="accent-indigo-600">이 브라우저에 기억 (개인 PC에서만)</span></label>
-          <label class="text-xs text-gray-500">모델<input type="text" id="past-model" value="gemini-3.8-flash" class="block w-full border rounded-lg p-2 text-sm mt-1"></label>
-        </div>
-        <p class="text-xs text-gray-400 mt-1">API 키는 aistudio.google.com에서 만들 수 있습니다. 키는 이 브라우저에만 두고 서버·학생 화면에는 보내지 않습니다.</p>
-      </details>
     </div>
     <div id="print-area" class="bg-white rounded-xl shadow-md p-8 max-w-4xl mx-auto"></div>
   </section>
@@ -1346,7 +1335,7 @@ function renderPast(x) {
     (ans ? `<div class="pq border-t pt-4 mt-8"><h3 class="font-bold mb-2">[정답 및 해설]</h3>${qs.map((q, i) => `<p class="text-sm">${i+1}번 정답: ${esc(q.answer)} ${q.explanation ? '해설: ' + esc(q.explanation) : ''}</p>`).join('')}</div>` : '');
 }
 
-/* ===== 기출 문제: 직접 그린 그림 넣기 · Gemini로 변형 문제 만들기 ===== */
+/* ===== 기출 문제: 직접 그린 그림 넣기 (변형 문제는 JSON의 variants로 불러옴) ===== */
 const pastShown = () => { const x = curPast, k = x ? pastCur(x) : 0; return !x ? null : k ? x.variants[k-1].questions : x.questions; };
 const pastSave = () => idbSet(PK, pastDB).catch(() => toast('기출 시험지를 브라우저에 저장하지 못했습니다.'));
 /* 그림 파일 → data URL (긴 변 1200px 이하, 큰 파일은 JPEG) */
@@ -1377,92 +1366,6 @@ async function pastFigFiles(inp) {
   }
   if (ok.length) { pastSave(); $('past-edit').checked = true; renderPast(curPast); }
   toast(`그림 ${ok.length}개를 넣었습니다${ok.length ? ` (${ok.sort((a, b) => a - b).join(', ')}번)` : ''}` + (miss.length ? `\n⚠ 번호를 찾지 못한 파일: ${miss.join(', ')}` : ''));
-}
-
-/* Gemini 설정: 키는 '기억'을 켤 때만 이 브라우저(localStorage)에 둠 */
-const GK = 'sciBankGeminiKey', GMK = 'sciBank_ig-textModel';
-const lsGet = k => { try { return localStorage.getItem(k) || ''; } catch(e) { return ''; } };
-const lsSet = (k, v) => { try { v ? localStorage.setItem(k, v) : localStorage.removeItem(k); } catch(e) {} };
-{
-  const k = $('past-key'), rm = $('past-keyrm'), m = $('past-model');
-  k.value = lsGet(GK); rm.checked = !!k.value; m.value = lsGet(GMK) || m.value;
-  k.addEventListener('input', () => { if (rm.checked) lsSet(GK, k.value.trim()); });
-  rm.addEventListener('change', () => { lsSet(GK, rm.checked ? k.value.trim() : ''); toast(rm.checked ? 'API 키를 이 브라우저에 기억합니다' : '기억한 API 키를 지웠습니다'); });
-  m.addEventListener('change', () => lsSet(GMK, m.value.trim()));
-}
-const sleep = ms => new Promise(r => setTimeout(r, ms));
-/* Gemini JSON 응답 받기: 혼잡(429·500·503)은 5→10→20→40초 기다렸다 다시, 그래도 안 되거나 모델이 없으면(404) 다른 flash/pro 모델로 */
-async function gemJson(key, parts, temperature, msg) {
-  const body = JSON.stringify({ contents: [{ parts }], generationConfig: { responseMimeType: 'application/json', temperature } });
-  const BUSY = [429, 500, 503];
-  const call = async (model, waits) => {
-    for (let i = 0; ; i++) {
-      impProg(msg + (model !== $('past-model').value.trim() ? ` (${model})` : ''));
-      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key }, body });
-      if (!BUSY.includes(r.status) || i >= waits.length) return r;
-      for (let s = waits[i]; s > 0; s--) { impProg(`${msg} — Gemini 서버가 혼잡해서 ${s}초 뒤 다시 시도 (${i+1}/${waits.length})`); await sleep(1000); }
-    }
-  };
-  const cur = $('past-model').value.trim();
-  let res = await call(cur, [5, 10, 20, 40]);
-  if (res.status === 404 || BUSY.includes(res.status)) {
-    const ms = await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=1000', { headers: { 'x-goog-api-key': key } }).then(r => r.ok ? r.json() : {}).catch(() => ({}));
-    const ver = n => (/(\d+(?:\.\d+)?)/.exec(n) || [0, 0])[1] * 1, tier = n => /-flash$/.test(n) ? 0 : /-flash-lite$/.test(n) ? 1 : 2;
-    const alts = (ms.models || []).filter(x => (x.supportedGenerationMethods || []).includes('generateContent')).map(x => x.name.replace(/^models\//, ''))
-      .filter(n => n !== cur && /^gemini-[\d.]+-(flash|flash-lite|pro)$/.test(n)).sort((a, b) => tier(a) - tier(b) || ver(b) - ver(a)).slice(0, 4);
-    for (const m of alts) {
-      const r = await call(m, [5]);
-      if (r.ok) { if (res.status === 404) { $('past-model').value = m; lsSet(GMK, m); toast(`'${cur}' 모델을 쓸 수 없어 '${m}'(으)로 바꿉니다`); } res = r; break; }
-    }
-  }
-  if (!res.ok) throw new Error(`${res.status} ${(await res.text()).slice(0, 300)}`);
-  const j = await res.json(), cand = j.candidates && j.candidates[0];
-  const txt = cand && cand.content && cand.content.parts ? cand.content.parts.map(p => p.text || '').join('') : '';
-  if (!txt) throw new Error('응답이 비어 있습니다' + (cand && cand.finishReason ? ` (${cand.finishReason})` : ''));
-  try { return JSON.parse(txt.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '')); }
-  catch(e) { throw new Error('응답이 올바른 JSON이 아닙니다' + (cand.finishReason === 'MAX_TOKENS' ? ' (응답이 길어 잘림)' : '')); }
-}
-const VAR_PROMPT = prev => `위는 과학 시험지의 원본 문항(JSON)과 문항 그림입니다. 문항마다 변형 문항을 하나씩 만들어 변형 세트를 구성하세요. 설명 없이 JSON만 출력합니다.
-규칙
-- 원본과 같은 개념·난이도를 묻되 조건·수치·<보기> 진술·선택지를 바꿔, 원본과 정답이나 풀이가 그대로 같지 않게 합니다.
-- has_figure가 true인 문항은 원본 그림을 그대로 다시 씁니다("same_figure": true). 그림에 실제로 나타난 내용과 맞게 질문·보기·선택지만 바꾸고, 그림에 없는 값이나 대상을 지어내지 않습니다. 그림 없이 풀 수 있는 문항으로 바꾸면 "same_figure": false 입니다.
-- 선택지는 원본과 같은 개수로, 번호 기호(①~⑤) 없이 내용만 넣습니다. <보기>가 있는 문항은 passage에 "ㄱ. … ㄴ. … ㄷ. …" 형식으로 넣습니다.
-- 과학적으로 정확해야 하고 정답은 하나입니다. answer는 정답 선택지 번호(1~5), explanation은 한국어 1~3문장입니다.${prev ? `\n- 이미 있는 변형 문항과 겹치지 않게 다른 방식으로 바꿉니다. 이미 있는 변형 문항:\n${prev}` : ''}
-출력 형식: {"questions":[{"number":1,"question":"","passage":"","choices":["",""],"answer":1,"explanation":"","same_figure":false}]}`;
-const CIRC = '①②③④⑤⑥⑦⑧⑨⑩';
-const varText = v => { const p = String(v.passage || '').trim(), q = String(v.question || ''); return !p ? q : /^ㄱ\./.test(p) ? `${q} <보기> ${p}` : `${q}\n${p}`; };
-const varChoices = cs => (Array.isArray(cs) ? cs : []).map((c, i) => `${CIRC[i] || `(${i+1})`} ${String(c).replace(/^\s*[①-⑩]\s*/, '')}`);
-const varAns = a => { const n = parseInt(String(a ?? '').replace(/[①-⑤]/, m => CIRC.indexOf(m) + 1)); return n >= 1 && n <= 5 ? CIRC[n-1] : String(a ?? ''); };
-let varBusy = false;
-async function pastMakeVariants() {
-  const x = curPast; if (!x) { toast('먼저 시험지를 고르세요.'); return; }
-  const key = $('past-key').value.trim();
-  if (!key) { document.querySelector('#past-controls details').open = true; $('past-key').focus(); toast('변형 문제를 만들려면 Gemini API 키가 필요합니다. ⚙ Gemini 설정에 입력해 주세요.'); return; }
-  if (varBusy) return;
-  const n = +$('past-vn').value || 1, src = x.questions, name = `${x.school} ${x.grade} ${x.subject} ${x.year}-${x.semester}-${x.round}`;
-  const parts = [{ text: '원본 문항 JSON:\n' + JSON.stringify(src.map((q, i) => ({ number: i + 1, question: q.question, choices: q.choices || [], answer: q.answer || '', has_figure: !!q.image }))) }];
-  src.forEach((q, i) => { const m = /^data:([^;]+);base64,(.+)$/.exec(q.image || ''); if (m) parts.push({ text: `[${i+1}번 문항 그림]` }, { inline_data: { mime_type: m[1], data: m[2] } }); });
-  varBusy = true; const made = [], warn = [];
-  try {
-    for (let k = 1; k <= n; k++) {
-      const prev = [...(x.variants || []).map(s => s.questions || []), ...made].flat().map(v => `- ${String(v.question).slice(0, 60)}`).join('\n');
-      try {
-        const r = await gemJson(key, [...parts, { text: VAR_PROMPT(prev) }], 0.7, `${name}: 변형 문제 ${k}/${n}세트 만드는 중…`);
-        const qs = (r.questions || []).map((v, i) => {
-          const o = src[(parseInt(v.number) || i + 1) - 1] || src[i] || {};
-          return { question: varText(v), choices: varChoices(v.choices), answer: varAns(v.answer), explanation: String(v.explanation || ''), ...(v.same_figure && o.image ? { image: o.image } : {}) };
-        }).filter(v => v.question.trim());
-        if (qs.length) made.push(qs); else warn.push(`${k}세트: 문항이 비어 있음`);
-      } catch(e) { warn.push(`${k}세트: ${e.message}`); }
-    }
-  } finally { varBusy = false; impProg(); }
-  if (!made.length) { toast('변형 문제를 만들지 못했습니다.\n' + warn.join('\n')); return; }
-  x.variants = [...(x.variants || []), ...made.map(qs => ({ questions: qs }))]; await pastSave();
-  PF.forEach(k => { pastSel[k] = x[k]; });
-  switchTab('var');
-  const sel = $('past-set'), last = x.variants.length - made.length + 1;
-  if (sel.querySelector(`option[value="${last}"]`)) { sel.value = last; renderPast(curPast); }
-  toast(`변형 ${made.length}세트를 만들어 기출 변형 문제에 넣었습니다. 정답·해설을 꼭 검토해 주세요.` + (warn.length ? '\n⚠ ' + warn.join('\n⚠ ') : ''));
 }
 
 /* ===== 학생 ===== */
