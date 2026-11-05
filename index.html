@@ -101,6 +101,7 @@ main .bg-red-100{background:#fff!important;color:#C62F2F!important;border:1px so
 footer{background:transparent!important;border:0!important;color:#9AA3B0!important;font-size:.75rem!important}
 @media(max-width:640px){header .max-w-7xl{flex-wrap:wrap;gap:8px}#top-nav{order:3;flex-basis:100%;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;overflow:visible}#top-nav button{flex-direction:column;gap:2px;padding:5px 2px;font-size:.72rem;justify-content:center}#top-nav .tab-sym{width:22px;height:22px;font-size:12px}#tab-editor>div:first-child{position:static}#tab-selector,#tab-book,#tab-diff{padding:18px!important}}
 .pv-cols{column-count:2;column-gap:36px;column-rule:1px solid #000}.pv-cols .pq{break-inside:avoid}
+@media screen and (max-width:640px){.pv-cols{column-count:1}}
 .pv-h1{border:1px solid #000;margin-bottom:16px}.pv-h1a{text-align:center;padding:14px 0}.pv-h1b{display:flex;justify-content:space-between;border-top:1px dotted #000;padding:4px 28px;font-size:.75rem}
 .pv-h2{display:flex;border:1px solid #000;font-size:.85rem;margin-bottom:10px}.pv-h2a{flex:1;text-align:center;padding:8px;border-right:1px solid #000}.pv-h2b{width:30px;text-align:center;font-size:.7rem;border-right:1px solid #000;display:flex;align-items:center;justify-content:center}.pv-h2c{display:grid;grid-template-columns:repeat(4,1fr);width:240px;text-align:center;font-size:.75rem}.pv-h2c span{border-left:1px solid #000;padding:4px}.pv-h2c span:first-child{border-left:0}
 .pv-n1{display:grid;grid-template-columns:1fr 92px;border:1.5px solid #000;margin-bottom:16px}.pv-n1a{padding:8px 14px 10px}.pv-n1s{display:flex;justify-content:space-between;font-size:.8rem}.pv-n1t{text-align:center;font-size:1.35rem;margin-top:4px}.pv-n1q{border-left:1px solid #000;display:flex;align-items:center;justify-content:center;padding:6px}.pv-n1b{grid-column:1/3;display:flex;justify-content:space-between;border-top:1px solid #000;padding:3px 12px;font-size:.72rem}
@@ -405,7 +406,13 @@ input.dn-over[type=number]{border-color:#ef4444!important;background:#fef2f2!imp
         <label class="text-sm cursor-pointer"><input type="checkbox" id="past-answers" onchange="renderPast(curPast)" class="mr-1">정답·해설 포함</label>
         <select id="past-set" onchange="renderPast(curPast)" class="border rounded-lg p-2 text-sm"><option value="0">원본</option></select>
         <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition text-sm">🖨 인쇄</button>
-        <button onclick="pastToExam()" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-lg font-medium transition text-sm" title="미리보기 화면에서 시험지1·2·3 중 골라 한글 파일로 내려받거나 저장합니다">📝 시험지로 만들기 (시험지1·2·3)</button>
+        <button onclick="pastDownload()" class="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded-lg font-medium transition text-sm">⬇ 다운로드 (.hwpx)</button>
+      </div>
+      <div class="flex items-center gap-4 flex-wrap text-sm">
+        <span class="font-bold text-gray-600">시험지 틀</span>
+        <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="past-tpl" value="1" checked onchange="renderPast(curPast)" class="w-4 h-4 accent-indigo-600">시험지1(학습지)</label>
+        <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="past-tpl" value="2" onchange="renderPast(curPast)" class="w-4 h-4 accent-indigo-600">시험지2(정기고사)</label>
+        <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="past-tpl" value="3" onchange="renderPast(curPast)" class="w-4 h-4 accent-indigo-600">시험지3(모의평가)</label>
       </div>
       <div class="flex items-center gap-2 flex-wrap border-t pt-3">
         <label class="text-sm cursor-pointer"><input type="checkbox" id="past-edit" onchange="renderPast(curPast)" class="mr-1">🖼 그림 넣기·바꾸기</label>
@@ -1086,12 +1093,13 @@ async function extractNow() {
   switchTab('preview');
 }
 /* 미리보기 머리 — 다운로드되는 시험지틀1·2·3과 같은 모양 */
-function pvHead(tpl, n) {
-  const qs = currentQuestions, t = esc(examName()), g = esc(examGradeText(qs)), sj = esc(subjectLabel(qs));
+/* c = {qs, name, id} — 기출 화면은 시험지 id 없이(QR·수업 없음) 부름 */
+function pvHead(tpl, n, c = {}) {
+  const qs = c.qs || currentQuestions, id = 'id' in c ? c.id : curExamId, t = esc(c.name ?? examName()), g = esc(examGradeText(qs)), sj = esc(subjectLabel(qs));
   const d = new Date(), dt = `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}.`;
-  const e = curExamId && stuDB.exams.find(x => x.id === curExamId), cid = e ? e.classId : pendingCls, cl = cid && CL().find(c => c.id === cid);
-  const qr = s => curExamId && sbReady() ? `<div id="pv-qr" data-s="${s}"></div>` : '<span class="text-[10px] text-gray-400">QR</span>';
-  if (tpl === '2') return `<div class="pv-n2"><div class="pv-n2q">${curExamId && sbReady() ? qr(44) : ''}</div><div class="text-sm">${t}</div><div class="pv-n2t">${g} ${sj}</div><div class="pv-n2r"><span>성명</span><span>${dt}</span><span>문항수 : ${n}문항</span></div></div>`;
+  const e = id && stuDB.exams.find(x => x.id === id), cid = e ? e.classId : id ? pendingCls : '', cl = cid && CL().find(c => c.id === cid);
+  const qr = s => id && sbReady() ? `<div id="pv-qr" data-s="${s}"></div>` : id === null ? '' : '<span class="text-[10px] text-gray-400">QR</span>';
+  if (tpl === '2') return `<div class="pv-n2"><div class="pv-n2q">${id && sbReady() ? qr(44) : ''}</div><div class="text-sm">${t}</div><div class="pv-n2t">${g} ${sj}</div><div class="pv-n2r"><span>성명</span><span>${dt}</span><span>문항수 : ${n}문항</span></div></div>`;
   if (tpl === '3') return `<div class="pv-n3"><div class="pv-n3y">${d.getFullYear()}학년도 모의평가</div><div class="pv-n3m"><span class="pv-n3o">제 4 교시</span><span class="pv-n3t">과학탐구 영역<small>(${sj})</small></span><span class="pv-n3q">${qr(64)}</span></div><div class="pv-n3r"><span>성명</span><span class="flex-1"></span><span>수험 번호</span><span class="flex-[2]"></span></div></div>`;
   return `<div class="pv-n1"><div class="pv-n1a"><div class="pv-n1s"><span>${esc(cl ? cl.name : '')}</span><span>${dt}</span></div><div class="pv-n1t">${t}</div></div><div class="pv-n1q">${qr(76)}</div><div class="pv-n1b"><span>이름 : ______________</span><span>문항수 : ${n}문항</span></div></div>`;
 }
@@ -1328,9 +1336,12 @@ const gradeLabel = g => ({'고2_일반':'고2·3 일반선택','고3_진로':'�
 const subjectLabel = qs => { const u = [...new Set(qs.map(q => { const m = /^\[([^\]\d]+)\d*\]/.exec(q.unit || ''); return m ? m[1] : ''; }).filter(Boolean))]; return u.length ? u.join('·') : '과학'; };
 const examGradeText = qs => [...new Set(qs.map(q => gradeLabel(q.grade)).filter(Boolean))].join(', ');
 /* ===== 문항 글: 분수 (a/b), [표] 줄, 그림 자리 ===== */
-const FRAC = /\(([-−]?[0-9A-Za-z√.]+)\/([0-9A-Za-z√.]+)\)/g;
-const isFrac = (a, b) => /\d/.test(a + b);   // (m/s) 같은 단위는 그대로
-const fracH = h => h.replace(FRAC, (m, a, b) => isFrac(a, b) ? `<span class="frac"><span>${a}</span><span>${b}</span></span>` : m);
+/* 분수: (a/b) (한쪽에 숫자 있을 때만 — (m/s)·(kJ/mol) 같은 단위는 그대로), 맨 숫자 1/2·3/16, ½ ¼ 같은 글자 */
+const FRAC = /\(([-−]?[0-9A-Za-z√.]+)\/([-−]?[0-9A-Za-z√.]+)\)|(?<![\w./√])(√?\d{1,3}(?:\.\d+)?)\/(√?\d{1,4}(?:\.\d+)?)(?![\w/])|([½¼¾⅓⅔⅛⅜⅝⅞])/g;
+const UFR = {'½':'1/2','¼':'1/4','¾':'3/4','⅓':'1/3','⅔':'2/3','⅛':'1/8','⅜':'3/8','⅝':'5/8','⅞':'7/8'};
+/* 맞은 분수 → [분자, 분모] 또는 null */
+const fracOf = (m, a, b, c, d, u) => u ? UFR[u].split('/') : a != null ? (/\d/.test(a + b) ? [a, b] : null) : [c, d];
+const fracH = h => h.replace(FRAC, (m, ...g) => { const f = fracOf(m, ...g.slice(0, 5)); return f ? `<span class="frac"><span>${f[0]}</span><span>${f[1]}</span></span>` : m; });
 const fx = s => fracH(esc(s));
 /* [표] 뒤 글 → 표들 (행·칸 구분이 ' | ', ' / ' 중 어느 쪽이든 칸 수가 맞는 쪽, 여러 표는 ' ; ') */
 function tblParse(s) {
@@ -1361,7 +1372,8 @@ const qHtml = s => qSegs(s).map(g => g.t === 'tbl' ? `<table class="qtbl">${g.ro
 let hxEqN = 0;
 const hxEq = (a, b) => { const id = 1800000000 + (++hxEqN), w = Math.max(a.length, b.length) * 520 + 500; return `<hp:equation id="${id}" zOrder="0" numberingType="EQUATION" textWrap="TOP_AND_BOTTOM" textFlow="BOTH_SIDES" lock="0" dropcapstyle="None" version="Equation Version 60" baseLine="66" textColor="#000000" baseUnit="1000" lineMode="CHAR" font="HancomEQN"><hp:sz width="${w}" widthRelTo="ABSOLUTE" height="2250" heightRelTo="ABSOLUTE" protect="0"/><hp:pos treatAsChar="1" affectLSpacing="0" flowWithText="1" allowOverlap="0" holdAnchorAndSO="0" vertRelTo="PARA" horzRelTo="PARA" vertAlign="TOP" horzAlign="LEFT" vertOffset="0" horzOffset="0"/><hp:outMargin left="56" right="56" top="0" bottom="0"/><hp:shapeComment>수식입니다.</hp:shapeComment><hp:script>{${X(a)}} over {${X(b)}}</hp:script></hp:equation>`; };
 /* 글 → <hp:t> + 분수는 한글 수식 */
-const hxT = t => { let o = '', p = 0; String(t).replace(FRAC, (m, a, b, k) => { if (isFrac(a, b)) { if (k > p) o += `<hp:t>${X(t.slice(p, k))}</hp:t>`; o += hxEq(a, b); p = k + m.length; } return m; }); if (p < t.length) o += `<hp:t>${X(t.slice(p))}</hp:t>`; return o; };
+const eqS = s => s.replace(/√(\w+)/g, 'sqrt{$1}');
+const hxT = t => { let o = '', p = 0; t.replace(FRAC, (m, ...g) => { const f = fracOf(m, ...g.slice(0, 5)), k = g[5]; if (f) { if (k > p) o += `<hp:t>${X(t.slice(p, k))}</hp:t>`; o += hxEq(eqS(f[0]), eqS(f[1])); p = k + m.length; } return m; }); if (p < t.length) o += `<hp:t>${X(t.slice(p))}</hp:t>`; return o; };
 const hxP = (t, c, br) => `<hp:p id="0" paraPrIDRef="${c[0]}" styleIDRef="${c[1]}" pageBreak="${br?1:0}" columnBreak="0" merged="0"><hp:run charPrIDRef="${c[2]}">${t === '' ? '' : hxT(String(t))}</hp:run></hp:p>`;
 /* 표 (bf = 실선 테두리 borderFill id, 단 너비 안 가운데) */
 let hxTblN = 0;
@@ -1393,7 +1405,7 @@ async function buildHwpx(qs, dims, o) {
   if (bfN) { head = head.replace(`<hh:borderFills itemCnt="${bfN}"`, `<hh:borderFills itemCnt="${BF}"`).replace('</hh:borderFills>', `<hh:borderFill id="${BF}" threeD="0" shadow="0" centerLine="NONE" breakCellSeparateLine="0"><hh:slash type="NONE" Crooked="0" isCounter="0"/><hh:backSlash type="NONE" Crooked="0" isCounter="0"/><hh:leftBorder type="SOLID" width="0.12 mm" color="#000000"/><hh:rightBorder type="SOLID" width="0.12 mm" color="#000000"/><hh:topBorder type="SOLID" width="0.12 mm" color="#000000"/><hh:bottomBorder type="SOLID" width="0.12 mm" color="#000000"/><hh:diagonal type="SOLID" width="0.1 mm" color="#000000"/></hh:borderFill></hh:borderFills>`); put('Contents/header.xml', head); }
   const segs = (s, cfg, pre) => { let first = !!pre; return qSegs(s).map(g => { if (g.t === 'tbl') return bfN ? hxTbl(g.rows, BC, BF) : g.rows.map(r => hxP(r.join('   '), cfg)).join(''); const t = first ? pre + g.s : g.s; first = false; return hxP(t, cfg); }).join(''); };
   qs.forEach((q, i) => {
-    if (i) { const n = Math.max(0, Math.round((o.gap + 24 * ((pvExtra[i]) || 0)) / 28)); for (let k = 0; k < n; k++) body += hxP('', BC); }
+    if (i) { const n = Math.max(0, Math.round((o.gap + 24 * (((o.extra || pvExtra)[i]) || 0)) / 28)); for (let k = 0; k < n; k++) body += hxP('', BC); }
     const [lead, ask] = q.imageOnly ? ['', ''] : askSplit(q.question);
     if (!q._rn) body += segs(lead, QC(i), `${i+1}. `);
     const m = q.image && dims[i] && /^data:image\/(png|jpeg);base64,(.+)$/.exec(q.image);
@@ -1435,7 +1447,7 @@ function saveExamNow() {
   saveExamRecord();
   toast(`"${examName()}" 시험지를 저장했습니다. 출제 문제에서 다시 열거나 다운로드할 수 있습니다.`);
 }
-async function exportHwpx(qs = currentQuestions, name = examName(), id = curExamId) {
+async function exportHwpx(qs = currentQuestions, name = examName(), id = curExamId, op = {}) {
   if (!qs.length) { toast('다운로드할 문제가 없습니다.'); return; }
   if (typeof DecompressionStream === 'undefined') { toast('이 브라우저는 .hwpx 다운로드를 지원하지 않습니다. 최신 Chrome/Edge/Safari를 사용하세요.'); return; }
   qs = await Promise.all(qs.map(async (q, i) => { if (!q.imageOnly || !q.image) return q; const u = await renumImg(q.image, i + 1); return u ? {...q, image: u, _rn: true} : q; }));
@@ -1445,10 +1457,10 @@ async function exportHwpx(qs = currentQuestions, name = examName(), id = curExam
     if (q.image) { try { const im = await loadImg(q.image); dims[i] = {w:im.naturalWidth, h:im.naturalHeight}; } catch(e) {} }
   }
   try {
-    const ex = id && stuDB.exams.find(x => x.id === id), cid = ex ? ex.classId : (id === curExamId ? pendingCls : ''), cl = cid && CL().find(c => c.id === cid);
+    const ex = id && stuDB.exams.find(x => x.id === id), cid = ex ? ex.classId : (id && id === curExamId ? pendingCls : ''), cl = cid && CL().find(c => c.id === cid);
     let qr = '';
     if (id && sbReady() && typeof QRCode !== 'undefined') { try { const tmp = document.createElement('div'); new QRCode(tmp, {text: qrUrl(id), width: 256, height: 256, correctLevel: QRCode.CorrectLevel.M}); qr = tmp.querySelector('canvas').toDataURL('image/png'); } catch (e) {} }
-    const blob = await buildHwpx(qs, dims, {tpl: examTpl(), ans: $('pv-ans').checked, gap: +$('pv-gap').value || 0, name, cls: cl ? cl.name : '', qr});
+    const blob = await buildHwpx(qs, dims, {tpl: op.tpl || examTpl(), ans: op.ans ?? $('pv-ans').checked, gap: op.gap ?? (+$('pv-gap').value || 0), name, cls: cl ? cl.name : '', qr, extra: op.extra});
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = name.replace(/[\\/:*?"<>|]/g, '_') + '.hwpx'; a.click();
@@ -1510,23 +1522,22 @@ function renderPast(x) {
   sel.innerHTML = (pastMode === 'var' ? '' : '<option value="0">원본</option>') + Array.from({length:nv}, (_, k) => `<option value="${k+1}">변형 ${k+1}세트</option>`).join('');
   sel.value = cur;
   const qs = cur ? (x.variants[cur-1].questions || []) : x.questions, ed = $('past-edit').checked;
-  const title = `${x.school} ${sfx(x.year,'년')} ${sfx(x.semester,'학기')} ${sfx(x.round,'차')} ${x.grade} ${x.subject}${cur ? ` · 변형 ${cur}세트` : ''}`;
   const tools = (q, i) => !ed ? '' : `<div class="no-print flex gap-2 items-center my-1"><label class="cursor-pointer text-xs border rounded-lg px-2 py-1 bg-white hover:bg-gray-50">🖼 ${q.image ? '그림 바꾸기' : '그림 넣기'}<input type="file" accept="image/*" class="hidden" onchange="pastFigPick(${i}, this)"></label>${q.image ? `<button onclick="pastFigDel(${i})" class="text-xs text-red-500">그림 지우기</button>` : ''}</div>`;
-  el.innerHTML = `<h2 class="text-center text-2xl font-bold mb-6">${esc(title)}</h2>` +
-    qs.map((q, i) => `<div class="pq mb-6">${fmtQ(q.question, i+1, (q.image ? `<img src="${esc(q.image)}" class="my-2 max-h-64">` : '') + tools(q, i))}${(q.choices || []).map(c => `<p class="ml-4 text-sm">${fx(c)}</p>`).join('')}</div>`).join('') +
+  const tpl = pastTpl();
+  el.dataset.tpl = tpl;
+  el.innerHTML = pvHead(tpl, qs.length, {qs: pastQs(x, qs), name: pastName(x, cur), id: null}) + '<div class="pv-cols">' +
+    qs.map((q, i) => `<div class="pq mb-6">${fmtQ(q.question, i+1, (q.image ? `<img src="${esc(q.image)}" class="my-2 max-h-64">` : '') + tools(q, i))}${(q.choices || []).map(c => `<p class="ml-4 text-sm">${fx(c)}</p>`).join('')}</div>`).join('') + '</div>' +
     (ans ? `<div class="pq border-t pt-4 mt-8"><h3 class="font-bold mb-2">[정답 및 해설]</h3>${qs.map((q, i) => `<p class="text-sm">${i+1}번 정답: ${fx(q.answer)} ${q.explanation ? '해설: ' + fx(q.explanation) : ''}</p>`).join('')}</div>` : '');
 }
 
-/* 지금 보이는 기출(또는 변형 세트)을 미리보기로 → 시험지1·2·3 틀로 내려받기·저장 */
-function pastToExam() {
+/* 기출 화면의 시험지 틀(시험지1·2·3)과 한글 파일 내려받기 */
+const pastTpl = () => (document.querySelector('input[name=past-tpl]:checked') || {}).value || '1';
+const pastName = (x, k) => `${x.school} ${sfx(x.year,'년')} ${sfx(x.semester,'학기')} ${sfx(x.round,'차')} ${x.subject}${k ? ` 변형 ${k}세트` : ''}`;
+const pastQs = (x, qs) => qs.map(q => ({...q, grade: q.grade || x.grade, unit: q.unit || `[${x.subject}]`}));
+function pastDownload() {
   const x = curPast, qs = pastShown();
-  if (!x || !qs || !qs.length) { toast('시험지로 만들 기출 문제가 없습니다.'); return; }
-  const k = pastCur(x);
-  currentQuestions = qs.map(q => ({...JSON.parse(JSON.stringify(q)), grade: q.grade || x.grade, unit: q.unit || `[${x.subject}]`}));
-  pvExtra = []; curExamId = uid('e');
-  $('exam-name').value = `${x.school} ${sfx(x.year,'년')} ${sfx(x.semester,'학기')} ${sfx(x.round,'차')} ${x.subject}${k ? ` 변형 ${k}세트` : ''}`;
-  switchTab('preview');
-  toast('시험지 틀(시험지1·2·3)을 고른 뒤 다운로드하거나 저장하세요.');
+  if (!x || !qs || !qs.length) { toast('내려받을 기출 문제가 없습니다.'); return; }
+  exportHwpx(pastQs(x, qs), pastName(x, pastCur(x)), null, {tpl: pastTpl(), ans: $('past-answers').checked, gap: 0, extra: []});
 }
 /* ===== 기출 문제: 직접 그린 그림 넣기 (변형 문제는 JSON의 variants로 불러옴) ===== */
 const pastShown = () => { const x = curPast, k = x ? pastCur(x) : 0; return !x ? null : k ? x.variants[k-1].questions : x.questions; };
@@ -1812,8 +1823,8 @@ function buildReport(all, o) {
   // (3) 개념 정리: 틀린 문제를 중단원별로 모아 해설과 정리 칸
   const noInfo = w => !w.q && !w.unit;
   const card = (w, src) => `<div class="rp-q"><div class="rp-q-src">${src}</div>
-      ${noInfo(w) ? '' : `<div class="rp-q-t">${esc(w.q) || '(문제 내용 없음)'}${w.img ? ' <span class="rp-q-src">(그림은 시험지를 참고하세요)</span>' : ''}</div>${(w.ch || []).length ? `<div class="rp-q-ch">${w.ch.map(c => `<span>${esc(c)}</span>`).join('')}</div>` : ''}`}
-      <div class="rp-q-exp"><b>해설</b> ${esc(w.exp) || (noInfo(w) ? '이 시험지는 아직 문제·해설이 올라오지 않았습니다.' : '해설이 없습니다.')}</div></div>`;
+      ${noInfo(w) ? '' : `<div class="rp-q-t">${fx(w.q) || '(문제 내용 없음)'}${w.img ? ' <span class="rp-q-src">(그림은 시험지를 참고하세요)</span>' : ''}</div>${(w.ch || []).length ? `<div class="rp-q-ch">${w.ch.map(c => `<span>${fx(c)}</span>`).join('')}</div>` : ''}`}
+      <div class="rp-q-exp"><b>해설</b> ${fx(w.exp) || (noInfo(w) ? '이 시험지는 아직 문제·해설이 올라오지 않았습니다.' : '해설이 없습니다.')}</div></div>`;
   const g = {}; rec.filter(r => !r.ok).forEach(r => { const k = noInfo(r) ? '문제 정보가 아직 없는 시험지' : r.sub ? `${r.unit} › ${r.sub}` : (r.unit || '단원 미분류'); (g[k] = g[k] || []).push(r); });
   h += `<div class="rp-break"></div><h3 class="rp-h">틀린 문제 개념 정리</h3>` + (Object.keys(g).length ? Object.entries(g).map(([k, ws]) =>
     `<div class="rp-grp"><div class="rp-grp-h">${esc(k)}<span>${ws.length}문항</span></div>${ws.map(w => card(w, `${esc(w.exam)} ${w.no}번 · 내 답 ${w.my ? circ(w.my) : '없음'} · 정답 ${circ(w.ans)}`)).join('')}<div class="rp-memo">나의 정리</div></div>`).join('') : '<p class="rp-empty">틀린 문제가 없습니다.</p>');
