@@ -2013,10 +2013,12 @@ async function sbMyPage() {
 /* ===== 출제 문제 목록 ===== */
 function renderEx() {
   const b = $('ex-body'), list = stuDB.exams.slice().sort((x, y) => y.at - x.at);
-  b.innerHTML = `<h2 class="text-xl font-bold mb-4">📋 출제한 시험지 (${list.length})</h2>` + (list.length
+  b.innerHTML = `<div class="flex items-center gap-3 mb-4 flex-wrap"><h2 class="text-xl font-bold">📋 출제한 시험지 (${list.length})</h2>${list.length ? `
+      <label class="ml-auto flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" id="ex-all" class="w-4 h-4 accent-indigo-600" onchange="document.querySelectorAll('.ex-chk').forEach(c => c.checked = this.checked); exSelCount()">전체 선택</label>
+      <button id="ex-del-sel" onclick="exDelSel()" disabled class="bg-red-600 hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed text-white px-3 py-2 rounded-lg text-sm font-bold">🗑 선택 삭제</button>` : ''}</div>` + (list.length
     ? `<div class="space-y-2">${list.map(e => { const n = stuDB.results.filter(r => r.examId === e.id).length;
         const cl = e.classId && CL().find(c => c.id === e.classId);
-        return `<div><div class="flex items-center gap-3 border rounded-xl px-4 py-3 flex-wrap"><div class="flex-1 min-w-[12rem]"><div class="font-bold">${esc(e.name)}${cl ? ` <span class="text-xs font-normal px-2 py-0.5 rounded-full" style="background:var(--c-cls-s);color:var(--c-cls)">${esc(cl.name)}</span>` : ''}</div><div class="text-xs text-gray-500">${new Date(e.at).toLocaleString('ko-KR')} · ${e.questions.length}문항 · 코드 ${exCode(e.id)} · 제출 ${n}명</div></div><button onclick="exOpen('${e.id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-sm font-bold">문제 보기·인쇄</button><button onclick="exDownload('${e.id}')" class="bg-gray-700 text-white px-3 py-2 rounded-lg text-sm font-bold">⬇ 다운로드 (.hwpx)</button><button onclick="exSub('${e.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-sm font-bold">제출 현황</button><button onclick="exDel('${e.id}')" class="text-xs text-red-500">삭제</button></div><div id="ex-sub-${e.id}" class="hidden"></div></div>`; }).join('')}</div>`
+        return `<div><div class="flex items-center gap-3 border rounded-xl px-4 py-3 flex-wrap"><input type="checkbox" class="ex-chk w-5 h-5 accent-indigo-600 cursor-pointer" value="${e.id}" onchange="exSelCount()" aria-label="${esc(e.name)} 선택"><div class="flex-1 min-w-[12rem]"><div class="font-bold">${esc(e.name)}${cl ? ` <span class="text-xs font-normal px-2 py-0.5 rounded-full" style="background:var(--c-cls-s);color:var(--c-cls)">${esc(cl.name)}</span>` : ''}</div><div class="text-xs text-gray-500">${new Date(e.at).toLocaleString('ko-KR')} · ${e.questions.length}문항 · 코드 ${exCode(e.id)} · 제출 ${n}명</div></div><button onclick="exOpen('${e.id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-sm font-bold">문제 보기·인쇄</button><button onclick="exDownload('${e.id}')" class="bg-gray-700 text-white px-3 py-2 rounded-lg text-sm font-bold">⬇ 다운로드 (.hwpx)</button><button onclick="exSub('${e.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-sm font-bold">제출 현황</button><button onclick="exDel('${e.id}')" class="text-xs text-red-500">삭제</button></div><div id="ex-sub-${e.id}" class="hidden"></div></div>`; }).join('')}</div>`
     : '<p class="text-center text-gray-400 py-12">아직 출제한 시험지가 없습니다. 단원별 문제에서 시험지를 만들어 보세요.</p>');
 }
 function exSub(id, pre = 'ex-sub-') {
@@ -2052,6 +2054,22 @@ function exDel(id) {
   if (sbOn() && stuDB.pin) sbCall('sb_delete_exam', {p: stuDB.pin, c: exCode(id)})
     .then(() => toast('서버에서도 시험지를 삭제했습니다.'))
     .catch(() => toast('이 컴퓨터에서는 삭제했지만 서버 삭제에 실패했습니다.\nSupabase에서 supabase-update2.sql을 실행했는지 확인하세요.'));
+}
+function exSelCount() {
+  const all = [...document.querySelectorAll('.ex-chk')], k = all.filter(c => c.checked).length, bt = $('ex-del-sel'), a = $('ex-all');
+  if (bt) { bt.disabled = !k; bt.textContent = k ? `🗑 선택 삭제 (${k})` : '🗑 선택 삭제'; }
+  if (a) { a.checked = k && k === all.length; a.indeterminate = k > 0 && k < all.length; }
+}
+async function exDelSel() {
+  const ids = [...document.querySelectorAll('.ex-chk:checked')].map(c => c.value); if (!ids.length) return;
+  const rs = stuDB.results.filter(r => ids.includes(r.examId)).length;
+  if (!confirm(`선택한 시험지 ${ids.length}개${rs ? `와 학생 풀이 기록 ${rs}건` : ''}을 삭제할까요? (되돌릴 수 없습니다)`)) return;
+  stuDB.exams = stuDB.exams.filter(x => !ids.includes(x.id)); stuDB.results = stuDB.results.filter(r => !ids.includes(r.examId));
+  stuSave(); renderEx();
+  if (!(sbOn() && stuDB.pin)) { toast(`시험지 ${ids.length}개를 삭제했습니다.`); return; }
+  const res = await Promise.allSettled(ids.map(id => sbCall('sb_delete_exam', {p: stuDB.pin, c: exCode(id)})));
+  const bad = res.filter(r => r.status === 'rejected').length;
+  toast(bad ? `시험지 ${ids.length}개를 이 컴퓨터에서 삭제했지만 서버 삭제 ${bad}개는 실패했습니다.` : `시험지 ${ids.length}개를 서버에서도 삭제했습니다.`);
 }
 
 /* ===== 수업: 같은 수업을 듣는 학생 묶음 (학년이 달라도 됨) + 수업별 시험지 =====
