@@ -99,7 +99,7 @@ main .bg-red-100{background:#fff!important;color:#C62F2F!important;border:1px so
 #question-list>div::before{content:'';position:absolute;left:-1px;top:16px;bottom:16px;width:3px;border-radius:0 3px 3px 0;background:var(--accent)}
 #question-list img{border-radius:8px;background:#fff}
 footer{background:transparent!important;border:0!important;color:#9AA3B0!important;font-size:.75rem!important}
-@media(max-width:640px){header .max-w-7xl{flex-wrap:wrap;gap:8px}#top-nav{order:3;flex-basis:100%;justify-content:flex-start}#tab-editor>div:first-child{position:static}#tab-selector,#tab-book,#tab-diff{padding:18px!important}}
+@media(max-width:640px){header .max-w-7xl{flex-wrap:wrap;gap:8px}#top-nav{order:3;flex-basis:100%;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;overflow:visible}#top-nav button{flex-direction:column;gap:2px;padding:5px 2px;font-size:.72rem;justify-content:center}#top-nav .tab-sym{width:22px;height:22px;font-size:12px}#tab-editor>div:first-child{position:static}#tab-selector,#tab-book,#tab-diff{padding:18px!important}}
 .pv-cols{column-count:2;column-gap:36px;column-rule:1px solid #000}.pv-cols .pq{break-inside:avoid}
 .pv-h1{border:1px solid #000;margin-bottom:16px}.pv-h1a{text-align:center;padding:14px 0}.pv-h1b{display:flex;justify-content:space-between;border-top:1px dotted #000;padding:4px 28px;font-size:.75rem}
 .pv-h2{display:flex;border:1px solid #000;font-size:.85rem;margin-bottom:10px}.pv-h2a{flex:1;text-align:center;padding:8px;border-right:1px solid #000}.pv-h2b{width:30px;text-align:center;font-size:.7rem;border-right:1px solid #000;display:flex;align-items:center;justify-content:center}.pv-h2c{display:grid;grid-template-columns:repeat(4,1fr);width:240px;text-align:center;font-size:.75rem}.pv-h2c span{border-left:1px solid #000;padding:4px}.pv-h2c span:first-child{border-left:0}
@@ -763,6 +763,37 @@ const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').repl
 const keyOf = q => q.grade + '|' + q.unit + '|' + q.question.trim();
 /* PDF에서 가져온 그림 문항(imageOnly): 문제 글은 분류·검색용, 화면·한글 파일에는 그림만. 선택지가 ①~⑤ 기호뿐이면 그림 안에 있으므로 생략 */
 const bareChoices = q => q.imageOnly && (q.choices || []).every(c => String(c).trim().length <= 1);
+/* 그림 문항 왼쪽 위에 찍힌 원래 번호("18.")를 지우고 시험지 번호를 그 자리에 그림 → 새 dataURL. 번호를 못 찾으면 null */
+const renumCache = new Map();
+function renumImg(src, n) {
+  const key = n + '|' + src.length + src.slice(-80) + src.slice(200, 280);
+  if (!renumCache.has(key)) renumCache.set(key, (async () => {
+    const im = await loadImg(src), W = im.naturalWidth, H = im.naturalHeight;
+    if (!W || !H) return null;
+    const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+    const g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, W, H); g.drawImage(im, 0, 0);
+    const h = Math.min(H, Math.max(40, Math.round(W * 0.2))), d = g.getImageData(0, 0, W, h).data, xr = Math.round(W * 0.6);
+    const dark = (x, y) => { const k = (y * W + x) * 4; return d[k] + d[k+1] + d[k+2] < 400; };
+    const row = y => { for (let x = 0; x < xr; x++) if (dark(x, y)) return true; return false; };
+    let y0 = 0; while (y0 < h && !row(y0)) y0++;
+    if (y0 >= h) return null;
+    let y1 = y0; while (y1 + 1 < h && row(y1 + 1)) y1++;
+    const bh = y1 - y0 + 1; if (bh < 8 || bh > W * 0.12) return null;
+    const col = x => { for (let y = y0; y <= y1; y++) if (dark(x, y)) return true; return false; };
+    let x0 = 0; const xl = Math.round(W * 0.2); while (x0 < xl && !col(x0)) x0++;
+    if (x0 >= xl) return null;
+    const gmax = Math.max(4, Math.round(bh * 0.25)); let x1 = x0, gap = 0, x = x0;
+    for (; x < W * 0.35; x++) { if (col(x)) { x1 = x; gap = 0; } else if (++gap > gmax) break; }
+    if (gap <= gmax || x1 - x0 > bh * 3.2 || x1 - x0 < bh * 0.4) return null;
+    // 번호 끝은 마침표: 맨 오른쪽 덩어리의 검은 점이 줄 아래쪽에만 있어야 함
+    for (let xx = Math.max(x0, x1 - 1); xx <= x1; xx++) for (let y = y0; y <= y1; y++) if (dark(xx, y) && y < y0 + bh * 0.55) return null;
+    g.fillStyle = '#fff'; g.fillRect(Math.max(0, x0 - 2), Math.max(0, y0 - 2), x1 - x0 + 5, bh + 4);
+    g.fillStyle = '#000'; g.font = `italic bold ${Math.round(bh * 0.95)}px "Times New Roman", serif`; g.textBaseline = 'bottom';
+    g.fillText(n + '.', x0, y1 + 1, x1 - x0 + gmax);
+    return cv.toDataURL('image/jpeg', 0.92);
+  })().catch(() => null));
+  return renumCache.get(key);
+}
 const valid = q => q && typeof q.grade==='string' && typeof q.unit==='string' && typeof q.question==='string' && Array.isArray(q.choices) && q.choices.length>0 && q.answer!=null;
 
 function saveDB() { idbSet(LS, masterDB).catch(() => toast('브라우저 저장에 실패했습니다. "DB 내보내기"로 JSON을 따로 보관하세요.')); }
@@ -1059,10 +1090,15 @@ function renderPreview() {
   if (document.activeElement !== $('pv-name')) $('pv-name').value = examName();
   const qs = currentQuestions;
   $('pv-paper').innerHTML = qrBox() + pvHead(tpl, qs.length) + '<div class="pv-cols">' +
-    qs.map((q, i) => `<div class="pq">${i ? `<div class="pvgap" tabindex="0" data-i="${i}" onkeydown="pvKey(event,${i})" style="height:${Math.max(0, +gap + 24*(pvExtra[i]||0))}px"></div>` : ''}<p class="font-bold whitespace-pre-wrap">${i+1}. ${q.imageOnly ? '' : esc(q.question)}</p>${q.image ? `<img src="${esc(q.image)}" class="${q.imageOnly ? 'my-1 w-full' : 'my-2 max-h-64'}">` : ''}${bareChoices(q) ? '' : (q.choices || []).map(c => `<p class="ml-4 text-sm">${esc(c)}</p>`).join('')}</div>`).join('') + '</div>' +
+    qs.map((q, i) => `<div class="pq">${i ? `<div class="pvgap" tabindex="0" data-i="${i}" onkeydown="pvKey(event,${i})" style="height:${Math.max(0, +gap + 24*(pvExtra[i]||0))}px"></div>` : ''}<p class="font-bold whitespace-pre-wrap">${i+1}. ${q.imageOnly ? '' : esc(q.question)}</p>${q.image ? `<img src="${esc(q.image)}" ${q.imageOnly ? `data-rn="${i}" ` : ''}class="${q.imageOnly ? 'my-1 w-full' : 'my-2 max-h-64'}">` : ''}${bareChoices(q) ? '' : (q.choices || []).map(c => `<p class="ml-4 text-sm">${esc(c)}</p>`).join('')}</div>`).join('') + '</div>' +
     (ans ? `<div class="pq border-t pt-4 mt-8"><h3 class="font-bold mb-2">[정답 및 해설]</h3>${qs.map((q, i) => `<p class="text-sm">${i+1}번 정답: ${esc(q.answer)} ${q.explanation ? '해설: ' + esc(q.explanation) : ''}</p>`).join('')}</div>` : '');
+  // 그림 문항: 그림 속 원래 번호를 시험지 번호로 바꾸고, 따로 붙인 번호 줄은 숨김
+  $('pv-paper').querySelectorAll('img[data-rn]').forEach(img => {
+    const i = +img.dataset.rn, q = qs[i];
+    renumImg(q.image, i + 1).then(u => { if (u && img.isConnected && currentQuestions[i] === q) { img.src = u; const p = img.previousElementSibling; if (p) p.style.display = 'none'; } });
+  });
 }
-const TABS = ['selector','book','diff','preview','editor','past','var','stu','stuname','ex','cls','msg'];
+const TABS =['selector','book','diff','preview','editor','past','var','stu','stuname','ex','cls','msg'];
 const SECTIONS = ['selector','book','diff','preview','editor','past','stu','ex','cls','msg'];
 /* 상위 탭 → 하위 탭 [이동할 탭, 이름, 색] */
 const NAV = [
@@ -1296,7 +1332,7 @@ async function buildHwpx(qs, dims, o) {
   const imgs = []; let body = '';
   qs.forEach((q, i) => {
     if (i) { const n = Math.max(0, Math.round((o.gap + 24 * ((pvExtra[i]) || 0)) / 28)); for (let k = 0; k < n; k++) body += hxP('', BC); }
-    String(q.imageOnly ? '' : q.question ?? '').split('\n').forEach((l, k) => body += hxP(k ? l : `${i+1}. ${l}`, QC(i)));
+    if (!q._rn) String(q.imageOnly ? '' : q.question ?? '').split('\n').forEach((l, k) => body += hxP(k ? l : `${i+1}. ${l}`, QC(i)));
     const m = q.image && dims[i] && /^data:image\/(png|jpeg);base64,(.+)$/.exec(q.image);
     if (m) {
       const n = imgs.length + 1, ext = m[1] === 'jpeg' ? 'jpg' : 'png', s = Math.min(1, 28000 / (dims[i].w * 75), 20000 / (dims[i].h * 75));
@@ -1332,6 +1368,7 @@ function saveExamNow() {
 async function exportHwpx(qs = currentQuestions, name = examName()) {
   if (!qs.length) { toast('다운로드할 문제가 없습니다.'); return; }
   if (typeof DecompressionStream === 'undefined') { toast('이 브라우저는 .hwpx 다운로드를 지원하지 않습니다. 최신 Chrome/Edge/Safari를 사용하세요.'); return; }
+  qs = await Promise.all(qs.map(async (q, i) => { if (!q.imageOnly || !q.image) return q; const u = await renumImg(q.image, i + 1); return u ? {...q, image: u, _rn: true} : q; }));
   const dims = [];
   for (let i = 0; i < qs.length; i++) {
     const q = qs[i];
@@ -1442,7 +1479,7 @@ async function pastFigFiles(inp) {
 const SK = 'sciBankStu_v1', GR = ['중1','중2','중3','고1','고2','고3'];
 let stuDB = {students:[], exams:[], results:[]}, stuView = ['grade'], curExamId = null, rpFrom = '', rpTo = '';
 const stuReady = (async () => { try { const a = await idbGet(SK); if (a && Array.isArray(a.students)) stuDB = a; } catch(e) {} })();
-const stuSave = () => idbSet(SK, stuDB).catch(() => toast('브라우저 저장에 실패했습니다.'));
+const stuSave = () => { const r = idbSet(SK, stuDB).catch(() => toast('브라우저 저장에 실패했습니다.')); if (typeof sySoon === 'function') sySoon(); return r; };
 const uid = p => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
 const numAns = a => { const t = String(a ?? '').trim(), k = '①②③④⑤'.indexOf(t[0]); return k >= 0 ? k + 1 : (parseInt(t) || 0); };
 const circ = n => '①②③④⑤'[n-1] || '';
@@ -1478,6 +1515,7 @@ function renderStu() {
         <b class="text-sm">☁ 서버(Supabase) 연결</b>
         <div class="flex gap-2 flex-wrap"><button onclick="sbSetPin()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-bold">PIN 설정</button><button onclick="sbSyncStudents(true)" class="bg-white hover:bg-gray-100 border px-3 py-2 rounded-lg text-xs font-bold">학생 명단 동기화</button><button onclick="syncSB()" class="bg-white hover:bg-gray-100 border px-3 py-2 rounded-lg text-xs font-bold">지금 답 가져오기</button></div>
         <p id="sb-status" class="text-xs text-gray-500">${sbOn() ? '' : '파일 맨 위 SB_CONFIG에 Supabase 주소·키·페이지 주소를 입력하면 사용할 수 있습니다.'}</p>
+        <p id="sync-status" class="text-xs text-gray-500">${syLast || (stuDB.pin ? '🔄 기기 연동 준비 중…' : '🔄 PIN을 설정하면 학생·수업·만든 시험지가 PC·휴대폰 사이에서 자동으로 맞춰집니다.')}</p>
       </div>
       <div class="max-w-xl mx-auto border rounded-xl p-4 bg-gray-50 space-y-2">
         <b class="text-sm">💾 백업</b>
@@ -1774,8 +1812,121 @@ async function sbSyncStudents(manual) {
 function sbSetPin() {
   const v = prompt('Supabase SQL에서 설정한 PIN을 입력하세요.', stuDB.pin || '');
   if (v === null) return;
-  stuDB.pin = v.trim(); stuSave(); sbSyncStudents(true); syncSB();
+  stuDB.pin = v.trim(); stuSave(); sbSyncStudents(true); syncSB(); syncState();
 }
+/* ===== 선생님 기기 간 연동: 학생·수업·만든 시험지·결과를 서버(sb_tstate)와 맞춤 =====
+   그림(data:…)은 해시로 바꿔 sb_blobs에 한 번만 올림. 마지막으로 맞춘 상태(base)와 비교하는 3방향 병합. */
+const SYK = 'sciBankSyncBase_v1', SYC = ['students', 'exams', 'results', 'classes'];
+const syKey = {students: x => x.id, exams: x => x.id, classes: x => x.id, results: x => x.studentId + '|' + x.examId};
+const syH2D = new Map(), syD2H = new Map();
+let syBusy = false, syTimer = null, syLast = '', syAgain = false;
+function syHash(s) {
+  let h1 = 0xdeadbeef ^ s.length, h2 = 0x41c6ce57 ^ s.length;
+  for (let i = 0; i < s.length; i++) { const c = s.charCodeAt(i); h1 = Math.imul(h1 ^ c, 2654435761); h2 = Math.imul(h2 ^ c, 1597334677); }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return (h2 >>> 0).toString(36) + (h1 >>> 0).toString(36) + s.length.toString(36);
+}
+function syStrip(v) {
+  if (typeof v === 'string') {
+    if (v.length > 300 && v.startsWith('data:')) { let h = syD2H.get(v); if (!h) { h = syHash(v); syD2H.set(v, h); syH2D.set(h, v); } return '§blob:' + h; }
+    return v;
+  }
+  if (Array.isArray(v)) return v.map(syStrip);
+  if (v && typeof v === 'object') { const o = {}; for (const k in v) if (v[k] !== undefined) o[k] = syStrip(v[k]); return o; }
+  return v;
+}
+function syFill(v) {
+  if (typeof v === 'string') return v.startsWith('§blob:') ? (syH2D.get(v.slice(6)) || '') : v;
+  if (Array.isArray(v)) return v.map(syFill);
+  if (v && typeof v === 'object') { const o = {}; for (const k in v) o[k] = syFill(v[k]); return o; }
+  return v;
+}
+function syRefs(v, set = new Set()) {
+  if (typeof v === 'string') { if (v.startsWith('§blob:')) set.add(v.slice(6)); }
+  else if (Array.isArray(v)) v.forEach(x => syRefs(x, set));
+  else if (v && typeof v === 'object') for (const k in v) syRefs(v[k], set);
+  return set;
+}
+const syDoc = () => { const d = {}; SYC.forEach(c => d[c] = syStrip(stuDB[c] || [])); return d; };
+/* b: 마지막으로 맞춘 상태, l: 이 기기, r: 서버. 한쪽만 바뀐 항목은 바뀐 쪽, 둘 다 바뀌면 이 기기 쪽 */
+function syMerge(b, l, r) {
+  const out = {};
+  SYC.forEach(c => {
+    const key = syKey[c], B = new Map((b[c] || []).map(x => [key(x), JSON.stringify(x)]));
+    const L = new Map((l[c] || []).map(x => [key(x), x])), R = new Map((r[c] || []).map(x => [key(x), x]));
+    const res = [], seen = new Set();
+    [...R.keys(), ...L.keys()].forEach(k => {
+      if (seen.has(k)) return; seen.add(k);
+      const bs = B.get(k), lx = L.get(k), rx = R.get(k);
+      const ls = lx === undefined ? undefined : JSON.stringify(lx), rs = rx === undefined ? undefined : JSON.stringify(rx);
+      const x = ls === bs ? rx : rs === bs ? lx : (lx !== undefined ? lx : rx);
+      if (x !== undefined) res.push(x);
+    });
+    out[c] = res;
+  });
+  return out;
+}
+const syStat = t => { syLast = t; const el = $('sync-status'); if (el) el.textContent = t; };
+function sySoon() { clearTimeout(syTimer); syTimer = setTimeout(syncState, 1500); }
+async function syUpload(doc) {
+  const hs = [...syRefs(doc)].filter(h => syH2D.has(h));
+  for (let i = 0; i < hs.length; i += 200) {
+    const miss = await sbCall('sb_blob_missing', {p: stuDB.pin, hs: hs.slice(i, i + 200)}) || [];
+    for (const h of miss) await sbCall('sb_blob_put', {p: stuDB.pin, h, d: syH2D.get(h)});
+  }
+}
+async function syApply(doc) {
+  const need = [...syRefs(doc)].filter(h => !syH2D.has(h));
+  for (let i = 0; i < need.length; i += 15) {
+    (await sbCall('sb_blob_get', {p: stuDB.pin, hs: need.slice(i, i + 15)}) || []).forEach(x => { syH2D.set(x.h, x.data); syD2H.set(x.data, x.h); });
+  }
+  SYC.forEach(c => stuDB[c] = syFill(doc[c] || []));
+  await idbSet(SK, stuDB).catch(() => {});
+  const a = document.activeElement;
+  if (a && /INPUT|TEXTAREA|SELECT/.test(a.tagName)) return;
+  if (!$('tab-ex').classList.contains('hidden')) renderEx();
+  if (!$('tab-stu').classList.contains('hidden') && ['detail', 'list', 'cls'].includes(stuView[0])) renderStu();
+  if (!$('tab-cls').classList.contains('hidden') && clsView[0] === 'view') renderCls();
+}
+async function syncState() {
+  if (!sbOn() || !stuDB.pin || SP.get('e') || SP.get('s') || SP.has('me')) return;
+  if (syBusy) { syAgain = true; return; }
+  syBusy = true; syAgain = false;
+  try {
+    await stuReady;
+    const base = (await idbGet(SYK).catch(() => null)) || {ver: -1, doc: {}};
+    for (let tries = 0; tries < 4; tries++) {
+      const local = syDoc(), ls = JSON.stringify(local);
+      const ver = await sbCall('sb_state_ver', {p: stuDB.pin});
+      if (ver === null || ver === undefined) throw new Error('서버에 update5 SQL이 없습니다');
+      if (ver === base.ver && ls === JSON.stringify(base.doc)) { syStat(`🔄 기기 연동됨 · ${new Date().toLocaleTimeString('ko-KR')} 확인`); break; }
+      let merged = local, rs = JSON.stringify(base.doc);
+      if (ver !== base.ver) { const g = await sbCall('sb_state_get', {p: stuDB.pin}); merged = syMerge(base.doc || {}, local, g.doc || {}); rs = JSON.stringify(g.doc || {}); }
+      const ms = JSON.stringify(merged);
+      let nv = ver;
+      if (ms !== rs) {
+        syStat('🔄 서버에 올리는 중…');
+        await syUpload(merged);
+        nv = await sbCall('sb_state_put', {p: stuDB.pin, d: merged, base: ver});
+        if (nv < 0) continue;
+      }
+      let fin = merged;
+      if (ms !== ls) {
+        const now = syDoc();
+        if (JSON.stringify(now) !== ls) fin = syMerge(local, now, merged);   // 기다리는 사이 이 기기에서 또 바뀜
+        await syApply(fin);
+        if (fin !== merged) syAgain = true;
+      }
+      base.ver = nv; base.doc = merged; await idbSet(SYK, base).catch(() => {});
+      syStat(`🔄 기기 연동됨 · ${new Date().toLocaleTimeString('ko-KR')}` + (ms !== ls ? ' · 다른 기기 변경 반영' : ' · 올림'));
+      break;
+    }
+  } catch(e) { const m = String(e.message || e); syStat('🔄 기기 연동 실패: ' + (m.includes('bad pin') ? 'PIN이 맞지 않습니다.' : /sb_state_ver|PGRST202/.test(m) ? '서버에 연동 기능(update5 SQL)이 없습니다.' : '인터넷 연결을 확인하세요.')); }
+  finally { syBusy = false; if (syAgain) sySoon(); }
+}
+setInterval(() => { if (!document.hidden) syncState(); }, 6000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) syncState(); });
 async function syncSB() {
   if (!sbOn() || !stuDB.pin) return;
   const st = $('sb-status');
@@ -2267,7 +2418,7 @@ function bkBanner() {
   let snooze = 0; try { snooze = +localStorage.getItem('sciBankBkSnooze') || 0; } catch(e) {}
   const show = has && (!t || Date.now() - t > 7 * 864e5) && Date.now() > snooze;
   el.classList.toggle('hidden', !show); if (!show) return;
-  el.querySelector('span').innerHTML = `💾 <b>${t ? `마지막 백업 후 ${Math.floor((Date.now() - t) / 864e5)}일이 지났습니다.` : '아직 백업한 적이 없습니다.'}</b> 문제·학생 기록은 이 브라우저에만 저장되어 OneDrive로 동기화되지 않습니다.`;
+  el.querySelector('span').innerHTML = `💾 <b>${t ? `마지막 백업 후 ${Math.floor((Date.now() - t) / 864e5)}일이 지났습니다.` : '아직 백업한 적이 없습니다.'}</b> 문제 DB·기출은 이 브라우저에만 저장됩니다. (학생·수업·만든 시험지는 PIN을 설정하면 다른 기기와 자동으로 맞춰집니다.)`;
 }
 function bkSnooze() { try { localStorage.setItem('sciBankBkSnooze', Date.now() + 864e5); } catch(e) {} bkBanner(); }
 function exportBackup() {
