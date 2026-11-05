@@ -103,6 +103,9 @@ footer{background:transparent!important;border:0!important;color:#9AA3B0!importa
 .pv-cols{column-count:2;column-gap:36px;column-rule:1px solid #000}.pv-cols .pq{break-inside:avoid}
 .pv-h1{border:1px solid #000;margin-bottom:16px}.pv-h1a{text-align:center;padding:14px 0}.pv-h1b{display:flex;justify-content:space-between;border-top:1px dotted #000;padding:4px 28px;font-size:.75rem}
 .pv-h2{display:flex;border:1px solid #000;font-size:.85rem;margin-bottom:10px}.pv-h2a{flex:1;text-align:center;padding:8px;border-right:1px solid #000}.pv-h2b{width:30px;text-align:center;font-size:.7rem;border-right:1px solid #000;display:flex;align-items:center;justify-content:center}.pv-h2c{display:grid;grid-template-columns:repeat(4,1fr);width:240px;text-align:center;font-size:.75rem}.pv-h2c span{border-left:1px solid #000;padding:4px}.pv-h2c span:first-child{border-left:0}
+.pv-n1{display:grid;grid-template-columns:1fr 92px;border:1.5px solid #000;margin-bottom:16px}.pv-n1a{padding:8px 14px 10px}.pv-n1s{display:flex;justify-content:space-between;font-size:.8rem}.pv-n1t{text-align:center;font-size:1.35rem;margin-top:4px}.pv-n1q{border-left:1px solid #000;display:flex;align-items:center;justify-content:center;padding:6px}.pv-n1b{grid-column:1/3;display:flex;justify-content:space-between;border-top:1px solid #000;padding:3px 12px;font-size:.72rem}
+.pv-n2{text-align:center;margin-bottom:14px;position:relative}.pv-n2q{position:absolute;right:0;top:-6px}.pv-n2t{font-size:1.5rem;margin:2px 0 8px}.pv-n2r{display:grid;grid-template-columns:1fr 1fr 1fr;border:1px solid #000;font-size:.72rem}.pv-n2r span{padding:3px 8px;border-left:1px solid #000;text-align:left}.pv-n2r span:first-child{border-left:0}.pv-n2r span:nth-child(2){text-align:center}.pv-n2r span:last-child{text-align:right}
+.pv-n3{margin-bottom:14px;border-bottom:1.5px solid #000;padding-bottom:10px}.pv-n3y{text-align:center;font-size:.95rem}.pv-n3m{display:flex;align-items:center;gap:12px;margin:4px 0 8px}.pv-n3o{border:1px solid #000;border-radius:999px;padding:2px 12px;font-size:.75rem;white-space:nowrap}.pv-n3t{flex:1;text-align:center;font-size:1.8rem;font-weight:600}.pv-n3t small{font-size:1.1rem;font-weight:500}.pv-n3q{width:70px;display:flex;justify-content:flex-end}.pv-n3r{display:flex;gap:0;font-size:.75rem;max-width:70%}.pv-n3r span{border:1px solid #000;padding:3px 8px;margin-left:-1px}
 .pv-box{border:1px solid #000;display:inline-block;font-size:.75rem;padding:6px 10px;margin-bottom:12px}
 .pv-h3{margin-bottom:14px}.pv-h3a{text-align:center;font-weight:700;font-size:1.05rem}.pv-h3b{text-align:center;font-size:1.9rem;margin:6px 0 10px}.pv-h3c{display:flex;gap:10px;font-size:.8rem;border-bottom:1px solid #000;padding-bottom:12px}.pv-h3c span{border:1px solid #000;padding:3px 10px;flex:1}
 .pvgap{outline:none;cursor:text;position:relative;min-height:14px;border-radius:6px}
@@ -1078,18 +1081,22 @@ async function extractNow() {
   pvExtra = []; curExamId = uid('e');
   switchTab('preview');
 }
+/* 미리보기 머리 — 다운로드되는 시험지틀1·2·3과 같은 모양 */
 function pvHead(tpl, n) {
-  const t = esc(examName()), g = esc(examGradeText(currentQuestions));
-  if (tpl === '2') return `<div class="pv-h2"><div class="pv-h2a"><div class="font-bold">${t}</div><div>과목 코드 (&nbsp;&nbsp;&nbsp;)&nbsp; 20&nbsp;&nbsp;년&nbsp;&nbsp;월&nbsp;&nbsp;일&nbsp;&nbsp;교시</div><div>${g} 과학 원안</div></div><div class="pv-h2b">출<br>제<br>자</div><div class="pv-h2c"><span>계</span><span>주 임</span><span>교 감</span><span>교 장</span></div></div><div class="pv-box">▶ 배점 안내<br>▷ 객관식( 1 ～ ${n} ) 각 &nbsp;&nbsp;&nbsp; 점 ; 주관식( &nbsp;～&nbsp; ) 각 &nbsp;&nbsp; 점</div>`;
-  if (tpl === '3') return `<div class="pv-h3"><div class="pv-h3a">${t}</div><div class="pv-h3b">과학탐구 영역(${esc(subjectLabel(currentQuestions))})</div><div class="pv-h3c"><span>성명</span><span>수험 번호</span><span>제 [&nbsp;&nbsp;&nbsp;] 선택</span></div></div>`;
-  return `<div class="pv-h1"><div class="pv-h1a"><div class="text-xl">${t}</div><div class="text-lg">${g}</div></div><div class="pv-h1b"><span>이름 : ______________</span><span>문항수 : ${n}</span></div></div>`;
+  const qs = currentQuestions, t = esc(examName()), g = esc(examGradeText(qs)), sj = esc(subjectLabel(qs));
+  const d = new Date(), dt = `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}.`;
+  const e = curExamId && stuDB.exams.find(x => x.id === curExamId), cid = e ? e.classId : pendingCls, cl = cid && CL().find(c => c.id === cid);
+  const qr = s => curExamId && sbReady() ? `<div id="pv-qr" data-s="${s}"></div>` : '<span class="text-[10px] text-gray-400">QR</span>';
+  if (tpl === '2') return `<div class="pv-n2"><div class="pv-n2q">${curExamId && sbReady() ? qr(44) : ''}</div><div class="text-sm">${t}</div><div class="pv-n2t">${g} ${sj}</div><div class="pv-n2r"><span>성명</span><span>${dt}</span><span>문항수 : ${n}문항</span></div></div>`;
+  if (tpl === '3') return `<div class="pv-n3"><div class="pv-n3y">${d.getFullYear()}학년도 모의평가</div><div class="pv-n3m"><span class="pv-n3o">제 4 교시</span><span class="pv-n3t">과학탐구 영역<small>(${sj})</small></span><span class="pv-n3q">${qr(64)}</span></div><div class="pv-n3r"><span>성명</span><span class="flex-1"></span><span>수험 번호</span><span class="flex-[2]"></span></div></div>`;
+  return `<div class="pv-n1"><div class="pv-n1a"><div class="pv-n1s"><span>${esc(cl ? cl.name : '')}</span><span>${dt}</span></div><div class="pv-n1t">${t}</div></div><div class="pv-n1q">${qr(76)}</div><div class="pv-n1b"><span>이름 : ______________</span><span>문항수 : ${n}문항</span></div></div>`;
 }
 function renderPreview() {
   const gap = $('pv-gap').value, ans = $('pv-ans').checked, tpl = examTpl();
   $('pv-gap-v').textContent = gap + 'px'; $('pv-paper').dataset.tpl = tpl; setTimeout(drawQR, 0); saveDraft(); pvClsOptions();
   if (document.activeElement !== $('pv-name')) $('pv-name').value = examName();
   const qs = currentQuestions;
-  $('pv-paper').innerHTML = qrBox() + pvHead(tpl, qs.length) + '<div class="pv-cols">' +
+  $('pv-paper').innerHTML = qrBox(tpl) + pvHead(tpl, qs.length) + '<div class="pv-cols">' +
     qs.map((q, i) => `<div class="pq">${i ? `<div class="pvgap" tabindex="0" data-i="${i}" onkeydown="pvKey(event,${i})" style="height:${Math.max(0, +gap + 24*(pvExtra[i]||0))}px"></div>` : ''}<p class="font-bold whitespace-pre-wrap">${i+1}. ${q.imageOnly ? '' : esc(q.question)}</p>${q.image ? `<img src="${esc(q.image)}" ${q.imageOnly ? `data-rn="${i}" ` : ''}class="${q.imageOnly ? 'my-1 w-full' : 'my-2 max-h-64'}">` : ''}${bareChoices(q) ? '' : (q.choices || []).map(c => `<p class="ml-4 text-sm">${esc(c)}</p>`).join('')}</div>`).join('') + '</div>' +
     (ans ? `<div class="pq border-t pt-4 mt-8"><h3 class="font-bold mb-2">[정답 및 해설]</h3>${qs.map((q, i) => `<p class="text-sm">${i+1}번 정답: ${esc(q.answer)} ${q.explanation ? '해설: ' + esc(q.explanation) : ''}</p>`).join('')}</div>` : '');
   // 그림 문항: 그림 속 원래 번호를 시험지 번호로 바꾸고, 따로 붙인 번호 줄은 숨김
@@ -1321,9 +1328,11 @@ const hxP = (t, c, br) => `<hp:p id="0" paraPrIDRef="${c[0]}" styleIDRef="${c[1]
 function hxPic(n, w, h, c) {
   return `<hp:p id="0" paraPrIDRef="${c[0]}" styleIDRef="${c[1]}" pageBreak="0" columnBreak="0" merged="0"><hp:run charPrIDRef="${c[2]}">${hxPicEl(n, w, h)}</hp:run></hp:p>`;
 }
-function hxPicEl(n, w, h) {
+/* fl = {x, y}: 종이 기준 위치에 글 앞으로 띄움 (없으면 글자처럼 취급) */
+function hxPicEl(n, w, h, fl) {
   const id = 1900000000 + n, M = 'e1="1" e2="0" e3="0" e4="0" e5="1" e6="0"';
-  return `<hp:pic id="${id}" zOrder="${n}" numberingType="PICTURE" textWrap="TOP_AND_BOTTOM" textFlow="BOTH_SIDES" lock="0" dropcapstyle="None" href="" groupLevel="0" instid="${id}" reverse="0"><hp:offset x="0" y="0"/><hp:orgSz width="${w}" height="${h}"/><hp:curSz width="${w}" height="${h}"/><hp:flip horizontal="0" vertical="0"/><hp:rotationInfo angle="0" centerX="${w>>1}" centerY="${h>>1}" rotateimage="1"/><hp:renderingInfo><hc:transMatrix ${M}/><hc:scaMatrix ${M}/><hc:rotMatrix ${M}/></hp:renderingInfo><hc:img binaryItemIDRef="image${n}" bright="0" contrast="0" effect="REAL_PIC" alpha="0"/><hp:imgRect><hc:pt0 x="0" y="0"/><hc:pt1 x="${w}" y="0"/><hc:pt2 x="${w}" y="${h}"/><hc:pt3 x="0" y="${h}"/></hp:imgRect><hp:imgClip left="0" right="${w}" top="0" bottom="${h}"/><hp:inMargin left="0" right="0" top="0" bottom="0"/><hp:imgDim dimwidth="${w}" dimheight="${h}"/><hp:effects/><hp:sz width="${w}" height="${h}" widthRelTo="ABSOLUTE" heightRelTo="ABSOLUTE" protect="0"/><hp:pos treatAsChar="1" affectLSpacing="0" flowWithText="1" allowOverlap="0" holdAnchorAndSO="0" vertRelTo="PARA" horzRelTo="PARA" vertAlign="TOP" horzAlign="LEFT" vertOffset="0" horzOffset="0"/><hp:outMargin left="0" right="0" top="0" bottom="0"/></hp:pic>`;
+  const pos = fl ? `<hp:pos treatAsChar="0" affectLSpacing="0" flowWithText="0" allowOverlap="1" holdAnchorAndSO="0" vertRelTo="PAPER" horzRelTo="PAPER" vertAlign="TOP" horzAlign="LEFT" vertOffset="${fl.y}" horzOffset="${fl.x}"/>` : '<hp:pos treatAsChar="1" affectLSpacing="0" flowWithText="1" allowOverlap="0" holdAnchorAndSO="0" vertRelTo="PARA" horzRelTo="PARA" vertAlign="TOP" horzAlign="LEFT" vertOffset="0" horzOffset="0"/>';
+  return `<hp:pic id="${id}" zOrder="${n}" numberingType="PICTURE" textWrap="${fl ? 'IN_FRONT_OF_TEXT' : 'TOP_AND_BOTTOM'}" textFlow="BOTH_SIDES" lock="0" dropcapstyle="None" href="" groupLevel="0" instid="${id}" reverse="0"><hp:offset x="0" y="0"/><hp:orgSz width="${w}" height="${h}"/><hp:curSz width="${w}" height="${h}"/><hp:flip horizontal="0" vertical="0"/><hp:rotationInfo angle="0" centerX="${w>>1}" centerY="${h>>1}" rotateimage="1"/><hp:renderingInfo><hc:transMatrix ${M}/><hc:scaMatrix ${M}/><hc:rotMatrix ${M}/></hp:renderingInfo><hc:img binaryItemIDRef="image${n}" bright="0" contrast="0" effect="REAL_PIC" alpha="0"/><hp:imgRect><hc:pt0 x="0" y="0"/><hc:pt1 x="${w}" y="0"/><hc:pt2 x="${w}" y="${h}"/><hc:pt3 x="0" y="${h}"/></hp:imgRect><hp:imgClip left="0" right="${w}" top="0" bottom="${h}"/><hp:inMargin left="0" right="0" top="0" bottom="0"/><hp:imgDim dimwidth="${w}" dimheight="${h}"/><hp:effects/><hp:sz width="${w}" height="${h}" widthRelTo="ABSOLUTE" heightRelTo="ABSOLUTE" protect="0"/>${pos}<hp:outMargin left="0" right="0" top="0" bottom="0"/></hp:pic>`;
 }
 async function buildHwpx(qs, dims, o) {
   const tpl = HWPX_TPL[o.tpl] ? o.tpl : '1';
@@ -1351,6 +1360,9 @@ async function buildHwpx(qs, dims, o) {
   let sec = txt('Contents/section0.xml');
   sec = sec.replace('</hs:sec>', body + '</hs:sec>');
   if (o.qr && sec.includes('<hp:t>@@QR@@</hp:t>')) { const n = imgs.length + 1, S = tpl === '3' ? 5600 : 7800; imgs.push({n, ext: 'png', mime: 'png', data: b64(o.qr.split(',')[1])}); sec = sec.replace('<hp:t>@@QR@@</hp:t>', hxPicEl(n, S, S)); }
+  // 시험지2: 틀에 QR 칸이 없어 오른쪽 위 여백에 작게 띄움 (종이 72852 폭, 오른쪽 여백 5668)
+  if (o.qr && tpl === '2') { const n = imgs.length + 1, S = 4200, at = sec.indexOf('</hp:colPr></hp:ctrl>');
+    if (at > 0) { imgs.push({n, ext: 'png', mime: 'png', data: b64(o.qr.split(',')[1])}); const k = at + '</hp:colPr></hp:ctrl>'.length; sec = sec.slice(0, k) + hxPicEl(n, S, S, {x: 72852 - 5668 - S, y: 400}) + sec.slice(k); } }
   sec = sec.replace('<hp:t>@@QR@@</hp:t>', '<hp:t/>');
   const now = new Date(), dt = `${now.getFullYear()}. ${now.getMonth() + 1}. ${now.getDate()}.`;
   const rep = s => s.replace(/@@TITLE@@/g, X(o.name || examName())).replace(/@@GRADE@@/g, X(tpl === '1' ? examGradeText(qs) : (examGradeText(qs) + ' ' + subjectLabel(qs)))).replace(/@@SUBJ@@/g, X(subjectLabel(qs))).replace(/@@N@@/g, String(qs.length)).replace(/@@CLASS@@/g, X(o.cls || '')).replace(/@@DATE@@/g, dt).replace(/@@YEAR@@/g, String(now.getFullYear()));
@@ -1787,17 +1799,16 @@ function printAccountCards(list) {
 
 /* ===== 시험지 QR ===== */
 const exCode = id => id.slice(-6).toUpperCase();
-function qrBox() {
+function qrBox(tpl) {
   if (!curExamId) return '';
-  return sbReady()
-    ? `<div class="flex justify-end items-center gap-3 mb-2"><div class="text-xs text-right leading-tight">답안 제출 QR<br>시험지 코드 <b class="text-base">${exCode(curExamId)}</b></div><div id="pv-qr"></div></div>`
-    : `<div class="text-right text-xs text-gray-500 mb-2">시험지 코드 <b>${exCode(curExamId)}</b></div>`;
+  return `<div class="text-right text-xs text-gray-500 mb-2">시험지 코드 <b>${exCode(curExamId)}</b></div>`;
 }
 function qrUrl(id = curExamId) { return `${SB_CONFIG.pageUrl.split('#')[0].split('?')[0]}?e=${exCode(id)}`; }
 function drawQR() {
   const el = $('pv-qr'); if (!el || !sbReady() || typeof QRCode === 'undefined') return;
   el.innerHTML = '';
-  new QRCode(el, {text: qrUrl(), width: 110, height: 110, correctLevel: QRCode.CorrectLevel.L});
+  const s = +el.dataset.s || 110;
+  new QRCode(el, {text: qrUrl(), width: s, height: s, correctLevel: QRCode.CorrectLevel.L});
 }
 const SP = new URLSearchParams(location.search);
 /* ===== Supabase ===== */
@@ -2330,7 +2341,7 @@ function pvSetClass(cid) {
   saveExamRecord();
   const e = stuDB.exams.find(x => x.id === curExamId); if (!e) return;
   if (cid) e.classId = cid; else delete e.classId;
-  stuSave(); sbPushExamClass(e);
+  stuSave(); sbPushExamClass(e); renderPreview();
   const c = CL().find(x => x.id === cid);
   toast(c ? `"${c.name}" 수업 학생의 개인 페이지에 이 시험지가 보입니다.` : '수업에서 뺐습니다.');
 }
