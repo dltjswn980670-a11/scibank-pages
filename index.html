@@ -12,12 +12,15 @@
 :root{--bg:#F2F4F7;--surface:#fff;--ink:#16202E;--muted:#5E6878;--line:#DDE2E9;--soft:#EEF1F5;
   --c-make:#2F6FEB;--c-make-s:#EAF1FE;--c-ex:#0E9F8E;--c-ex-s:#E3F6F3;--c-past:#D98200;--c-past-s:#FDF3E1;
   --c-var:#DE3F76;--c-var-s:#FDEBF1;--c-stu:#7655DD;--c-stu-s:#F1ECFD;--c-book:#3E8E2F;--c-book-s:#EAF5E6;
+  --c-cls:#0A7FA8;--c-cls-s:#E2F3F9;--c-msg:#C2398F;--c-msg-s:#FBEAF4;
   --accent:#2F6FEB;--accent-s:#EAF1FE;--brand:var(--accent)}
 body[data-tab=book]{--accent:var(--c-book);--accent-s:var(--c-book-s)}
 body[data-tab=ex]{--accent:var(--c-ex);--accent-s:var(--c-ex-s)}
 body[data-tab=past]{--accent:var(--c-past);--accent-s:var(--c-past-s)}
 body[data-tab=var]{--accent:var(--c-var);--accent-s:var(--c-var-s)}
 body[data-tab=stu]{--accent:var(--c-stu);--accent-s:var(--c-stu-s)}
+body[data-tab=cls]{--accent:var(--c-cls);--accent-s:var(--c-cls-s)}
+body[data-tab=msg]{--accent:var(--c-msg);--accent-s:var(--c-msg-s)}
 body{font-family:'Pretendard Variable',Pretendard,-apple-system,'Malgun Gothic',sans-serif;background:var(--bg)!important;color:var(--ink);letter-spacing:-.01em;-webkit-font-smoothing:antialiased}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
@@ -31,15 +34,21 @@ body{font-family:'Pretendard Variable',Pretendard,-apple-system,'Malgun Gothic',
 header{background:rgba(255,255,255,.92)!important;backdrop-filter:blur(8px);color:var(--ink)!important;border-bottom:1px solid var(--line);box-shadow:none!important;position:sticky;top:0;z-index:20}
 header .max-w-7xl{padding-top:10px!important;padding-bottom:10px!important;gap:16px}
 header h1{font-size:1.05rem!important}
-header #main-tabs{display:flex;gap:4px;margin:0;max-width:100%;overflow-x:auto;scrollbar-width:none}
-header #main-tabs::-webkit-scrollbar{display:none}
-header #main-tabs button{display:flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;border-radius:10px;font-weight:600;color:var(--muted);white-space:nowrap;position:relative}
-header #main-tabs button:hover{background:var(--soft);color:var(--ink)}
-header #main-tabs button{font-size:.9rem}
-header #main-tabs button.bg-indigo-700{background:var(--cs)!important;color:var(--ink);font-weight:700;box-shadow:inset 0 -2px 0 var(--c)}
-header .tab-desc{display:none}
+/* 상단바: 왼쪽 로고 · 가운데 상위 탭 · 오른쪽 메시지, 아래 줄에 하위 탭 */
+#top-nav{display:flex;gap:4px;justify-content:center;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none}
+#top-nav::-webkit-scrollbar{display:none}
+#top-nav button,#msg-btn{display:flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;border-radius:10px;font-weight:600;font-size:.9rem;color:var(--muted);white-space:nowrap;position:relative}
+#top-nav button:hover,#msg-btn:hover{background:var(--soft);color:var(--ink)}
+#top-nav button.on,#msg-btn.on{background:var(--cs);color:var(--ink);font-weight:700;box-shadow:inset 0 -2px 0 var(--c)}
+#top-nav button.on .tab-sym,#msg-btn.on .tab-sym{background:var(--c);color:#fff}
+#msg-btn{flex:none}
+#msg-btn .tab-sym{font-size:14px}
+#msg-badge{position:absolute;top:0;right:2px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#E5383B;color:#fff;font-size:11px;font-weight:800;line-height:18px;text-align:center}
+#sub-nav{display:flex;justify-content:center;gap:6px;padding:0 16px 10px;flex-wrap:wrap}
+#sub-nav button{padding:5px 14px;border-radius:999px;border:1px solid var(--line);font-size:.85rem;font-weight:600;color:var(--muted);background:#fff}
+#sub-nav button:hover{border-color:var(--c);color:var(--ink)}
+#sub-nav button.on{background:var(--c);border-color:var(--c);color:#fff}
 .tab-sym{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:6px;background:var(--cs);color:var(--c);font-weight:800;font-size:13px;flex:none}
-header #main-tabs button.bg-indigo-700 .tab-sym{background:var(--c);color:#fff}
 
 /* 처음 화면: 큰 원소 타일 */
 #hero{min-height:calc(100vh - 90px);display:flex;flex-direction:column;justify-content:center;padding-bottom:48px;text-align:left!important}
@@ -90,7 +99,7 @@ main .bg-red-100{background:#fff!important;color:#C62F2F!important;border:1px so
 #question-list>div::before{content:'';position:absolute;left:-1px;top:16px;bottom:16px;width:3px;border-radius:0 3px 3px 0;background:var(--accent)}
 #question-list img{border-radius:8px;background:#fff}
 footer{background:transparent!important;border:0!important;color:#9AA3B0!important;font-size:.75rem!important}
-@media(max-width:640px){header .max-w-7xl{flex-direction:column;align-items:stretch!important;gap:8px}#tab-editor>div:first-child{position:static}#tab-selector,#tab-book,#tab-diff{padding:18px!important}}
+@media(max-width:640px){header .max-w-7xl{flex-wrap:wrap;gap:8px}#top-nav{order:3;flex-basis:100%;justify-content:flex-start}#tab-editor>div:first-child{position:static}#tab-selector,#tab-book,#tab-diff{padding:18px!important}}
 .pv-cols{column-count:2;column-gap:36px;column-rule:1px solid #000}.pv-cols .pq{break-inside:avoid}
 .pv-h1{border:1px solid #000;margin-bottom:16px}.pv-h1a{text-align:center;padding:14px 0}.pv-h1b{display:flex;justify-content:space-between;border-top:1px dotted #000;padding:4px 28px;font-size:.75rem}
 .pv-h2{display:flex;border:1px solid #000;font-size:.85rem;margin-bottom:10px}.pv-h2a{flex:1;text-align:center;padding:8px;border-right:1px solid #000}.pv-h2b{width:30px;text-align:center;font-size:.7rem;border-right:1px solid #000;display:flex;align-items:center;justify-content:center}.pv-h2c{display:grid;grid-template-columns:repeat(4,1fr);width:240px;text-align:center;font-size:.75rem}.pv-h2c span{border-left:1px solid #000;padding:4px}.pv-h2c span:first-child{border-left:0}
@@ -148,6 +157,35 @@ input[type=password]:focus,input[type=date]:focus{outline:none;border-color:var(
 .sb-opt.on{background:var(--accent);color:#fff;border-color:var(--accent)}
 .sb-mark{flex:none;width:38px;height:34px;border-radius:8px;font-weight:800;background:var(--soft);color:var(--muted)}
 .sb-mark.o{background:#E3F6EE;color:#0E9F6E}.sb-mark.x{background:#FDECEC;color:#D63B3B}
+/* 메시지 (선생님·학생 공용) */
+.msg-wrap{display:flex;height:min(72vh,680px)}
+.msg-side{width:280px;flex:none;border-right:1px solid #E5E7EB;display:flex;flex-direction:column;min-height:0}
+#msg-list{overflow-y:auto;flex:1}
+.msg-th{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border-bottom:1px solid #F3F4F6;font-size:14px}
+.msg-th:hover{background:#FAFAFB}.msg-th.on{background:var(--c-msg-s)}
+.msg-av{flex:none;width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#F58529,#DD2A7B 55%,#8134AF);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.msg-un{display:inline-block;min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:#E5383B;color:#fff;font-size:11px;font-weight:800;line-height:20px;text-align:center}
+.msg-main{flex:1;display:flex;flex-direction:column;min-width:0;min-height:0}
+.msg-head{padding:12px 16px;border-bottom:1px solid #E5E7EB}
+.msg-log{flex:1;overflow-y:auto;padding:14px 12px;display:flex;flex-direction:column;gap:6px;background:#fff;min-height:0}
+.msg-row{display:flex;align-items:flex-end;gap:6px;max-width:100%}
+.msg-row.me{flex-direction:row-reverse}
+.msg-b{max-width:75%;padding:9px 13px;border-radius:18px;background:#EFEFF1;color:#111;white-space:pre-wrap;word-break:break-word;font-size:14.5px;line-height:1.45}
+.msg-row.me .msg-b{background:linear-gradient(135deg,#7B3FE4,#C2398F);color:#fff}
+.msg-t{font-size:10.5px;color:#9CA3AF;flex:none;text-align:right;line-height:1.2}
+.msg-row:not(.me) .msg-t{text-align:left}
+.msg-day{align-self:center;font-size:11.5px;color:#9CA3AF;margin:8px 0 2px}
+.msg-form{display:flex;gap:8px;align-items:flex-end;padding:10px;border-top:1px solid #E5E7EB;background:#fff}
+.msg-form textarea{flex:1;resize:none;border:1px solid #D1D5DB;border-radius:20px;padding:9px 14px;font-size:14.5px;line-height:1.4;max-height:140px;outline:none}
+.msg-form textarea:focus{border-color:var(--c-msg)}
+.msg-send{flex:none;background:var(--c-msg);color:#fff;font-weight:700;border-radius:20px;padding:9px 16px;font-size:14px}
+.msg-send:disabled{opacity:.5}
+@media (max-width:700px){.msg-wrap{flex-direction:column;height:auto}.msg-side{width:auto;border-right:0;border-bottom:1px solid #E5E7EB;max-height:220px}.msg-main{height:70vh}}
+.sb-chat{height:min(68vh,620px)}
+.sb-chat-btn{display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#7B3FE4,#C2398F);color:#fff;font-weight:700;padding:13px;border-radius:12px}
+.sb-cls{text-align:left;background:#fff;border:1px solid #E5E7EB;border-radius:12px;padding:14px}.sb-cls:hover{border-color:var(--accent)}
+.sb-ex{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #E5E7EB;border-radius:12px;padding:12px 14px}.sb-ex:hover{border-color:var(--accent)}
+.sb-todo{flex:none;background:var(--accent);color:#fff;font-weight:700;font-size:13px;padding:8px 12px;border-radius:8px}
 .sb-exp{margin:4px 0 6px 48px;background:var(--soft);border-radius:8px;padding:8px 10px;font-size:.85rem;white-space:pre-wrap}
 .sb-modal{position:fixed;inset:0;background:rgba(22,32,46,.45);display:flex;align-items:flex-end;justify-content:center;z-index:60;padding:16px}
 .sb-sheet{background:#fff;border-radius:16px;max-width:28rem;width:100%;padding:20px;max-height:85vh;overflow:auto}
@@ -166,7 +204,10 @@ input.dn-over[type=number]{border-color:#ef4444!important;background:#fef2f2!imp
 <header class="hidden bg-indigo-600 text-white shadow-md">
   <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
     <h1 class="logo cursor-pointer" onclick="goHome()" title="처음 화면으로"><span class="logo-tile"><i>51</i>Sb</span>Sci-Bank</h1>
+    <nav id="top-nav" aria-label="메뉴"></nav>
+    <button type="button" id="msg-btn" onclick="switchTab('msg')" style="--c:var(--c-msg);--cs:var(--c-msg-s)"><span class="tab-sym">💬</span>메시지<span id="msg-badge" class="hidden"></span></button>
   </div>
+  <div id="sub-nav" class="hidden"></div>
 </header>
 
 <div id="hero" class="max-w-7xl w-full mx-auto px-4 pt-8">
@@ -176,12 +217,12 @@ input.dn-over[type=number]{border-color:#ef4444!important;background:#fef2f2!imp
     <p class="hero-sub">2022 개정 교육과정 중1부터 고3까지, 시험지 만들기부터 채점까지 한곳에서.</p>
   </div>
   <div id="main-tabs">
-    <button onclick="switchTab('selector')" id="btn-make" style="--c:var(--c-make);--cs:var(--c-make-s)"><span class="tab-sym">단</span><span class="tab-name">단원별 문제</span><span class="tab-desc">단원과 난이도를 골라 새 시험지를 만듭니다</span></button>
-    <button onclick="switchTab('book')" id="btn-book" style="--c:var(--c-book);--cs:var(--c-book-s)"><span class="tab-sym">교</span><span class="tab-name">시중 교재</span><span class="tab-desc">교과·교재를 골라 시중 교재 문제로 시험지를 만듭니다</span></button>
-    <button onclick="switchTab('ex')" id="btn-ex" style="--c:var(--c-ex);--cs:var(--c-ex-s)"><span class="tab-sym">출</span><span class="tab-name">출제 문제</span><span class="tab-desc">만든 시험지를 다시 열고 제출 현황을 봅니다</span></button>
-    <button onclick="switchTab('past')" id="btn-past" style="--c:var(--c-past);--cs:var(--c-past-s)"><span class="tab-sym">기</span><span class="tab-name">기출 문제</span><span class="tab-desc">학교별 기출 시험지를 보고 인쇄합니다</span></button>
-    <button onclick="switchTab('var')" id="btn-var" style="--c:var(--c-var);--cs:var(--c-var-s)"><span class="tab-sym">변</span><span class="tab-name">기출 변형 문제</span><span class="tab-desc">기출 시험지의 변형 세트를 봅니다</span></button>
-    <button onclick="switchTab('stu')" id="btn-stu" style="--c:var(--c-stu);--cs:var(--c-stu-s)"><span class="tab-sym">학</span><span class="tab-name">학생</span><span class="tab-desc">학생 명단, 답 입력, 정오표를 관리합니다</span></button>
+    <button onclick="switchTab('selector')" style="--c:var(--c-make);--cs:var(--c-make-s)"><span class="tab-sym">문</span><span class="tab-name">문제</span><span class="tab-desc">단원별 문제·시중 교재에서 골라 새 시험지를 만듭니다</span></button>
+    <button onclick="switchTab('ex')" style="--c:var(--c-ex);--cs:var(--c-ex-s)"><span class="tab-sym">시</span><span class="tab-name">만든 시험지</span><span class="tab-desc">만든 시험지를 다시 열고 제출 현황을 봅니다</span></button>
+    <button onclick="switchTab('past')" style="--c:var(--c-past);--cs:var(--c-past-s)"><span class="tab-sym">기</span><span class="tab-name">기출</span><span class="tab-desc">학교별 기출 시험지와 변형 세트를 보고 인쇄합니다</span></button>
+    <button onclick="switchTab('cls')" style="--c:var(--c-cls);--cs:var(--c-cls-s)"><span class="tab-sym">수</span><span class="tab-name">수업</span><span class="tab-desc">같은 수업을 듣는 학생을 묶고, 수업별로 시험지를 냅니다</span></button>
+    <button onclick="switchTab('stu')" style="--c:var(--c-stu);--cs:var(--c-stu-s)"><span class="tab-sym">학</span><span class="tab-name">학생</span><span class="tab-desc">학년·이름으로 학생을 찾고 답 입력·보고서를 봅니다</span></button>
+    <button onclick="switchTab('msg')" style="--c:var(--c-msg);--cs:var(--c-msg-s)"><span class="tab-sym">💬</span><span class="tab-name">메시지</span><span class="tab-desc">학생이 보낸 질문을 읽고 답장합니다</span></button>
   </div>
   <div class="hero-import">
     <span><b>📥 JSON 한번에 불러오기</b> 단원별 문제·기출 문제(변형 포함)·시중 교재·EBS·백업 파일을 섞어서 골라도 알아서 나눠 넣습니다.</span>
@@ -298,6 +339,8 @@ input.dn-over[type=number]{border-color:#ef4444!important;background:#fef2f2!imp
   <section id="tab-ex" class="hidden max-w-5xl w-full mx-auto bg-white rounded-xl shadow-md p-6"><div id="ex-body"></div></section>
 
   <section id="tab-stu" class="hidden max-w-5xl w-full mx-auto bg-white rounded-xl shadow-md p-6"><div id="stu-body"></div></section>
+  <section id="tab-cls" class="hidden max-w-5xl w-full mx-auto bg-white rounded-xl shadow-md p-6"><div id="cls-body"></div></section>
+  <section id="tab-msg" class="hidden max-w-5xl w-full mx-auto bg-white rounded-xl shadow-md p-0 overflow-hidden"><div id="msg-body"></div></section>
 
 
   <section id="tab-diff" class="hidden bg-white rounded-xl shadow-md p-6 max-w-3xl mx-auto space-y-4">
@@ -330,6 +373,7 @@ input.dn-over[type=number]{border-color:#ef4444!important;background:#fef2f2!imp
         <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="exam-tpl" value="3" onchange="renderPreview()" class="w-4 h-4 accent-indigo-600">시험지3(모의평가)</label>
       </div>
       <label class="text-sm cursor-pointer"><input type="checkbox" id="pv-ans" onchange="renderPreview()" class="mr-1">정답·해설 포함</label>
+      <label class="text-sm flex items-center gap-2" title="수업을 고르면 그 수업 학생의 개인 페이지에 이 시험지가 보입니다">수업 <select id="pv-cls" onchange="pvSetClass(this.value)" class="border rounded-lg p-2 text-sm"></select></label>
       <button onclick="saveExamNow()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium text-sm">💾 시험지 저장</button>
       <button onclick="exportHwpx()" class="bg-gray-700 text-white px-4 py-2 rounded-lg font-medium text-sm">⬇ 다운로드 (.hwpx)</button>
       <button onclick="window.print()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium text-sm">🖨 인쇄</button>
@@ -892,6 +936,11 @@ function addBackup(d, c, keys) {
     const o = stuDB.results.find(x => x.studentId === r.studentId && x.examId === r.examId);
     if (!o) { stuDB.results.push(r); c.rs++; } else if ((r.at || 0) > (o.at || 0)) { Object.assign(o, r); }
   });
+  (S.classes || []).forEach(k => {
+    const o = CL().find(x => x.id === k.id);
+    if (!o) CL().push(JSON.parse(JSON.stringify(k)));
+    else o.members = [...new Set([...o.members, ...(k.members || [])])];
+  });
   addBank(d.masterDB || [], c, keys);
   (d.pastDB || []).forEach(x => { if (pastValid(x) && !pastDB.some(y => PF.every(k => String(y[k]) === String(x[k])))) { pastDB.push(x); c.past++; } });
 }
@@ -1006,34 +1055,56 @@ function pvHead(tpl, n) {
 }
 function renderPreview() {
   const gap = $('pv-gap').value, ans = $('pv-ans').checked, tpl = examTpl();
-  $('pv-gap-v').textContent = gap + 'px'; $('pv-paper').dataset.tpl = tpl; setTimeout(drawQR, 0); saveDraft();
+  $('pv-gap-v').textContent = gap + 'px'; $('pv-paper').dataset.tpl = tpl; setTimeout(drawQR, 0); saveDraft(); pvClsOptions();
   if (document.activeElement !== $('pv-name')) $('pv-name').value = examName();
   const qs = currentQuestions;
   $('pv-paper').innerHTML = qrBox() + pvHead(tpl, qs.length) + '<div class="pv-cols">' +
     qs.map((q, i) => `<div class="pq">${i ? `<div class="pvgap" tabindex="0" data-i="${i}" onkeydown="pvKey(event,${i})" style="height:${Math.max(0, +gap + 24*(pvExtra[i]||0))}px"></div>` : ''}<p class="font-bold whitespace-pre-wrap">${i+1}. ${q.imageOnly ? '' : esc(q.question)}</p>${q.image ? `<img src="${esc(q.image)}" class="${q.imageOnly ? 'my-1 w-full' : 'my-2 max-h-64'}">` : ''}${bareChoices(q) ? '' : (q.choices || []).map(c => `<p class="ml-4 text-sm">${esc(c)}</p>`).join('')}</div>`).join('') + '</div>' +
     (ans ? `<div class="pq border-t pt-4 mt-8"><h3 class="font-bold mb-2">[정답 및 해설]</h3>${qs.map((q, i) => `<p class="text-sm">${i+1}번 정답: ${esc(q.answer)} ${q.explanation ? '해설: ' + esc(q.explanation) : ''}</p>`).join('')}</div>` : '');
 }
-const TABS = ['selector','book','diff','preview','editor','past','var','stu','ex'];
+const TABS = ['selector','book','diff','preview','editor','past','var','stu','stuname','ex','cls','msg'];
+const SECTIONS = ['selector','book','diff','preview','editor','past','stu','ex','cls','msg'];
+/* 상위 탭 → 하위 탭 [이동할 탭, 이름, 색] */
+const NAV = [
+  {name: '문제', sym: '문', c: 'make', subs: [['selector', '단원별 문제', 'make'], ['book', '시중 교재', 'book']]},
+  {name: '만든 시험지', sym: '시', c: 'ex', subs: [['ex', '', 'ex']]},
+  {name: '기출', sym: '기', c: 'past', subs: [['past', '기출 문제', 'past'], ['var', '기출 변형 문제', 'var']]},
+  {name: '수업', sym: '수', c: 'cls', subs: [['cls', '', 'cls']]},
+  {name: '학생', sym: '학', c: 'stu', subs: [['stu', '학년으로 검색', 'stu'], ['stuname', '이름으로 검색', 'stu']]}
+];
+function renderNav(bt) {
+  const g = NAV.find(n => n.subs.some(s => s[0] === bt));
+  $('top-nav').innerHTML = NAV.map(n => `<button type="button" onclick="switchTab('${n.subs[0][0]}')" class="${n === g ? 'on' : ''}" style="--c:var(--c-${n.c});--cs:var(--c-${n.c}-s)"><span class="tab-sym">${n.sym}</span>${n.name}</button>`).join('');
+  $('msg-btn').classList.toggle('on', bt === 'msg');
+  const sn = $('sub-nav'), subs = g && g.subs.length > 1 ? g.subs : null;
+  sn.classList.toggle('hidden', !subs);
+  sn.innerHTML = subs ? subs.map(([k, nm, c]) => `<button type="button" onclick="switchTab('${k}')" class="${k === bt ? 'on' : ''}" style="--c:var(--c-${c})">${nm}</button>`).join('') : '';
+}
 function switchTab(t, fromHistory) {
   if (t === 'diff' && !diffUnits.length) t = srcTab();
   if ((t === 'preview' || t === 'editor') && !currentQuestions.length) t = srcTab();
   if (!fromHistory && location.hash.slice(1) !== t) history.pushState(null, '', '#' + t);
-  if (!document.querySelector('header #main-tabs')) { document.querySelector('header .max-w-7xl').appendChild($('main-tabs')); $('hero').style.display = 'none'; document.querySelector('header').classList.remove('hidden'); }
+  $('hero').style.display = 'none'; document.querySelector('header').classList.remove('hidden');
+  let bt = t;
   if (t === 'past' || t === 'var') { pastMode = t === 'var' ? 'var' : 'orig'; t = 'past'; }
-  ['selector','book','diff','preview','editor','past','stu','ex'].forEach(x => $('tab-'+x).classList.add('hidden'));
-  ['make','book','past','var','stu','ex'].forEach(x => $('btn-'+x).classList.remove('bg-indigo-700'));
+  if (t === 'stuname') t = 'stu';
+  if (!['past', 'var', 'stu', 'stuname', 'ex', 'cls', 'msg'].includes(bt)) bt = t === 'book' || (t !== 'selector' && src === 'book') ? 'book' : 'selector';
+  SECTIONS.forEach(x => $('tab-'+x).classList.add('hidden'));
   $('tab-'+t).classList.remove('hidden');
-  const bt = t === 'past' ? (pastMode === 'var' ? 'var' : 'past') : t === 'stu' ? 'stu' : t === 'ex' ? 'ex' : t === 'book' || (t !== 'selector' && src === 'book') ? 'book' : 'make';
-  $('btn-'+bt).classList.add('bg-indigo-700'); document.body.dataset.tab = bt;
+  renderNav(bt);
+  document.body.dataset.tab = {selector: 'make', stuname: 'stu'}[bt] || bt;
   if (t === 'book') bookReady.then(renderBook);
   if (t === 'editor') renderEditor();
   if (t === 'past') renderPastSelects();
   if (t === 'ex') renderEx();
   if (t === 'preview') { saveExamRecord(); renderPreview(); }
-  if (t === 'stu') { stuGo('grade'); syncSB(); }
+  if (t === 'stu') { stuGo(bt === 'stuname' ? 'name' : 'grade'); syncSB(); }
+  if (t === 'cls') clsGo('list');
+  if (t === 'msg') msgOpen();
   if (t === 'selector') draftBanner();
+  if (t !== 'msg') msgStop();
   renderSteps(t); bkBanner();
-  const on = document.querySelector('#main-tabs .bg-indigo-700'); if (on) on.scrollIntoView({block: 'nearest', inline: 'center'});
+  const on = document.querySelector('#top-nav .on'); if (on) on.scrollIntoView({block: 'nearest', inline: 'center'});
   window.scrollTo(0, 0);
 }
 /* 진행 단계 표시: 단원 → 난이도 → 미리보기 → 편집 (클릭하면 해당 단계로 이동) */
@@ -1047,9 +1118,8 @@ function renderSteps(t) {
 }
 function goHome(fromHistory) {
   if (!fromHistory && location.hash) history.pushState(null, '', location.pathname + location.search);
-  TABS.forEach(x => { const s = $('tab-'+x); if (s) s.classList.add('hidden'); });
-  ['make','book','past','var','stu','ex'].forEach(x => $('btn-'+x).classList.remove('bg-indigo-700'));
-  $('hero').appendChild($('main-tabs')); $('hero').style.display = ''; $('steps').classList.add('hidden');
+  SECTIONS.forEach(x => $('tab-'+x).classList.add('hidden')); msgStop();
+  $('hero').style.display = ''; $('steps').classList.add('hidden');
   document.querySelector('header').classList.add('hidden'); delete document.body.dataset.tab;
 }
 window.addEventListener('popstate', () => { const t = location.hash.slice(1); if (TABS.includes(t)) switchTab(t, true); else goHome(true); });
@@ -1381,7 +1451,7 @@ const qInfo = qs => qs.map(q => ({q: q.question || '', ch: q.choices || [], exp:
 function saveExamRecord() {
   if (!curExamId) return;
   let e = stuDB.exams.find(x => x.id === curExamId);
-  if (!e) { e = {id: curExamId, at: Date.now()}; stuDB.exams.push(e); }
+  if (!e) { e = {id: curExamId, at: Date.now()}; if (pendingCls && CL().some(c => c.id === pendingCls)) e.classId = pendingCls; pendingCls = ''; stuDB.exams.push(e); }
   e.name = examName(); e.questions = JSON.parse(JSON.stringify(currentQuestions)); stuSave();
   if (sbOn() && stuDB.pin) sbPushExam(e).catch(() => {});
 }
@@ -1390,6 +1460,7 @@ async function sbPushExam(e) {
   const a = {p: stuDB.pin, c: exCode(e.id), nm: e.name, cnt: e.questions.length, k: e.questions.map(q => numAns(q.answer))};
   try { await sbCall('sb_upsert_exam', {...a, info: qInfo(e.questions)}); e.infoSent = true; }
   catch(x) { await sbCall('sb_upsert_exam', a); }
+  if (e.classId) sbPushExamClass(e);
 }
 /* 문항 정보 기능 이전에 만든 시험지도 한 번씩 서버에 다시 올림 (학생 화면 해설·단원용) */
 async function sbPushOldExams() {
@@ -1416,6 +1487,15 @@ function renderStu() {
           <label for="bk-file" class="cursor-pointer bg-white hover:bg-gray-100 border px-3 py-2 rounded-lg text-xs font-bold">📂 백업 파일 불러오기 (합치기)</label></div>
         <p class="text-xs text-gray-400">※ 보안을 위해 PIN은 백업 파일에 들어가지 않습니다. 새 컴퓨터에서는 PIN 설정을 다시 해 주세요.</p>
       </div>`;
+  } else if (v === 'name') {
+    const q = (a || '').trim(), ss = q ? stuDB.students.filter(s => s.name.includes(q)).sort((x, y) => x.name.localeCompare(y.name, 'ko') || x.grade.localeCompare(y.grade, 'ko')) : [];
+    b.innerHTML = `<h2 class="text-xl font-bold text-center my-6">이름으로 학생 찾기</h2>
+      <input id="stu-q" type="search" value="${esc(q)}" placeholder="이름 일부를 입력하세요 (예: 민)" class="block w-full max-w-xl mx-auto border rounded-xl p-3 text-lg mb-5">
+      ${q ? (ss.length ? `<div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-2 max-w-4xl mx-auto">${ss.map(s => `<button onclick="stuGo('detail','${s.id}')" class="stu-btn">${esc(s.name)}<span class="block text-xs font-normal text-gray-400 mt-0.5">${s.grade}${clsOf(s.id).length ? ' · ' + esc(clsOf(s.id).map(c => c.name).join(', ')) : ''}</span></button>`).join('')}</div>` : '<p class="text-center text-gray-400 py-10">찾는 학생이 없습니다.</p>')
+        : `<p class="text-center text-gray-400 py-6">등록된 학생 ${stuDB.students.length}명</p>`}`;
+    const i = $('stu-q');
+    i.oninput = () => { clearTimeout(renderStu.t); renderStu.t = setTimeout(() => { stuView = ['name', i.value]; renderStu(); const n = $('stu-q'); n.focus(); n.setSelectionRange(n.value.length, n.value.length); }, 200); };
+    if (!q) i.focus();
   } else if (v === 'list') {
     const ss = stuDB.students.filter(s => s.grade === a).sort((x, y) => x.name.localeCompare(y.name, 'ko'));
     b.innerHTML = `<div class="flex items-center gap-3 mb-4 flex-wrap"><button onclick="stuGo('grade')" class="stu-back">← 학년 선택</button><h2 class="text-xl font-bold">${a} 학생 (${ss.length}명)</h2>
@@ -1449,7 +1529,19 @@ function renderStu() {
         e.questions.map((q, i) => `<div class="ans-row flex items-center gap-3 border-b py-2 px-2 rounded" tabindex="0" data-i="${i}"><span class="w-12 font-bold">${i+1}번</span>${[1,2,3,4,5].map(n => `<label class="cursor-pointer text-lg"><input type="radio" name="a${i}" value="${n}" ${old[i] === n ? 'checked' : ''} tabindex="-1" class="mr-0.5 accent-indigo-600">${circ(n)}</label>`).join('')}</div>`).join('') +
         `<button class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg">저장</button></form>`;
       bindAnsEntry(e.questions.length);
+    } else if (v === 'cls') {
+      const cl = CL().find(x => x.id === c);
+      if (!cl) { stuGo('detail', a); return; }
+      const exs = clsExams(cl.id);
+      b.innerHTML = head + `<h3 class="font-bold mb-3">📚 ${esc(cl.name)} 수업에서 낸 시험지 (${exs.length})</h3><div class="space-y-2">${exs.map(e => {
+        const r = stuDB.results.find(x => x.studentId === a && x.examId === e.id);
+        const ok = r ? e.questions.filter((q, i) => r.answers[i] && r.answers[i] === numAns(q.answer)).length : 0;
+        return `<div class="flex items-center gap-3 border rounded-xl px-4 py-3 flex-wrap"><div class="flex-1 min-w-[12rem]"><div class="font-bold">${esc(e.name)}</div><div class="text-xs text-gray-500">${new Date(e.at).toLocaleDateString('ko-KR')} · ${e.questions.length}문항</div></div>
+          ${r ? `<span class="font-bold ${ok === e.questions.length ? 'text-emerald-600' : 'text-gray-800'}">${ok}/${e.questions.length}</span>` : '<span class="text-sm text-red-500">미제출</span>'}
+          <button onclick="exOpen('${e.id}')" class="stu-back">문제 보기</button><button onclick="stuGo('entry','${a}','${e.id}')" class="bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-bold">✏ 답 ${r ? '고치기' : '입력'}</button></div>`; }).join('') || '<p class="text-gray-400 text-center py-10">이 수업에서 아직 낸 시험지가 없습니다.</p>'}</div>`;
     } else {
+      const myCls = clsOf(a);
+      const clsBox = `<div class="mb-5"><h3 class="font-bold mb-2">📚 듣는 수업</h3>${myCls.length ? `<div class="flex gap-2 flex-wrap">${myCls.map(c => `<button onclick="stuGo('cls','${s.id}','${c.id}')" class="stu-btn px-4">${esc(c.name)}<span class="block text-xs font-normal text-gray-400 mt-0.5">시험지 ${clsExams(c.id).length}개</span></button>`).join('')}</div>` : '<p class="text-sm text-gray-400">아직 듣는 수업이 없습니다. 수업 탭에서 넣을 수 있습니다.</p>'}</div>`;
       const rs = stuDB.results.filter(r => r.studentId === a).sort((x, y) => y.at - x.at);
       const opts = stuDB.exams.slice().sort((x, y) => y.at - x.at).map(e => `<option value="${e.id}">${esc(e.name)} (${new Date(e.at).toLocaleDateString('ko-KR')} · ${e.questions.length}문항)</option>`).join('');
       const cards = rs.map(r => {
@@ -1462,7 +1554,7 @@ function renderStu() {
         return `<div class="border rounded-xl p-4 space-y-3"><div class="flex justify-between flex-wrap gap-2"><b>${esc(e.name)}</b><span class="text-sm text-gray-500">${new Date(r.at).toLocaleDateString('ko-KR')} · ${ok}/${e.questions.length}${hasR ? ` → 다시 풀기 후 ${ok2}/${e.questions.length}` : ''}</span></div>
           <table class="stu-tbl"><thead><tr><th>번호</th><th>단원</th><th>난이도</th><th>정답</th><th>학생 답</th><th>정오</th>${hasR ? '<th>다시 푼 답</th><th>정오</th>' : ''}</tr></thead><tbody>${rows}</tbody></table>
           <button onclick="stuVariant('${e.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg">🔄 이 시험지의 변형문제 출제하기</button></div>`; }).join('');
-      b.innerHTML = head + `<div class="flex gap-2 flex-wrap mb-5 p-3 bg-gray-50 rounded-xl border">
+      b.innerHTML = head + clsBox + `<h3 class="font-bold mb-2">📝 전체 풀이 기록</h3><div class="flex gap-2 flex-wrap mb-5 p-3 bg-gray-50 rounded-xl border">
         <select id="stu-exam" class="flex-1 min-w-[12rem] border rounded-lg p-2 text-sm">${opts || '<option value="">저장된 시험지가 없습니다</option>'}</select>
         <button onclick="stuGo('entry','${s.id}',$('stu-exam').value)" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-bold">✏ 답 입력</button></div>` +
         `<div class="space-y-4">${cards || '<p class="text-center text-gray-400 py-10">아직 푼 시험지가 없습니다. 위에서 시험지를 선택해 답을 입력하세요.</p>'}</div>`;
@@ -1504,6 +1596,7 @@ function stuDel(id) {
   const s = stuDB.students.find(x => x.id === id);
   if (!s || !confirm(`${s.name} 학생과 풀이 기록을 삭제할까요?`)) return;
   stuDB.students = stuDB.students.filter(x => x.id !== id); stuDB.results = stuDB.results.filter(r => r.studentId !== id);
+  CL().forEach(c => c.members = c.members.filter(m => m !== id));
   stuSave(); stuGo('list', s.grade);
   if (sbOn() && stuDB.pin) sbCall('sb_delete_student', {p: stuDB.pin, sid: id})
     .catch(() => toast('이 컴퓨터에서는 삭제했지만 서버 삭제에 실패했습니다.\nSupabase에서 supabase-update2.sql을 실행했는지 확인하세요.'));
@@ -1704,7 +1797,9 @@ async function syncSB() {
         if (s && ((s.lid || null) !== (x.login_id || null) || s.mustChange !== x.must_change)) { s.lid = x.login_id || undefined; s.mustChange = x.must_change; n++; }
       });
     } catch(e) {}
-    if (n) { stuSave(); if (['detail', 'list'].includes(stuView[0]) && !$('tab-stu').classList.contains('hidden')) renderStu(); }
+    if (n) { stuSave(); if (['detail', 'list', 'cls'].includes(stuView[0]) && !$('tab-stu').classList.contains('hidden')) renderStu(); if (!$('tab-cls').classList.contains('hidden') && clsView[0] === 'view') renderCls(); }
+    if (!syncSB.cls && CL().length) { syncSB.cls = true; sbSyncClasses(); }
+    msgPollBadge();
     const up = await sbPushOldExams();
     if (up) toast(`예전 시험지 ${up}개의 해설·단원 정보를 서버에 올렸습니다. 이제 학생 화면에서도 보입니다.`);
     if (st) st.textContent = `☁ 연결됨 · ${new Date().toLocaleTimeString('ko-KR')} 확인` + (n ? ` · 새 답 ${n}건 반영` : '');
@@ -1834,8 +1929,9 @@ function sbResult(code, st, flash, retrying) {
       const line = retrying && m === 0 ? `<span class="text-xs text-gray-400 w-8">${a ? circ(a) : '-'}</span>${sbOpts(0)}`
         : `<span class="flex-1 text-lg">${a ? circ(a) : '<span class="text-gray-400 text-sm">답 없음</span>'}${again ? ` <span class="text-sm text-gray-500">→ 다시 푼 답 ${ra ? circ(ra) : '없음'} <b class="${rm[i] === 1 ? 'text-emerald-600' : 'text-red-500'}">${rm[i] === 1 ? 'O' : 'X'}</b></span>` : ''}</span>`;
       return `<div data-i="${i}"><div class="flex items-center gap-2"><span class="w-10 font-bold text-sm">${i+1}번</span>${line}${badge(m, a)}</div><div class="sb-exp hidden">${exp[i] ? esc(exp[i]) : '해설이 없습니다.'}</div></div>`; }).join('')}</div>
-    <div id="sb-act" class="space-y-2"></div><a href="?me=1" class="block text-center underline text-sm text-gray-500">내 학습 페이지</a>`;
+    <div id="sb-act" class="space-y-2"></div>${retrying ? '' : '<button id="sb-ask" class="w-full sb-ghost">💬 이 시험지에 대해 선생님께 질문</button>'}<a href="?me=1" class="block text-center underline text-sm text-gray-500">내 학습 페이지</a>`;
   sbBindTop();
+  if ($('sb-ask')) $('sb-ask').onclick = () => sbChat(`[${st.name}] 번 문제 질문: `, () => sbResult(code, st));
   [...$('sb-rows').children].forEach((row, i) => {
     row.querySelector('.sb-mark').onclick = () => row.querySelector('.sb-exp').classList.toggle('hidden');
     if (retrying && mk[i] === 0) sbBindOpts(row.firstElementChild, re, i);
@@ -1854,13 +1950,53 @@ function sbResult(code, st, flash, retrying) {
   }
 }
 /* 내 학습 페이지: 보고서 (1)~(4), 인쇄 가능 */
+let sbChatTimer = null, sbClasses = null;
+const sbChatStop = () => { clearInterval(sbChatTimer); sbChatTimer = null; };
+/* 학생: 선생님께 질문 (메신저 형식) */
+async function sbChat(prefill, back) {
+  sbChatStop();
+  const R = sbR(); R.className = 'max-w-md mx-auto p-4 space-y-3';
+  R.innerHTML = sbTop() + `<div class="flex items-center gap-2"><button id="sb-back" class="sb-ghost px-3 text-sm">← 뒤로</button><h1 class="text-lg font-bold">💬 선생님께 질문</h1></div>
+    <div class="bg-white border rounded-xl overflow-hidden flex flex-col sb-chat"><div id="msg-log" class="msg-log"><p class="text-center text-gray-400 text-sm py-10">불러오는 중…</p></div>
+    <form id="msg-form" class="msg-form"><textarea id="msg-in" rows="1" maxlength="2000" placeholder="궁금한 것을 적어 보세요"></textarea><button class="msg-send">보내기</button></form></div>
+    <p class="text-xs text-gray-400 text-center">선생님이 확인하면 답장이 이곳에 옵니다.</p>`;
+  sbBindTop();
+  $('sb-back').onclick = () => { sbChatStop(); back ? back() : sbMyPage(); };
+  let sig = '';
+  const load = async first => {
+    let list; try { list = await sbCall('sb_msg_my', {t: tokGet()}) || []; } catch(e) { if (first) { sbChatStop(); /not logged in/.test(e.message) ? sbFail(e) : ($('msg-log').innerHTML = '<p class="text-center text-gray-500 text-sm py-10">메시지를 불러오지 못했습니다.</p>'); } return; }
+    const log = $('msg-log'); if (!log) { sbChatStop(); return; }
+    const s = list.length + ':' + list.filter(m => m.read_at).length; if (s === sig) return; sig = s;
+    log.innerHTML = list.length ? msgBubbles(list, false) : '<p class="text-center text-gray-400 text-sm py-10">아직 주고받은 메시지가 없습니다.<br>모르는 문제나 궁금한 점을 물어보세요.</p>';
+    log.scrollTop = log.scrollHeight;
+  };
+  msgBindForm(async t => { await sbCall('sb_msg_send', {t: tokGet(), msg: t}); sig = ''; load(); });
+  if (prefill) { const i = $('msg-in'); i.value = prefill; i.focus(); i.setSelectionRange(i.value.length, i.value.length); }
+  await load(true);
+  sbChatTimer = setInterval(load, 8000);
+}
+/* 학생: 수업 하나의 시험지 목록 */
+function sbClassPage(c) {
+  const R = sbR(); R.className = 'max-w-md mx-auto p-4 space-y-4';
+  R.innerHTML = sbTop() + `<div class="flex items-center gap-2"><button id="sb-back" class="sb-ghost px-3 text-sm">← 내 페이지</button><h1 class="text-lg font-bold">📚 ${esc(c.name)}</h1></div>
+    <div class="space-y-2">${(c.exams || []).map(e => `<a href="?e=${encodeURIComponent(e.code)}" class="sb-ex"><span class="flex-1 min-w-0"><b class="block truncate">${esc(e.name)}</b><span class="text-xs text-gray-500">${new Date(e.at).toLocaleDateString('ko-KR')} · ${e.n}문항</span></span>${e.submitted ? `<span class="text-right"><b class="text-lg">${e.score == null ? '제출함' : e.score + ' / ' + e.n}</b><span class="block text-xs text-gray-400">결과·해설 보기</span></span>` : '<span class="sb-todo">답 입력하기</span>'}</a>`).join('') || '<p class="text-center text-gray-400 py-10">이 수업에서 아직 낸 시험지가 없습니다.</p>'}</div>`;
+  sbBindTop();
+  $('sb-back').onclick = sbMyPage;
+}
 async function sbMyPage() {
+  sbChatStop();
   const R = sbR(); R.className = 'max-w-3xl mx-auto p-4 space-y-4';
   let rows; try { rows = await sbCall('sb_my_report', {t: tokGet()}); } catch(e) { return sbFail(e); }
+  try { sbClasses = await sbCall('sb_my_classes', {t: tokGet()}) || []; } catch(e) { sbClasses = null; }
+  let unread = 0; try { unread = await sbCall('sb_msg_unread', {t: tokGet()}) || 0; } catch(e) { unread = -1; }
   const items = (rows || []).map(x => ({name: x.name, at: Date.parse(x.at), answers: x.answers || [], retry: x.retry, rank: x.rank, count: x.count,
     qs: (x.info || Array.from({length: x.n}, () => ({}))).map((q, i) => ({q: q.q || '', ch: q.ch || [], exp: q.exp || '', unit: q.unit || '', sub: q.sub || '', lv: q.lv || '', type: q.type || '', img: q.img, ans: (x.key || [])[i] || 0}))}));
   let from = '', to = '';
-  R.innerHTML = sbTop() + `<div class="no-print bg-white border rounded-xl p-4 space-y-3">
+  const cls = sbClasses || [];
+  R.innerHTML = sbTop() + (unread >= 0 ? `<button id="sb-chat" class="no-print w-full sb-chat-btn">💬 선생님께 질문하기${unread ? `<span class="msg-un">${unread}</span><span class="text-xs font-normal">새 답장</span>` : ''}</button>` : '') +
+    (sbClasses ? `<div class="no-print"><h2 class="font-bold mb-2">📚 내 수업</h2>${cls.length ? `<div class="grid sm:grid-cols-2 gap-2">${cls.map((c, i) => { const todo = (c.exams || []).filter(e => !e.submitted).length;
+        return `<button data-c="${i}" class="sb-cls"><b class="block text-base">${esc(c.name)}</b><span class="text-xs text-gray-500">시험지 ${(c.exams || []).length}개${todo ? ` · <span class="text-red-500 font-bold">안 푼 시험지 ${todo}개</span>` : ''}</span></button>`; }).join('')}</div>` : '<p class="text-sm text-gray-400 bg-white border rounded-xl p-4">아직 등록된 수업이 없습니다.</p>'}</div>` : '') +
+    `<div class="no-print bg-white border rounded-xl p-4 space-y-3">
       <form id="sb-goex" class="flex gap-2"><input id="sb-code" type="text" placeholder="시험지 코드 6자리" autocapitalize="characters" class="flex-1 p-3 uppercase"><button class="sb-primary px-5">답안 입력</button></form>
       <div class="flex flex-wrap items-end gap-2"><label class="text-xs text-gray-500">시작일<input type="date" id="rp-from" class="block p-2 text-sm"></label><label class="text-xs text-gray-500">종료일<input type="date" id="rp-to" class="block p-2 text-sm"></label>
       <div class="ml-auto flex gap-2"><button id="sb-cpw" class="sb-ghost px-4 text-sm">비밀번호 바꾸기</button><button onclick="window.print()" class="sb-primary px-4 text-sm">🖨 인쇄</button></div></div></div>
@@ -1868,6 +2004,8 @@ async function sbMyPage() {
   sbBindTop();
   $('sb-goex').onsubmit = e => { e.preventDefault(); const v = $('sb-code').value.trim(); if (v) location.search = '?e=' + encodeURIComponent(v.toUpperCase()); };
   $('sb-cpw').onclick = () => sbChangePw(false);
+  if ($('sb-chat')) $('sb-chat').onclick = () => sbChat();
+  R.querySelectorAll('.sb-cls').forEach(b => b.onclick = () => sbClassPage(cls[+b.dataset.c]));
   const draw = () => { from = $('rp-from').value; to = $('rp-to').value; $('rp-box').innerHTML = buildReport(items, {who: `${sbMe.grade} ${sbMe.name}`, from, to, allExp: true}); };
   $('rp-from').onchange = draw; $('rp-to').onchange = draw; draw();
 }
@@ -1877,11 +2015,12 @@ function renderEx() {
   const b = $('ex-body'), list = stuDB.exams.slice().sort((x, y) => y.at - x.at);
   b.innerHTML = `<h2 class="text-xl font-bold mb-4">📋 출제한 시험지 (${list.length})</h2>` + (list.length
     ? `<div class="space-y-2">${list.map(e => { const n = stuDB.results.filter(r => r.examId === e.id).length;
-        return `<div><div class="flex items-center gap-3 border rounded-xl px-4 py-3 flex-wrap"><div class="flex-1 min-w-[12rem]"><div class="font-bold">${esc(e.name)}</div><div class="text-xs text-gray-500">${new Date(e.at).toLocaleString('ko-KR')} · ${e.questions.length}문항 · 코드 ${exCode(e.id)} · 제출 ${n}명</div></div><button onclick="exOpen('${e.id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-sm font-bold">문제 보기·인쇄</button><button onclick="exDownload('${e.id}')" class="bg-gray-700 text-white px-3 py-2 rounded-lg text-sm font-bold">⬇ 다운로드 (.hwpx)</button><button onclick="exSub('${e.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-sm font-bold">제출 현황</button><button onclick="exDel('${e.id}')" class="text-xs text-red-500">삭제</button></div><div id="ex-sub-${e.id}" class="hidden"></div></div>`; }).join('')}</div>`
+        const cl = e.classId && CL().find(c => c.id === e.classId);
+        return `<div><div class="flex items-center gap-3 border rounded-xl px-4 py-3 flex-wrap"><div class="flex-1 min-w-[12rem]"><div class="font-bold">${esc(e.name)}${cl ? ` <span class="text-xs font-normal px-2 py-0.5 rounded-full" style="background:var(--c-cls-s);color:var(--c-cls)">${esc(cl.name)}</span>` : ''}</div><div class="text-xs text-gray-500">${new Date(e.at).toLocaleString('ko-KR')} · ${e.questions.length}문항 · 코드 ${exCode(e.id)} · 제출 ${n}명</div></div><button onclick="exOpen('${e.id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-sm font-bold">문제 보기·인쇄</button><button onclick="exDownload('${e.id}')" class="bg-gray-700 text-white px-3 py-2 rounded-lg text-sm font-bold">⬇ 다운로드 (.hwpx)</button><button onclick="exSub('${e.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-sm font-bold">제출 현황</button><button onclick="exDel('${e.id}')" class="text-xs text-red-500">삭제</button></div><div id="ex-sub-${e.id}" class="hidden"></div></div>`; }).join('')}</div>`
     : '<p class="text-center text-gray-400 py-12">아직 출제한 시험지가 없습니다. 단원별 문제에서 시험지를 만들어 보세요.</p>');
 }
-function exSub(id) {
-  const box = $('ex-sub-' + id), e = stuDB.exams.find(x => x.id === id); if (!box || !e) return;
+function exSub(id, pre = 'ex-sub-') {
+  const box = $(pre + id), e = stuDB.exams.find(x => x.id === id); if (!box || !e) return;
   if (!box.classList.contains('hidden')) { box.classList.add('hidden'); return; }
   const rs = stuDB.results.filter(r => r.examId === id).map(r => ({r, s: stuDB.students.find(x => x.id === r.studentId)})).filter(o => o.s)
     .sort((a, b) => a.s.grade.localeCompare(b.s.grade, 'ko') || a.s.name.localeCompare(b.s.name, 'ko'));
@@ -1913,6 +2052,187 @@ function exDel(id) {
   if (sbOn() && stuDB.pin) sbCall('sb_delete_exam', {p: stuDB.pin, c: exCode(id)})
     .then(() => toast('서버에서도 시험지를 삭제했습니다.'))
     .catch(() => toast('이 컴퓨터에서는 삭제했지만 서버 삭제에 실패했습니다.\nSupabase에서 supabase-update2.sql을 실행했는지 확인하세요.'));
+}
+
+/* ===== 수업: 같은 수업을 듣는 학생 묶음 (학년이 달라도 됨) + 수업별 시험지 =====
+   stuDB.classes = [{id, name, members: [학생 id], at}], 시험지 e.classId */
+let clsView = ['list'], pendingCls = '';
+const CL = () => stuDB.classes || (stuDB.classes = []);
+const clsOf = sid => CL().filter(c => c.members.includes(sid)).sort((a, b) => a.name.localeCompare(b.name, 'ko'));
+const clsExams = cid => stuDB.exams.filter(e => e.classId === cid).sort((x, y) => y.at - x.at);
+const stuName = s => `${s.grade} ${s.name}`;
+function clsSave() { stuSave(); sbSyncClasses(); }
+async function sbSyncClasses(manual) {
+  if (!sbOn() || !stuDB.pin) return;
+  try {
+    await sbSyncStudents();
+    await sbCall('sb_sync_classes', {p: stuDB.pin, payload: CL().map(c => ({id: c.id, name: c.name, members: c.members}))});
+    if (manual) toast('수업 목록을 서버에 올렸습니다.');
+  } catch(e) { toast('수업을 서버에 올리지 못했습니다.\nSupabase에서 supabase-update4.sql을 실행했는지 확인하세요.'); }
+}
+function sbPushExamClass(e) {
+  if (sbOn() && stuDB.pin) sbCall('sb_set_exam_class', {p: stuDB.pin, c: exCode(e.id), cls: e.classId || ''}).catch(() => {});
+}
+function clsGo(...v) { clsView = v; renderCls(); }
+function renderCls() {
+  const b = $('cls-body'), [v, cid] = clsView, c = CL().find(x => x.id === cid);
+  if (v === 'list' || !c) {
+    const list = CL().slice().sort((a, b) => a.name.localeCompare(b.name, 'ko'));
+    b.innerHTML = `<div class="flex items-center gap-3 mb-5 flex-wrap"><h2 class="text-xl font-bold">수업 (${list.length})</h2>
+      <form onsubmit="clsAdd(event)" class="ml-auto flex gap-2"><input id="cls-new" type="text" placeholder="수업 이름 (예: 화요일 고2 화학)" class="border rounded-lg p-2 text-sm w-64"><button class="bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-bold">➕ 수업 만들기</button></form></div>` +
+      (list.length ? `<div class="grid sm:grid-cols-2 md:grid-cols-3 gap-3">${list.map(c => { const g = [...new Set(c.members.map(id => (stuDB.students.find(s => s.id === id) || {}).grade).filter(Boolean))];
+        return `<button onclick="clsGo('view','${c.id}')" class="stu-btn text-left p-4"><span class="block text-base">${esc(c.name)}</span><span class="block text-xs font-normal text-gray-500 mt-1">학생 ${c.members.length}명${g.length ? ' · ' + g.join('·') : ''} · 시험지 ${clsExams(c.id).length}개</span></button>`; }).join('')}</div>`
+        : '<p class="text-center text-gray-400 py-12">아직 수업이 없습니다. 위에서 수업을 만든 뒤 학생을 넣으세요.</p>');
+    return;
+  }
+  const mem = c.members.map(id => stuDB.students.find(s => s.id === id)).filter(Boolean).sort((x, y) => x.grade.localeCompare(y.grade, 'ko') || x.name.localeCompare(y.name, 'ko'));
+  const back = `<button onclick="clsGo('${v === 'add' ? 'view' : 'list'}','${c.id}')" class="stu-back">← ${v === 'add' ? esc(c.name) : '수업 목록'}</button>`;
+  if (v === 'add') {
+    const g = clsView[2] || '', q = (clsView[3] || '').trim();
+    const cand = stuDB.students.filter(s => (!g || s.grade === g) && (!q || s.name.includes(q))).sort((x, y) => x.grade.localeCompare(y.grade, 'ko') || x.name.localeCompare(y.name, 'ko'));
+    b.innerHTML = `<div class="flex items-center gap-3 mb-4 flex-wrap">${back}<h2 class="text-xl font-bold">학생 넣기</h2></div>
+      <div class="flex gap-2 flex-wrap mb-3"><select id="cls-g" onchange="clsGo('add','${c.id}',this.value,$('cls-q').value)" class="border rounded-lg p-2 text-sm"><option value="">전체 학년</option>${GR.map(x => `<option ${x === g ? 'selected' : ''}>${x}</option>`).join('')}</select>
+        <input id="cls-q" type="text" value="${esc(q)}" placeholder="이름으로 찾기" class="border rounded-lg p-2 text-sm flex-1 min-w-[10rem]"></div>
+      <form onsubmit="clsAddMembers(event,'${c.id}')"><div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-2 mb-4">${cand.map(s => `<label class="flex items-center gap-2 border rounded-lg px-3 py-2 text-sm cursor-pointer"><input type="checkbox" value="${s.id}" ${c.members.includes(s.id) ? 'checked' : ''} class="accent-indigo-600"><span>${esc(s.name)}<span class="block text-xs text-gray-400">${s.grade}</span></span></label>`).join('') || '<p class="text-gray-400 col-span-full text-center py-6">학생이 없습니다.</p>'}</div>
+      <button class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg">저장 (체크한 학생이 이 수업 학생이 됩니다)</button></form>`;
+    $('cls-q').oninput = e => { clearTimeout(renderCls.t); renderCls.t = setTimeout(() => { clsView[3] = e.target.value; renderCls(); const i = $('cls-q'); i.focus(); i.setSelectionRange(i.value.length, i.value.length); }, 250); };
+    return;
+  }
+  const exs = clsExams(c.id), free = stuDB.exams.filter(e => !e.classId).sort((x, y) => y.at - x.at);
+  b.innerHTML = `<div class="flex items-center gap-3 mb-5 flex-wrap">${back}<h2 class="text-xl font-bold">${esc(c.name)}</h2>
+      <div class="ml-auto flex gap-2"><button onclick="clsRename('${c.id}')" class="stu-back">이름 바꾸기</button><button onclick="clsDel('${c.id}')" class="text-xs text-red-500">수업 삭제</button></div></div>
+    <div class="flex items-center gap-2 mb-2"><h3 class="font-bold">학생 ${mem.length}명</h3><button onclick="clsGo('add','${c.id}')" class="stu-back ml-auto">➕ 학생 넣기·빼기</button></div>
+    ${mem.length ? `<div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2 mb-6">${mem.map(s => `<button onclick="stuOpen('${s.id}')" class="stu-btn">${esc(s.name)}<span class="block text-xs font-normal text-gray-400 mt-0.5">${s.grade}</span></button>`).join('')}</div>` : '<p class="text-gray-400 text-sm mb-6">아직 학생이 없습니다. 학생 넣기를 누르세요.</p>'}
+    <div class="flex items-center gap-2 mb-2 flex-wrap"><h3 class="font-bold">이 수업 시험지 ${exs.length}개</h3>
+      <button onclick="clsNewExam('${c.id}')" class="ml-auto bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-bold">📝 이 수업으로 새 시험지 만들기</button></div>
+    ${free.length ? `<div class="flex gap-2 mb-3"><select id="cls-attach" class="flex-1 border rounded-lg p-2 text-sm">${free.map(e => `<option value="${e.id}">${esc(e.name)} (${new Date(e.at).toLocaleDateString('ko-KR')} · ${e.questions.length}문항)</option>`).join('')}</select><button onclick="clsAttach('${c.id}',$('cls-attach').value)" class="bg-white border px-3 py-2 rounded-lg text-sm font-bold">이미 만든 시험지 넣기</button></div>` : ''}
+    <div class="space-y-2">${exs.map(e => { const n = stuDB.results.filter(r => r.examId === e.id && c.members.includes(r.studentId)).length;
+      return `<div><div class="flex items-center gap-3 border rounded-xl px-4 py-3 flex-wrap"><div class="flex-1 min-w-[12rem]"><div class="font-bold">${esc(e.name)}</div><div class="text-xs text-gray-500">${new Date(e.at).toLocaleDateString('ko-KR')} · ${e.questions.length}문항 · 코드 ${exCode(e.id)} · 제출 ${n}/${mem.length}명</div></div>
+        <button onclick="exOpen('${e.id}')" class="bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-bold">문제 보기·QR 인쇄</button><button onclick="exSub('${e.id}','cls-sub-')" class="bg-emerald-600 text-white px-3 py-2 rounded-lg text-sm font-bold">제출 현황</button><button onclick="clsAttach('','${e.id}')" class="text-xs text-gray-500">수업에서 빼기</button></div><div id="cls-sub-${e.id}" class="hidden"></div></div>`; }).join('') || '<p class="text-gray-400 text-sm">아직 이 수업에서 낸 시험지가 없습니다.</p>'}</div>`;
+}
+function clsAdd(ev) {
+  ev.preventDefault();
+  const n = $('cls-new').value.trim(); if (!n) return;
+  const c = {id: 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name: n, members: [], at: Date.now()};
+  CL().push(c); clsSave(); clsGo('add', c.id);
+}
+function clsAddMembers(ev, cid) {
+  ev.preventDefault();
+  const c = CL().find(x => x.id === cid); if (!c) return;
+  const shown = [...ev.target.querySelectorAll('input[type=checkbox]')];
+  const on = new Set(shown.filter(x => x.checked).map(x => x.value)), off = new Set(shown.filter(x => !x.checked).map(x => x.value));
+  c.members = [...new Set([...c.members.filter(id => !off.has(id)), ...on])];
+  clsSave(); clsGo('view', cid);
+}
+function clsRename(cid) {
+  const c = CL().find(x => x.id === cid); if (!c) return;
+  const n = prompt('수업 이름', c.name); if (!n || !n.trim()) return;
+  c.name = n.trim(); clsSave(); renderCls();
+}
+function clsDel(cid) {
+  const c = CL().find(x => x.id === cid);
+  if (!c || !confirm(`"${c.name}" 수업을 삭제할까요?\n학생과 시험지, 풀이 기록은 지워지지 않고 수업 묶음만 없어집니다.`)) return;
+  stuDB.classes = CL().filter(x => x !== c);
+  stuDB.exams.forEach(e => { if (e.classId === cid) delete e.classId; });
+  clsSave(); clsGo('list');
+}
+function clsAttach(cid, eid) {
+  const e = stuDB.exams.find(x => x.id === eid); if (!e) return;
+  if (cid) e.classId = cid; else delete e.classId;
+  stuSave(); sbPushExamClass(e); renderCls();
+}
+function clsNewExam(cid) { pendingCls = cid; toast('시험지를 만들면 이 수업에 들어갑니다. 미리보기 화면의 "수업"에서 바꿀 수 있습니다.'); switchTab('selector'); }
+/* 미리보기의 수업 선택 */
+function pvClsOptions() {
+  const sel = $('pv-cls'); if (!sel) return;
+  const e = stuDB.exams.find(x => x.id === curExamId), cur = e ? e.classId || '' : pendingCls;
+  sel.innerHTML = '<option value="">수업 없음</option>' + CL().slice().sort((a, b) => a.name.localeCompare(b.name, 'ko')).map(c => `<option value="${c.id}" ${c.id === cur ? 'selected' : ''}>${esc(c.name)}</option>`).join('');
+}
+function pvSetClass(cid) {
+  saveExamRecord();
+  const e = stuDB.exams.find(x => x.id === curExamId); if (!e) return;
+  if (cid) e.classId = cid; else delete e.classId;
+  stuSave(); sbPushExamClass(e);
+  const c = CL().find(x => x.id === cid);
+  toast(c ? `"${c.name}" 수업 학생의 개인 페이지에 이 시험지가 보입니다.` : '수업에서 뺐습니다.');
+}
+function stuOpen(sid) { switchTab('stu'); stuGo('detail', sid); }
+
+/* ===== 메시지 (선생님): 왼쪽 학생 목록, 오른쪽 대화 ===== */
+let msgSid = null, msgTimer = null, msgThreads = [], msgLastN = -1;
+const msgTime = s => { const d = new Date(s), t = new Date(); return d.toDateString() === t.toDateString() ? d.toLocaleTimeString('ko-KR', {hour: 'numeric', minute: '2-digit'}) : d.toLocaleDateString('ko-KR', {month: 'numeric', day: 'numeric'}) + ' ' + d.toLocaleTimeString('ko-KR', {hour: 'numeric', minute: '2-digit'}); };
+function msgBubbles(list, mineIsTeacher) {
+  if (!list.length) return '<p class="text-center text-gray-400 text-sm py-10">아직 주고받은 메시지가 없습니다.</p>';
+  let day = '';
+  return list.map(m => {
+    const mine = m.from_teacher === mineIsTeacher, d = new Date(m.created_at).toLocaleDateString('ko-KR', {month: 'long', day: 'numeric', weekday: 'short'});
+    const sep = d !== day ? `<div class="msg-day">${(day = d)}</div>` : '';
+    return `${sep}<div class="msg-row ${mine ? 'me' : ''}"><div class="msg-b">${esc(m.body)}</div><span class="msg-t">${mine && m.read_at ? '읽음<br>' : ''}${new Date(m.created_at).toLocaleTimeString('ko-KR', {hour: 'numeric', minute: '2-digit'})}</span></div>`;
+  }).join('');
+}
+function msgNeed() {
+  if (!sbOn()) return '파일 맨 위 SB_CONFIG에 Supabase 설정이 필요합니다.';
+  if (!stuDB.pin) return '학생 탭 첫 화면에서 PIN을 먼저 설정하세요.';
+  return '';
+}
+async function msgOpen(sid) {
+  if (sid !== undefined) msgSid = sid;
+  const b = $('msg-body'), need = msgNeed();
+  if (need) { b.innerHTML = `<p class="text-center text-gray-500 py-16">${need}</p>`; return; }
+  if (!$('msg-list')) b.innerHTML = `<div class="msg-wrap"><aside class="msg-side"><div class="p-3 border-b"><select id="msg-new" class="w-full border rounded-lg p-2 text-sm"><option value="">✉ 학생에게 새 메시지…</option></select></div><div id="msg-list"></div></aside><section class="msg-main" id="msg-main"></section></div>`;
+  const sel = $('msg-new');
+  sel.innerHTML = '<option value="">✉ 학생에게 새 메시지…</option>' + stuDB.students.filter(s => s.lid).sort((x, y) => x.grade.localeCompare(y.grade, 'ko') || x.name.localeCompare(y.name, 'ko')).map(s => `<option value="${s.id}">${esc(stuName(s))}</option>`).join('');
+  sel.onchange = () => { if (sel.value) msgOpen(sel.value); };
+  await msgRefresh(true);
+  msgStop(); msgTimer = setInterval(() => msgRefresh(false), 8000);
+}
+function msgStop() { clearInterval(msgTimer); msgTimer = null; }
+async function msgRefresh(drawChat) {
+  if (!$('msg-list')) return;
+  try { msgThreads = await sbCall('sb_msg_threads', {p: stuDB.pin}) || []; }
+  catch(e) { $('msg-main').innerHTML = '<p class="text-center text-gray-500 py-16">메시지를 불러오지 못했습니다.<br>Supabase에서 supabase-update4.sql을 실행했는지 확인하세요.</p>'; return; }
+  msgThreads.sort((a, b) => Date.parse(b.last_at) - Date.parse(a.last_at));
+  const rows = msgThreads.map(t => ({t, s: stuDB.students.find(x => x.id === t.student_id)})).filter(o => o.s);
+  if (msgSid && !rows.some(o => o.s.id === msgSid)) { const s = stuDB.students.find(x => x.id === msgSid); if (s) rows.unshift({t: {unread: 0, last_body: '', last_at: null}, s}); }
+  $('msg-list').innerHTML = rows.map(({t, s}) => `<button type="button" onclick="msgOpen('${s.id}')" class="msg-th ${s.id === msgSid ? 'on' : ''}"><span class="msg-av">${esc(s.name.slice(-2))}</span><span class="flex-1 min-w-0 text-left"><b class="block truncate">${esc(s.name)} <span class="text-xs font-normal text-gray-400">${s.grade}</span></b><span class="block text-xs text-gray-500 truncate">${t.last_from_teacher ? '나: ' : ''}${esc(t.last_body || '')}</span></span><span class="text-right flex-none"><span class="block text-[11px] text-gray-400">${t.last_at ? msgTime(t.last_at) : ''}</span>${t.unread ? `<span class="msg-un">${t.unread}</span>` : ''}</span></button>`).join('') || '<p class="text-center text-gray-400 text-sm py-10">아직 받은 메시지가 없습니다.</p>';
+  msgSetBadge(msgThreads.reduce((n, t) => n + (t.unread || 0), 0));
+  if (msgSid) await msgChat(drawChat);
+  else if (drawChat) $('msg-main').innerHTML = '<p class="text-center text-gray-400 py-16">왼쪽에서 학생을 고르세요.</p>';
+}
+async function msgChat(full) {
+  const s = stuDB.students.find(x => x.id === msgSid), main = $('msg-main'); if (!s || !main) return;
+  let list; try { list = await sbCall('sb_msg_list_t', {p: stuDB.pin, sid: s.id}) || []; } catch(e) { return; }
+  if (full || !$('msg-log') || main.dataset.sid !== s.id) {
+    main.dataset.sid = s.id; msgLastN = -1;
+    main.innerHTML = `<div class="msg-head"><button onclick="stuOpen('${s.id}')" class="font-bold hover:underline">${esc(stuName(s))}</button>${s.lid ? '' : '<span class="text-xs text-red-500 ml-2">계정이 없어 학생이 볼 수 없습니다</span>'}</div><div id="msg-log" class="msg-log"></div>
+      <form id="msg-form" class="msg-form"><textarea id="msg-in" rows="1" maxlength="2000" placeholder="메시지 입력 (Enter 보내기 · Shift+Enter 줄 바꿈)"></textarea><button class="msg-send">보내기</button></form>`;
+    msgBindForm(async txt => { await sbCall('sb_msg_send_t', {p: stuDB.pin, sid: s.id, msg: txt}); msgRefresh(false); });
+  }
+  const log = $('msg-log'), sig = list.length + ':' + list.filter(m => m.read_at).length;
+  if (sig === msgLastN) return;
+  const atEnd = log.scrollHeight - log.scrollTop - log.clientHeight < 40 || msgLastN === -1;
+  msgLastN = sig; log.innerHTML = msgBubbles(list, true);
+  if (atEnd) log.scrollTop = log.scrollHeight;
+}
+/* 보내기 칸 공용: Enter 보내기, Shift+Enter 줄 바꿈, 높이 자동 */
+function msgBindForm(send) {
+  const f = $('msg-form'), i = $('msg-in');
+  const fit = () => { i.style.height = 'auto'; i.style.height = Math.min(i.scrollHeight, 140) + 'px'; };
+  i.oninput = fit;
+  i.onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); f.requestSubmit(); } };
+  f.onsubmit = async e => {
+    e.preventDefault();
+    const t = i.value.trim(); if (!t) return;
+    const bt = f.querySelector('button'); bt.disabled = true;
+    try { await send(t); i.value = ''; fit(); }
+    catch(x) { toast(/too many/.test(x.message) ? '잠시 뒤에 다시 보내 주세요. (10분에 20개까지)' : '보내지 못했습니다. 인터넷 연결을 확인하세요.'); }
+    bt.disabled = false; i.focus();
+  };
+}
+function msgSetBadge(n) { const b = $('msg-badge'); if (!b) return; b.textContent = n > 99 ? '99+' : n; b.classList.toggle('hidden', !n); }
+async function msgPollBadge() {
+  if (msgTimer || !sbOn() || !stuDB.pin || SP.get('e') || SP.has('me')) return;
+  try { msgSetBadge((await sbCall('sb_msg_threads', {p: stuDB.pin}) || []).reduce((n, t) => n + (t.unread || 0), 0)); } catch(e) {}
 }
 
 /* ===== 백업 ===== */
