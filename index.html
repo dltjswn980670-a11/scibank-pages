@@ -106,6 +106,9 @@ footer{background:transparent!important;border:0!important;color:#9AA3B0!importa
 .pv-n1{display:grid;grid-template-columns:1fr 92px;border:1.5px solid #000;margin-bottom:16px}.pv-n1a{padding:8px 14px 10px}.pv-n1s{display:flex;justify-content:space-between;font-size:.8rem}.pv-n1t{text-align:center;font-size:1.35rem;margin-top:4px}.pv-n1q{border-left:1px solid #000;display:flex;align-items:center;justify-content:center;padding:6px}.pv-n1b{grid-column:1/3;display:flex;justify-content:space-between;border-top:1px solid #000;padding:3px 12px;font-size:.72rem}
 .pv-n2{text-align:center;margin-bottom:14px;position:relative}.pv-n2q{position:absolute;right:0;top:-6px}.pv-n2t{font-size:1.5rem;margin:2px 0 8px}.pv-n2r{display:grid;grid-template-columns:1fr 1fr 1fr;border:1px solid #000;font-size:.72rem}.pv-n2r span{padding:3px 8px;border-left:1px solid #000;text-align:left}.pv-n2r span:first-child{border-left:0}.pv-n2r span:nth-child(2){text-align:center}.pv-n2r span:last-child{text-align:right}
 .pv-n3{margin-bottom:14px;border-bottom:1.5px solid #000;padding-bottom:10px}.pv-n3y{text-align:center;font-size:.95rem}.pv-n3m{display:flex;align-items:center;gap:12px;margin:4px 0 8px}.pv-n3o{border:1px solid #000;border-radius:999px;padding:2px 12px;font-size:.75rem;white-space:nowrap}.pv-n3t{flex:1;text-align:center;font-size:1.8rem;font-weight:600}.pv-n3t small{font-size:1.1rem;font-weight:500}.pv-n3q{width:70px;display:flex;justify-content:flex-end}.pv-n3r{display:flex;gap:0;font-size:.75rem;max-width:70%}.pv-n3r span{border:1px solid #000;padding:3px 8px;margin-left:-1px}
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;font-size:.78em;line-height:1.15;margin:0 2px;text-indent:0}.frac>span{text-indent:0}.frac>span:last-child{border-top:1px solid currentColor;padding:0 2px}
+.qtbl{border-collapse:collapse;margin:8px auto;font-size:14px}.qtbl td{border:1px solid #222;padding:3px 12px;text-align:center}
+.qimg{text-align:center;margin:4px 0}.qimg img{display:inline-block;margin-left:auto;margin-right:auto}
 .pv-box{border:1px solid #000;display:inline-block;font-size:.75rem;padding:6px 10px;margin-bottom:12px}
 .pv-h3{margin-bottom:14px}.pv-h3a{text-align:center;font-weight:700;font-size:1.05rem}.pv-h3b{text-align:center;font-size:1.9rem;margin:6px 0 10px}.pv-h3c{display:flex;gap:10px;font-size:.8rem;border-bottom:1px solid #000;padding-bottom:12px}.pv-h3c span{border:1px solid #000;padding:3px 10px;flex:1}
 .pvgap{outline:none;cursor:text;position:relative;min-height:14px;border-radius:6px}
@@ -402,6 +405,7 @@ input.dn-over[type=number]{border-color:#ef4444!important;background:#fef2f2!imp
         <label class="text-sm cursor-pointer"><input type="checkbox" id="past-answers" onchange="renderPast(curPast)" class="mr-1">정답·해설 포함</label>
         <select id="past-set" onchange="renderPast(curPast)" class="border rounded-lg p-2 text-sm"><option value="0">원본</option></select>
         <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition text-sm">🖨 인쇄</button>
+        <button onclick="pastToExam()" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-lg font-medium transition text-sm" title="미리보기 화면에서 시험지1·2·3 중 골라 한글 파일로 내려받거나 저장합니다">📝 시험지로 만들기 (시험지1·2·3)</button>
       </div>
       <div class="flex items-center gap-2 flex-wrap border-t pt-3">
         <label class="text-sm cursor-pointer"><input type="checkbox" id="past-edit" onchange="renderPast(curPast)" class="mr-1">🖼 그림 넣기·바꾸기</label>
@@ -1097,8 +1101,8 @@ function renderPreview() {
   if (document.activeElement !== $('pv-name')) $('pv-name').value = examName();
   const qs = currentQuestions;
   $('pv-paper').innerHTML = qrBox(tpl) + pvHead(tpl, qs.length) + '<div class="pv-cols">' +
-    qs.map((q, i) => `<div class="pq">${i ? `<div class="pvgap" tabindex="0" data-i="${i}" onkeydown="pvKey(event,${i})" style="height:${Math.max(0, +gap + 24*(pvExtra[i]||0))}px"></div>` : ''}<p class="font-bold whitespace-pre-wrap">${i+1}. ${q.imageOnly ? '' : esc(q.question)}</p>${q.image ? `<img src="${esc(q.image)}" ${q.imageOnly ? `data-rn="${i}" ` : ''}class="${q.imageOnly ? 'my-1 w-full' : 'my-2 max-h-64'}">` : ''}${bareChoices(q) ? '' : (q.choices || []).map(c => `<p class="ml-4 text-sm">${esc(c)}</p>`).join('')}</div>`).join('') + '</div>' +
-    (ans ? `<div class="pq border-t pt-4 mt-8"><h3 class="font-bold mb-2">[정답 및 해설]</h3>${qs.map((q, i) => `<p class="text-sm">${i+1}번 정답: ${esc(q.answer)} ${q.explanation ? '해설: ' + esc(q.explanation) : ''}</p>`).join('')}</div>` : '');
+    qs.map((q, i) => `<div class="pq">${i ? `<div class="pvgap" tabindex="0" data-i="${i}" onkeydown="pvKey(event,${i})" style="height:${Math.max(0, +gap + 24*(pvExtra[i]||0))}px"></div>` : ''}${q.imageOnly ? `<p class="font-bold">${i+1}. </p>${q.image ? `<img src="${esc(q.image)}" data-rn="${i}" class="my-1 w-full">` : ''}` : fmtQ(q.question, i + 1, q.image ? `<img src="${esc(q.image)}" class="my-2 max-h-64">` : '')}${bareChoices(q) ? '' : (q.choices || []).map(c => `<p class="ml-4 text-sm">${fx(c)}</p>`).join('')}</div>`).join('') + '</div>' +
+    (ans ? `<div class="pq border-t pt-4 mt-8"><h3 class="font-bold mb-2">[정답 및 해설]</h3>${qs.map((q, i) => `<p class="text-sm">${i+1}번 정답: ${fx(q.answer)} ${q.explanation ? '해설: ' + fx(q.explanation) : ''}</p>`).join('')}</div>` : '');
   // 그림 문항: 그림 속 원래 번호를 시험지 번호로 바꾸고, 따로 붙인 번호 줄은 숨김
   $('pv-paper').querySelectorAll('img[data-rn]').forEach(img => {
     const i = +img.dataset.rn, q = qs[i];
@@ -1323,16 +1327,58 @@ async function unzipAll(u8) {
 const gradeLabel = g => ({'고2_일반':'고2·3 일반선택','고3_진로':'고3 진로선택'})[g] || g || '';
 const subjectLabel = qs => { const u = [...new Set(qs.map(q => { const m = /^\[([^\]\d]+)\d*\]/.exec(q.unit || ''); return m ? m[1] : ''; }).filter(Boolean))]; return u.length ? u.join('·') : '과학'; };
 const examGradeText = qs => [...new Set(qs.map(q => gradeLabel(q.grade)).filter(Boolean))].join(', ');
-/* 문단: cfg = [paraPrIDRef, styleIDRef, charPrIDRef] */
-const hxP = (t, c, br) => `<hp:p id="0" paraPrIDRef="${c[0]}" styleIDRef="${c[1]}" pageBreak="${br?1:0}" columnBreak="0" merged="0"><hp:run charPrIDRef="${c[2]}">${t === '' ? '' : `<hp:t>${X(t)}</hp:t>`}</hp:run></hp:p>`;
-function hxPic(n, w, h, c) {
-  return `<hp:p id="0" paraPrIDRef="${c[0]}" styleIDRef="${c[1]}" pageBreak="0" columnBreak="0" merged="0"><hp:run charPrIDRef="${c[2]}">${hxPicEl(n, w, h)}</hp:run></hp:p>`;
+/* ===== 문항 글: 분수 (a/b), [표] 줄, 그림 자리 ===== */
+const FRAC = /\(([-−]?[0-9A-Za-z√.]+)\/([0-9A-Za-z√.]+)\)/g;
+const isFrac = (a, b) => /\d/.test(a + b);   // (m/s) 같은 단위는 그대로
+const fracH = h => h.replace(FRAC, (m, a, b) => isFrac(a, b) ? `<span class="frac"><span>${a}</span><span>${b}</span></span>` : m);
+const fx = s => fracH(esc(s));
+/* [표] 뒤 글 → 표들 (행·칸 구분이 ' | ', ' / ' 중 어느 쪽이든 칸 수가 맞는 쪽, 여러 표는 ' ; ') */
+function tblParse(s) {
+  return s.split(/\s+;\s+/).map(part => {
+    const tr = (rd, cd) => { const rows = part.split(rd).map(r => r.split(cd).map(c => c.trim())), n = rows[0].length; return n >= 2 && rows.every(r => r.length === n) ? rows : null; };
+    return tr(/\s+\|\s+/, /\s+\/\s+/) || tr(/\s+\/\s+/, /\s+\|\s+/);
+  });
 }
-/* fl = {x, y}: 종이 기준 위치에 글 앞으로 띄움 (없으면 글자처럼 취급) */
+/* 글 → [{t:'p', s} | {t:'tbl', rows}] */
+function qSegs(text) {
+  const out = [];
+  String(text ?? '').split('\n').forEach(line => {
+    const m = /^(.*?)\[표\]\s*(.+)$/.exec(line), ts = m && tblParse(m[2]);
+    if (ts && ts.every(Boolean)) { if (m[1].trim()) out.push({t: 'p', s: m[1].trim()}); ts.forEach(rows => out.push({t: 'tbl', rows})); }
+    else out.push({t: 'p', s: line});
+  });
+  return out;
+}
+/* 지문 / 묻는 문장(마지막 '?'가 있는 문장부터) 나누기 → 그림은 그 사이 */
+function askSplit(s) {
+  s = String(s ?? ''); const q = s.lastIndexOf('?'); if (q < 0) return [s, ''];
+  let k = -1; const re = /\.(?=\s)|\n/g; let m;
+  while ((m = re.exec(s)) && m.index < q) k = m.index + 1;
+  return k > 0 ? [s.slice(0, k).trim(), s.slice(k).trim()] : [s, ''];
+}
+const qHtml = s => qSegs(s).map(g => g.t === 'tbl' ? `<table class="qtbl">${g.rows.map(r => `<tr>${r.map(c => `<td>${fx(c)}</td>`).join('')}</tr>`).join('')}</table>` : `<div class="font-bold whitespace-pre-wrap">${fx(g.s)}</div>`).join('');
+/* 문단: cfg = [paraPrIDRef, styleIDRef, charPrIDRef] */
+let hxEqN = 0;
+const hxEq = (a, b) => { const id = 1800000000 + (++hxEqN), w = Math.max(a.length, b.length) * 520 + 500; return `<hp:equation id="${id}" zOrder="0" numberingType="EQUATION" textWrap="TOP_AND_BOTTOM" textFlow="BOTH_SIDES" lock="0" dropcapstyle="None" version="Equation Version 60" baseLine="66" textColor="#000000" baseUnit="1000" lineMode="CHAR" font="HancomEQN"><hp:sz width="${w}" widthRelTo="ABSOLUTE" height="2250" heightRelTo="ABSOLUTE" protect="0"/><hp:pos treatAsChar="1" affectLSpacing="0" flowWithText="1" allowOverlap="0" holdAnchorAndSO="0" vertRelTo="PARA" horzRelTo="PARA" vertAlign="TOP" horzAlign="LEFT" vertOffset="0" horzOffset="0"/><hp:outMargin left="56" right="56" top="0" bottom="0"/><hp:shapeComment>수식입니다.</hp:shapeComment><hp:script>{${X(a)}} over {${X(b)}}</hp:script></hp:equation>`; };
+/* 글 → <hp:t> + 분수는 한글 수식 */
+const hxT = t => { let o = '', p = 0; String(t).replace(FRAC, (m, a, b, k) => { if (isFrac(a, b)) { if (k > p) o += `<hp:t>${X(t.slice(p, k))}</hp:t>`; o += hxEq(a, b); p = k + m.length; } return m; }); if (p < t.length) o += `<hp:t>${X(t.slice(p))}</hp:t>`; return o; };
+const hxP = (t, c, br) => `<hp:p id="0" paraPrIDRef="${c[0]}" styleIDRef="${c[1]}" pageBreak="${br?1:0}" columnBreak="0" merged="0"><hp:run charPrIDRef="${c[2]}">${t === '' ? '' : hxT(String(t))}</hp:run></hp:p>`;
+/* 표 (bf = 실선 테두리 borderFill id, 단 너비 안 가운데) */
+let hxTblN = 0;
+function hxTbl(rows, c, bf) {
+  const id = 1700000000 + (++hxTblN), nc = rows[0].length, cw = Math.floor(Math.min(27000, nc * 7000) / nc), W = cw * nc, ch = 1700, H = ch * rows.length, M = 'left="400" right="400" top="141" bottom="141"';
+  const cell = (s, r, k) => `<hp:tc name="" header="0" hasMargin="0" protect="0" editable="0" dirty="0" borderFillIDRef="${bf}"><hp:subList id="" textDirection="HORIZONTAL" lineWrap="BREAK" vertAlign="CENTER" linkListIDRef="0" linkListNextIDRef="0" textWidth="0" textHeight="0" hasTextRef="0" hasNumRef="0"><hp:p id="0" paraPrIDRef="${c[0]}" styleIDRef="${c[1]}" pageBreak="0" columnBreak="0" merged="0"><hp:run charPrIDRef="${c[2]}">${s ? hxT(s) : ''}</hp:run></hp:p></hp:subList><hp:cellAddr colAddr="${k}" rowAddr="${r}"/><hp:cellSpan colSpan="1" rowSpan="1"/><hp:cellSz width="${cw}" height="${ch}"/><hp:cellMargin ${M}/></hp:tc>`;
+  return `<hp:p id="0" paraPrIDRef="${c[0]}" styleIDRef="${c[1]}" pageBreak="0" columnBreak="0" merged="0"><hp:run charPrIDRef="${c[2]}"><hp:tbl id="${id}" zOrder="0" numberingType="TABLE" textWrap="TOP_AND_BOTTOM" textFlow="BOTH_SIDES" lock="0" dropcapstyle="None" pageBreak="CELL" repeatHeader="1" rowCnt="${rows.length}" colCnt="${nc}" cellSpacing="0" borderFillIDRef="${bf}" noAdjust="0"><hp:sz width="${W}" widthRelTo="ABSOLUTE" height="${H}" heightRelTo="ABSOLUTE" protect="0"/><hp:pos treatAsChar="0" affectLSpacing="0" flowWithText="1" allowOverlap="0" holdAnchorAndSO="0" vertRelTo="PARA" horzRelTo="COLUMN" vertAlign="TOP" horzAlign="CENTER" vertOffset="0" horzOffset="0"/><hp:outMargin left="283" right="283" top="283" bottom="283"/><hp:inMargin ${M}/>${rows.map((r, ri) => `<hp:tr>${r.map((s, k) => cell(s, ri, k)).join('')}</hp:tr>`).join('')}</hp:tbl><hp:t/></hp:run></hp:p>`;
+}
+function hxPic(n, w, h, c, fl) {
+  return `<hp:p id="0" paraPrIDRef="${c[0]}" styleIDRef="${c[1]}" pageBreak="0" columnBreak="0" merged="0"><hp:run charPrIDRef="${c[2]}">${hxPicEl(n, w, h, fl)}</hp:run></hp:p>`;
+}
+/* fl = {x, y}: 종이 기준 위치에 글 앞으로 띄움, fl = 'center': 단 가운데, 없으면 글자처럼 취급 */
 function hxPicEl(n, w, h, fl) {
   const id = 1900000000 + n, M = 'e1="1" e2="0" e3="0" e4="0" e5="1" e6="0"';
-  const pos = fl ? `<hp:pos treatAsChar="0" affectLSpacing="0" flowWithText="0" allowOverlap="1" holdAnchorAndSO="0" vertRelTo="PAPER" horzRelTo="PAPER" vertAlign="TOP" horzAlign="LEFT" vertOffset="${fl.y}" horzOffset="${fl.x}"/>` : '<hp:pos treatAsChar="1" affectLSpacing="0" flowWithText="1" allowOverlap="0" holdAnchorAndSO="0" vertRelTo="PARA" horzRelTo="PARA" vertAlign="TOP" horzAlign="LEFT" vertOffset="0" horzOffset="0"/>';
-  return `<hp:pic id="${id}" zOrder="${n}" numberingType="PICTURE" textWrap="${fl ? 'IN_FRONT_OF_TEXT' : 'TOP_AND_BOTTOM'}" textFlow="BOTH_SIDES" lock="0" dropcapstyle="None" href="" groupLevel="0" instid="${id}" reverse="0"><hp:offset x="0" y="0"/><hp:orgSz width="${w}" height="${h}"/><hp:curSz width="${w}" height="${h}"/><hp:flip horizontal="0" vertical="0"/><hp:rotationInfo angle="0" centerX="${w>>1}" centerY="${h>>1}" rotateimage="1"/><hp:renderingInfo><hc:transMatrix ${M}/><hc:scaMatrix ${M}/><hc:rotMatrix ${M}/></hp:renderingInfo><hc:img binaryItemIDRef="image${n}" bright="0" contrast="0" effect="REAL_PIC" alpha="0"/><hp:imgRect><hc:pt0 x="0" y="0"/><hc:pt1 x="${w}" y="0"/><hc:pt2 x="${w}" y="${h}"/><hc:pt3 x="0" y="${h}"/></hp:imgRect><hp:imgClip left="0" right="${w}" top="0" bottom="${h}"/><hp:inMargin left="0" right="0" top="0" bottom="0"/><hp:imgDim dimwidth="${w}" dimheight="${h}"/><hp:effects/><hp:sz width="${w}" height="${h}" widthRelTo="ABSOLUTE" heightRelTo="ABSOLUTE" protect="0"/>${pos}<hp:outMargin left="0" right="0" top="0" bottom="0"/></hp:pic>`;
+  const pos = fl === 'center' ? '<hp:pos treatAsChar="0" affectLSpacing="0" flowWithText="1" allowOverlap="0" holdAnchorAndSO="0" vertRelTo="PARA" horzRelTo="COLUMN" vertAlign="TOP" horzAlign="CENTER" vertOffset="0" horzOffset="0"/>'
+    : fl ? `<hp:pos treatAsChar="0" affectLSpacing="0" flowWithText="0" allowOverlap="1" holdAnchorAndSO="0" vertRelTo="PAPER" horzRelTo="PAPER" vertAlign="TOP" horzAlign="LEFT" vertOffset="${fl.y}" horzOffset="${fl.x}"/>` : '<hp:pos treatAsChar="1" affectLSpacing="0" flowWithText="1" allowOverlap="0" holdAnchorAndSO="0" vertRelTo="PARA" horzRelTo="PARA" vertAlign="TOP" horzAlign="LEFT" vertOffset="0" horzOffset="0"/>';
+  return `<hp:pic id="${id}" zOrder="${n}" numberingType="PICTURE" textWrap="${fl && fl !== 'center' ? 'IN_FRONT_OF_TEXT' : 'TOP_AND_BOTTOM'}" textFlow="BOTH_SIDES" lock="0" dropcapstyle="None" href="" groupLevel="0" instid="${id}" reverse="0"><hp:offset x="0" y="0"/><hp:orgSz width="${w}" height="${h}"/><hp:curSz width="${w}" height="${h}"/><hp:flip horizontal="0" vertical="0"/><hp:rotationInfo angle="0" centerX="${w>>1}" centerY="${h>>1}" rotateimage="1"/><hp:renderingInfo><hc:transMatrix ${M}/><hc:scaMatrix ${M}/><hc:rotMatrix ${M}/></hp:renderingInfo><hc:img binaryItemIDRef="image${n}" bright="0" contrast="0" effect="REAL_PIC" alpha="0"/><hp:imgRect><hc:pt0 x="0" y="0"/><hc:pt1 x="${w}" y="0"/><hc:pt2 x="${w}" y="${h}"/><hc:pt3 x="0" y="${h}"/></hp:imgRect><hp:imgClip left="0" right="${w}" top="0" bottom="${h}"/><hp:inMargin left="0" right="0" top="0" bottom="0"/><hp:imgDim dimwidth="${w}" dimheight="${h}"/><hp:effects/><hp:sz width="${w}" height="${h}" widthRelTo="ABSOLUTE" heightRelTo="ABSOLUTE" protect="0"/>${pos}<hp:outMargin left="0" right="0" top="0" bottom="0"/></hp:pic>`;
 }
 async function buildHwpx(qs, dims, o) {
   const tpl = HWPX_TPL[o.tpl] ? o.tpl : '1';
@@ -1342,15 +1388,21 @@ async function buildHwpx(qs, dims, o) {
   const CF = {'1': {q: () => [8,0,0], c: [9,0,0], b: [10,0,0]}, '2': {q: i => i < 9 ? [1,1,1] : [2,2,1], c: [3,3,0], b: [7,0,3]}, '3': {q: () => [34,1,10], c: [64,4,10], b: [21,0,27]}}[tpl];
   const QC = CF.q, CC = CF.c, BC = CF.b;
   const imgs = []; let body = '';
+  // 표 테두리(실선) borderFill 하나를 머리 정보에 더함
+  let head = txt('Contents/header.xml'); const bfN = +((/<hh:borderFills itemCnt="(\d+)"/.exec(head) || [])[1] || 0), BF = bfN + 1;
+  if (bfN) { head = head.replace(`<hh:borderFills itemCnt="${bfN}"`, `<hh:borderFills itemCnt="${BF}"`).replace('</hh:borderFills>', `<hh:borderFill id="${BF}" threeD="0" shadow="0" centerLine="NONE" breakCellSeparateLine="0"><hh:slash type="NONE" Crooked="0" isCounter="0"/><hh:backSlash type="NONE" Crooked="0" isCounter="0"/><hh:leftBorder type="SOLID" width="0.12 mm" color="#000000"/><hh:rightBorder type="SOLID" width="0.12 mm" color="#000000"/><hh:topBorder type="SOLID" width="0.12 mm" color="#000000"/><hh:bottomBorder type="SOLID" width="0.12 mm" color="#000000"/><hh:diagonal type="SOLID" width="0.1 mm" color="#000000"/></hh:borderFill></hh:borderFills>`); put('Contents/header.xml', head); }
+  const segs = (s, cfg, pre) => { let first = !!pre; return qSegs(s).map(g => { if (g.t === 'tbl') return bfN ? hxTbl(g.rows, BC, BF) : g.rows.map(r => hxP(r.join('   '), cfg)).join(''); const t = first ? pre + g.s : g.s; first = false; return hxP(t, cfg); }).join(''); };
   qs.forEach((q, i) => {
     if (i) { const n = Math.max(0, Math.round((o.gap + 24 * ((pvExtra[i]) || 0)) / 28)); for (let k = 0; k < n; k++) body += hxP('', BC); }
-    if (!q._rn) String(q.imageOnly ? '' : q.question ?? '').split('\n').forEach((l, k) => body += hxP(k ? l : `${i+1}. ${l}`, QC(i)));
+    const [lead, ask] = q.imageOnly ? ['', ''] : askSplit(q.question);
+    if (!q._rn) body += segs(lead, QC(i), `${i+1}. `);
     const m = q.image && dims[i] && /^data:image\/(png|jpeg);base64,(.+)$/.exec(q.image);
     if (m) {
       const n = imgs.length + 1, ext = m[1] === 'jpeg' ? 'jpg' : 'png', s = Math.min(1, 28000 / (dims[i].w * 75), 20000 / (dims[i].h * 75));
       imgs.push({n, ext, mime: m[1], data: b64(m[2])});
-      body += hxPic(n, Math.round(dims[i].w * 75 * s), Math.round(dims[i].h * 75 * s), BC);
+      body += hxPic(n, Math.round(dims[i].w * 75 * s), Math.round(dims[i].h * 75 * s), BC, q.imageOnly ? undefined : 'center');
     }
+    if (ask) body += segs(ask, QC(i));
     if (!bareChoices(q)) (q.choices || []).forEach(c => body += hxP(c, CC));
   });
   if (o.ans) {
@@ -1433,17 +1485,19 @@ function renderPastSelects() {
 function fmtQ(t, no, img = '') {
   t = String(t || '');
   const MK = /<(보기|실험 과정|실험 결과|탐구 과정|자료|조건|가설)>\s*/g, ms = [...t.matchAll(MK)].filter(m => m[1] !== '보기' || /^ㄱ\./.test(t.slice(m.index + m[0].length)));
-  if (!ms.length) return `<p class="font-bold whitespace-pre-wrap">${no}. ${esc(t)}</p>${img}`;
-  const stem = t.slice(0, ms[0].index).trim(), TAIL = /\s(옳은 것|옳지 않은|이에 대한|제시한|\(단,|이 실험|위 실험|다음 중)/;
+  const [lead, ask] = askSplit(ms.length ? t.slice(0, ms[0].index).trim() : t);
+  const top = qHtml(`${no}. ${lead}`) + (img ? `<div class="qimg">${img}</div>` : '') + (ask ? qHtml(ask) : '');
+  if (!ms.length) return top;
+  const TAIL = /\s(옳은 것|옳지 않은|이에 대한|제시한|\(단,|이 실험|위 실험|다음 중)/;
   let boxes = '', tail = '';
   ms.forEach((m, i) => {
     let body = t.slice(m.index + m[0].length, i + 1 < ms.length ? ms[i + 1].index : t.length).trim();
     if (i === ms.length - 1) { const k = body.search(TAIL); if (k > 0) { tail = body.slice(k).trim(); body = body.slice(0, k).trim(); } }
     const lab = m[1] === '보기' ? '보 기' : m[1];
     const items = m[1] === '보기' ? body.split(/\s+(?=[ㄱ-ㅎ]\.\s)/) : body.split(/\n+|\s+(?=\d+\.\s|\([가-하]\)\s)/);
-    boxes += `<div style="border:1.5px solid #222;padding:10px 14px;margin:8px 0;font-size:14px;line-height:1.7"><div style="text-align:center;font-weight:bold;margin-bottom:4px">&lt; ${lab} &gt;</div>${items.filter(Boolean).map(x => `<div style="padding-left:1.4em;text-indent:-1.4em">${esc(x)}</div>`).join('')}</div>`;
+    boxes += `<div style="border:1.5px solid #222;padding:10px 14px;margin:8px 0;font-size:14px;line-height:1.7"><div style="text-align:center;font-weight:bold;margin-bottom:4px">&lt; ${lab} &gt;</div>${items.filter(Boolean).map(x => `<div style="padding-left:1.4em;text-indent:-1.4em">${fx(x)}</div>`).join('')}</div>`;
   });
-  return `<p class="font-bold whitespace-pre-wrap">${no}. ${esc(stem)}</p>${img}` + boxes + (tail ? `<p class="font-bold whitespace-pre-wrap">${esc(tail)}</p>` : '');
+  return top + boxes + (tail ? qHtml(tail) : '');
 }
 /* 지금 보이는 세트 번호 (0 = 원본) */
 const pastCur = x => pastMode === 'var' ? Math.min(Math.max(parseInt($('past-set').value) || 1, 1), (x.variants || []).length) : 0;
@@ -1459,10 +1513,21 @@ function renderPast(x) {
   const title = `${x.school} ${sfx(x.year,'년')} ${sfx(x.semester,'학기')} ${sfx(x.round,'차')} ${x.grade} ${x.subject}${cur ? ` · 변형 ${cur}세트` : ''}`;
   const tools = (q, i) => !ed ? '' : `<div class="no-print flex gap-2 items-center my-1"><label class="cursor-pointer text-xs border rounded-lg px-2 py-1 bg-white hover:bg-gray-50">🖼 ${q.image ? '그림 바꾸기' : '그림 넣기'}<input type="file" accept="image/*" class="hidden" onchange="pastFigPick(${i}, this)"></label>${q.image ? `<button onclick="pastFigDel(${i})" class="text-xs text-red-500">그림 지우기</button>` : ''}</div>`;
   el.innerHTML = `<h2 class="text-center text-2xl font-bold mb-6">${esc(title)}</h2>` +
-    qs.map((q, i) => `<div class="pq mb-6">${fmtQ(q.question, i+1, (q.image ? `<img src="${esc(q.image)}" class="my-2 max-h-64">` : '') + tools(q, i))}${(q.choices || []).map(c => `<p class="ml-4 text-sm">${esc(c)}</p>`).join('')}</div>`).join('') +
-    (ans ? `<div class="pq border-t pt-4 mt-8"><h3 class="font-bold mb-2">[정답 및 해설]</h3>${qs.map((q, i) => `<p class="text-sm">${i+1}번 정답: ${esc(q.answer)} ${q.explanation ? '해설: ' + esc(q.explanation) : ''}</p>`).join('')}</div>` : '');
+    qs.map((q, i) => `<div class="pq mb-6">${fmtQ(q.question, i+1, (q.image ? `<img src="${esc(q.image)}" class="my-2 max-h-64">` : '') + tools(q, i))}${(q.choices || []).map(c => `<p class="ml-4 text-sm">${fx(c)}</p>`).join('')}</div>`).join('') +
+    (ans ? `<div class="pq border-t pt-4 mt-8"><h3 class="font-bold mb-2">[정답 및 해설]</h3>${qs.map((q, i) => `<p class="text-sm">${i+1}번 정답: ${fx(q.answer)} ${q.explanation ? '해설: ' + fx(q.explanation) : ''}</p>`).join('')}</div>` : '');
 }
 
+/* 지금 보이는 기출(또는 변형 세트)을 미리보기로 → 시험지1·2·3 틀로 내려받기·저장 */
+function pastToExam() {
+  const x = curPast, qs = pastShown();
+  if (!x || !qs || !qs.length) { toast('시험지로 만들 기출 문제가 없습니다.'); return; }
+  const k = pastCur(x);
+  currentQuestions = qs.map(q => ({...JSON.parse(JSON.stringify(q)), grade: q.grade || x.grade, unit: q.unit || `[${x.subject}]`}));
+  pvExtra = []; curExamId = uid('e');
+  $('exam-name').value = `${x.school} ${sfx(x.year,'년')} ${sfx(x.semester,'학기')} ${sfx(x.round,'차')} ${x.subject}${k ? ` 변형 ${k}세트` : ''}`;
+  switchTab('preview');
+  toast('시험지 틀(시험지1·2·3)을 고른 뒤 다운로드하거나 저장하세요.');
+}
 /* ===== 기출 문제: 직접 그린 그림 넣기 (변형 문제는 JSON의 variants로 불러옴) ===== */
 const pastShown = () => { const x = curPast, k = x ? pastCur(x) : 0; return !x ? null : k ? x.variants[k-1].questions : x.questions; };
 const pastSave = () => idbSet(PK, pastDB).catch(() => toast('기출 시험지를 브라우저에 저장하지 못했습니다.'));
