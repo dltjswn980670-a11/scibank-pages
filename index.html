@@ -134,6 +134,7 @@ input[type=password],input[type=date]{border:1px solid var(--line)!important;bor
 input[type=password]:focus,input[type=date]:focus{outline:none;border-color:var(--accent)!important;box-shadow:0 0 0 3px var(--accent-s)!important}
 /* 학습 보고서 (선생님·학생 공용, 인쇄 가능) */
 .rp{font-size:.9rem}
+.rp-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}.rp-tab{padding:7px 14px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:.875rem;font-weight:500;color:var(--ink)}.rp-tab span{margin-left:5px;font-size:.75rem;color:var(--muted)}.rp-tab:hover{border-color:var(--accent)}.rp-tab.on{background:var(--accent);border-color:var(--accent);color:#fff}.rp-tab.on span{color:rgba(255,255,255,.8)}
 .rp-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;border-bottom:2px solid var(--ink);padding-bottom:12px;margin-bottom:16px}
 .rp-title{font-size:1.5rem;font-weight:700;letter-spacing:-.03em}.rp-who{color:var(--muted);margin-top:2px}
 .rp-meta{text-align:right;font-size:.75rem;color:var(--muted)}
@@ -1576,7 +1577,7 @@ async function pastFigFiles(inp) {
 
 /* ===== 학생 ===== */
 const SK = 'sciBankStu_v1', GR = ['중1','중2','중3','고1','고2','고3'];
-let stuDB = {students:[], exams:[], results:[]}, stuView = ['grade'], curExamId = null, rpFrom = '', rpTo = '';
+let stuDB = {students:[], exams:[], results:[]}, stuView = ['grade'], curExamId = null, rpFrom = '', rpTo = '', rpCls = '';
 const stuReady = (async () => { try { const a = await idbGet(SK); if (a && Array.isArray(a.students)) stuDB = a; } catch(e) {} })();
 const stuSave = () => { const r = idbSet(SK, stuDB).catch(() => toast('브라우저 저장에 실패했습니다.')); if (typeof sySoon === 'function') sySoon(); return r; };
 const uid = p => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
@@ -1651,8 +1652,17 @@ function renderStu() {
         <label class="text-xs text-gray-500">종료일<input type="date" id="rp-to" value="${rpTo}" class="block p-2 text-sm"></label>
         <button onclick="rpFrom='';rpTo='';stuGo('report','${s.id}')" class="stu-back">전체 기간</button>
         <div class="ml-auto flex gap-2 flex-wrap"><button onclick="window.print()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold"><i data-lucide="printer"></i>보고서 인쇄</button>
-        <button onclick="rpVariant('${s.id}')" class="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-semibold" title="선택한 기간에 틀린 문제와 같은 단원·난이도의 다른 문제로 시험지를 만듭니다"><i data-lucide="refresh-cw"></i>이 기간 틀린 문제로 변형 문제 출제</button></div></div><div id="rp-box"></div>`;
-      const draw = () => { rpFrom = $('rp-from').value; rpTo = $('rp-to').value; $('rp-box').innerHTML = buildReport(teacherReportItems(s.id), {who: `${s.grade} ${s.name}`, from: rpFrom, to: rpTo}); };
+        <button onclick="rpVariant('${s.id}')" class="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-semibold" title="선택한 기간에 틀린 문제와 같은 단원·난이도의 다른 문제로 시험지를 만듭니다"><i data-lucide="refresh-cw"></i>이 기간 틀린 문제로 변형 문제 출제</button></div></div><div id="rp-cls"></div><div id="rp-box"></div>`;
+      const all = teacherReportItems(s.id), names = Object.fromEntries(CL().map(c => [c.id, c.name]));
+      const draw = () => {
+        rpFrom = $('rp-from').value; rpTo = $('rp-to').value;
+        const tabs = rpClsTabs(all, names, rpCls);
+        if (!tabs || !tabs.includes(`data-rc="${rpCls}"`)) rpCls = '';
+        $('rp-cls').innerHTML = rpClsTabs(all, names, rpCls);
+        $('rp-cls').querySelectorAll('.rp-tab').forEach(t => t.onclick = () => { rpCls = t.dataset.rc; draw(); });
+        const cn = rpCls ? (rpCls === '-' ? '수업 없음' : names[rpCls]) : '';
+        $('rp-box').innerHTML = buildReport(rpClsPick(all, names, rpCls), {who: `${s.grade} ${s.name}` + (cn ? ` · ${cn}` : ''), from: rpFrom, to: rpTo});
+      };
       $('rp-from').onchange = draw; $('rp-to').onchange = draw; draw();
     } else if (v === 'entry') {
       const e = stuDB.exams.find(x => x.id === c);
@@ -1776,10 +1786,12 @@ function rpVariant(sid) {
   const [f, t] = dayRange(rpFrom, rpTo), wrong = [];
   stuDB.results.filter(r => r.studentId === sid && r.at >= f && r.at < t).forEach(r => {
     const e = stuDB.exams.find(x => x.id === r.examId);
-    if (e) e.questions.forEach((q, i) => { const k = numAns(q.answer); if (k && r.answers[i] !== k) wrong.push(q); });
+    const ok = !rpCls || (rpCls === '-' ? !(e && e.classId && CL().some(c => c.id === e.classId)) : e && e.classId === rpCls);
+    if (e && ok) e.questions.forEach((q, i) => { const k = numAns(q.answer); if (k && r.answers[i] !== k) wrong.push(q); });
   });
-  if (!wrong.length) { toast('이 기간에 틀린 문제가 없습니다.'); return; }
-  makeVariantExam(wrong, `${s.name} 오답 변형 문제`);
+  if (!wrong.length) { toast(rpCls ? '이 기간·수업에 틀린 문제가 없습니다.' : '이 기간에 틀린 문제가 없습니다.'); return; }
+  const cn = rpCls && rpCls !== '-' ? (CL().find(c => c.id === rpCls) || {}).name : '';
+  makeVariantExam(wrong, `${s.name}${cn ? ' ' + cn : ''} 오답 변형 문제`);
 }
 
 /* ===== 학습 보고서: (1) 정오표 (2) 틀린 유형 (3) 개념 정리 (4) 등수 — 선생님·학생 공용 =====
@@ -1789,9 +1801,22 @@ function teacherReportItems(sid) {
     const e = stuDB.exams.find(x => x.id === r.examId); if (!e) return null;
     const key = e.questions.map(q => numAns(q.answer)), sc = a => key.filter((k, i) => k && (a || [])[i] === k).length;
     const all = stuDB.results.filter(x => x.examId === e.id), mine = sc(r.answers);
-    return {name: e.name, at: r.at, qs: qInfo(e.questions).map((q, i) => ({...q, ans: key[i]})), answers: r.answers || [], retry: r.retry || null,
+    return {name: e.name, at: r.at, cls: e.classId || '', qs: qInfo(e.questions).map((q, i) => ({...q, ans: key[i]})), answers: r.answers || [], retry: r.retry || null,
       rank: 1 + all.filter(x => sc(x.answers) > mine).length, count: all.length};
   }).filter(Boolean);
+}
+/* 보고서 수업 탭: items[].cls(수업 id, 없으면 '') · names = {id: 이름} · cur = 고른 수업('' 전체, '-' 수업 없음) */
+function rpClsTabs(items, names, cur) {
+  const n = {}; items.forEach(x => { const k = x.cls && names[x.cls] ? x.cls : '-'; n[k] = (n[k] || 0) + 1; });
+  const ks = Object.keys(names).filter(k => n[k]).sort((a, b) => names[a].localeCompare(names[b], 'ko'));
+  if (!ks.length) return '';
+  if (n['-']) ks.push('-');
+  const b = (k, label, c) => `<button type="button" class="rp-tab${cur === k ? ' on' : ''}" data-rc="${k}">${esc(label)}<span>${c}</span></button>`;
+  return `<div class="rp-tabs no-print">${b('', '전체', items.length)}${ks.map(k => b(k, k === '-' ? '수업 없음' : names[k], n[k])).join('')}</div>`;
+}
+function rpClsPick(items, names, cur) {
+  if (!cur) return items;
+  return items.filter(x => (x.cls && names[x.cls] ? x.cls : '-') === cur);
 }
 function buildReport(all, o) {
   const [f, t] = dayRange(o.from, o.to);
@@ -2238,7 +2263,7 @@ async function sbMyPage() {
   let rows; try { rows = await sbCall('sb_my_report', {t: tokGet()}); } catch(e) { return sbFail(e); }
   try { sbClasses = await sbCall('sb_my_classes', {t: tokGet()}) || []; } catch(e) { sbClasses = null; }
   let unread = 0; try { unread = await sbCall('sb_msg_unread', {t: tokGet()}) || 0; } catch(e) { unread = -1; }
-  const items = (rows || []).map(x => ({name: x.name, at: Date.parse(x.at), answers: x.answers || [], retry: x.retry, rank: x.rank, count: x.count,
+  const items = (rows || []).map(x => ({name: x.name, code: x.code, at: Date.parse(x.at), answers: x.answers || [], retry: x.retry, rank: x.rank, count: x.count,
     qs: (x.info || Array.from({length: x.n}, () => ({}))).map((q, i) => ({q: q.q || '', ch: q.ch || [], exp: q.exp || '', unit: q.unit || '', sub: q.sub || '', lv: q.lv || '', type: q.type || '', img: q.img, ans: (x.key || [])[i] || 0}))}));
   let from = '', to = '';
   const cls = sbClasses || [];
@@ -2249,13 +2274,23 @@ async function sbMyPage() {
       <form id="sb-goex" class="flex gap-2"><input id="sb-code" type="text" placeholder="시험지 코드 6자리" autocapitalize="characters" class="flex-1 p-3 uppercase"><button class="sb-primary px-5">답안 입력</button></form>
       <div class="flex flex-wrap items-end gap-2"><label class="text-xs text-gray-500">시작일<input type="date" id="rp-from" class="block p-2 text-sm"></label><label class="text-xs text-gray-500">종료일<input type="date" id="rp-to" class="block p-2 text-sm"></label>
       <div class="ml-auto flex gap-2"><button id="sb-cpw" class="sb-ghost px-4 text-sm">비밀번호 바꾸기</button><button onclick="window.print()" class="sb-primary px-4 text-sm"><i data-lucide="printer"></i>인쇄</button></div></div></div>
-    <div id="rp-box" class="bg-white border rounded-xl p-5"></div>`;
+    <div id="rp-cls"></div><div id="rp-box" class="bg-white border rounded-xl p-5"></div>`;
   sbBindTop();
   $('sb-goex').onsubmit = e => { e.preventDefault(); const v = $('sb-code').value.trim(); if (v) location.search = '?e=' + encodeURIComponent(v.toUpperCase()); };
   $('sb-cpw').onclick = () => sbChangePw(false);
   if ($('sb-chat')) $('sb-chat').onclick = () => sbChat();
   R.querySelectorAll('.sb-cls').forEach(b => b.onclick = () => sbClassPage(cls[+b.dataset.c]));
-  const draw = () => { from = $('rp-from').value; to = $('rp-to').value; $('rp-box').innerHTML = buildReport(items, {who: `${sbMe.grade} ${sbMe.name}`, from, to, allExp: true}); };
+  const names = {}, byCode = {};
+  cls.forEach(c => { names[c.id] = c.name; (c.exams || []).forEach(e => { byCode[e.code] = c.id; }); });
+  items.forEach(x => { x.cls = byCode[x.code] || ''; });
+  let cur = '';
+  const draw = () => {
+    from = $('rp-from').value; to = $('rp-to').value;
+    $('rp-cls').innerHTML = rpClsTabs(items, names, cur);
+    $('rp-cls').querySelectorAll('.rp-tab').forEach(t => t.onclick = () => { cur = t.dataset.rc; draw(); });
+    const cn = cur ? (cur === '-' ? '수업 없음' : names[cur]) : '';
+    $('rp-box').innerHTML = buildReport(rpClsPick(items, names, cur), {who: `${sbMe.grade} ${sbMe.name}` + (cn ? ` · ${cn}` : ''), from, to, allExp: true});
+  };
   $('rp-from').onchange = draw; $('rp-to').onchange = draw; draw();
 }
 
