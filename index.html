@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <script src="https://cdn.tailwindcss.com/3.4.17"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
 <style>
 /* ===== 디자인 토큰: 차분한 바탕 + 탭마다 고유 색 (주기율표 원소 타일 모티프) ===== */
 :root{--bg:#F2F4F7;--surface:#fff;--ink:#16202E;--muted:#5E6878;--line:#DDE2E9;--soft:#EEF1F5;
@@ -54,11 +55,11 @@ header h1{font-size:1.05rem!important}
 #hero{min-height:calc(100vh - 90px);display:flex;flex-direction:column;justify-content:center;padding-bottom:48px;text-align:left!important}
 .hero-head{max-width:56rem;width:100%;margin:0 auto}
 .hero-head .logo{font-size:15px}
-.hero-title{font-size:clamp(1.9rem,4.5vw,2.8rem);font-weight:800;letter-spacing:-.04em;line-height:1.15;margin-top:28px}
+.hero-title{font-size:clamp(1.9rem,4.5vw,2.8rem);font-weight:700;letter-spacing:-.04em;line-height:1.15;margin-top:28px}
 .hero-sub{color:var(--muted);margin-top:8px;font-size:1rem}
 #hero #main-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;max-width:56rem;width:100%;margin:36px auto 0}
 #hero #main-tabs button{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:6px;min-height:168px;padding:16px;background:var(--surface);border:1px solid var(--line);border-radius:12px;transition:border-color .15s,transform .15s}
-#hero #main-tabs button:hover{border-color:var(--c);transform:translateY(-2px)}
+#hero #main-tabs button:hover{border-color:var(--c);background:var(--cs)}
 #hero .tab-sym{width:52px;height:52px;font-size:24px;border-radius:8px;margin-bottom:auto}
 #hero .tab-name{font-size:1rem;font-weight:700;color:var(--ink);margin-top:14px}
 #hero .tab-desc{font-size:.8rem;line-height:1.45;color:var(--muted);word-break:keep-all}
@@ -134,12 +135,12 @@ input[type=password]:focus,input[type=date]:focus{outline:none;border-color:var(
 /* 학습 보고서 (선생님·학생 공용, 인쇄 가능) */
 .rp{font-size:.9rem}
 .rp-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;border-bottom:2px solid var(--ink);padding-bottom:12px;margin-bottom:16px}
-.rp-title{font-size:1.5rem;font-weight:800;letter-spacing:-.03em}.rp-who{color:var(--muted);margin-top:2px}
+.rp-title{font-size:1.5rem;font-weight:700;letter-spacing:-.03em}.rp-who{color:var(--muted);margin-top:2px}
 .rp-meta{text-align:right;font-size:.75rem;color:var(--muted)}
 .rp-sum{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:8px}
 .rp-sum div{border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:.75rem;color:var(--muted)}
 .rp-sum b{display:block;font-size:1.3rem;color:var(--ink)}
-.rp-h{font-size:1.05rem;font-weight:800;margin:26px 0 10px;padding-left:10px;border-left:3px solid var(--accent)}
+.rp-h{font-size:1.05rem;font-weight:700;margin:26px 0 10px;padding-left:10px;border-left:3px solid var(--accent)}
 .rp-note{font-size:.75rem;color:var(--muted);margin:-4px 0 8px}
 .rp-exam{border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:12px;break-inside:avoid}
 .rp-exam-h{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:8px}.rp-exam-h span{font-size:.8rem;color:var(--muted)}
@@ -150,7 +151,7 @@ input[type=password]:focus,input[type=date]:focus{outline:none;border-color:var(
 .rp-bar{display:grid;grid-template-columns:minmax(0,1fr) 80px 40px;align-items:center;gap:8px;font-size:.8rem;padding:3px 0}
 .rp-track{height:8px;background:var(--soft);border-radius:4px;overflow:hidden}.rp-track i{display:block;height:100%;background:#D63B3B}
 .rp-n{text-align:right;color:var(--muted)}
-.rp-grp{margin-bottom:18px}.rp-grp-h{font-weight:800;padding:6px 0;border-bottom:1px solid var(--line);margin-bottom:4px}.rp-grp-h span{font-weight:500;color:var(--muted);font-size:.8rem;margin-left:4px}
+.rp-grp{margin-bottom:18px}.rp-grp-h{font-weight:700;padding:6px 0;border-bottom:1px solid var(--line);margin-bottom:4px}.rp-grp-h span{font-weight:500;color:var(--muted);font-size:.8rem;margin-left:4px}
 .rp-q{padding:10px 0;border-bottom:1px dashed var(--line);break-inside:avoid}.rp-q-src{font-size:.75rem;color:var(--muted)}.rp-q-t{font-weight:600;margin:4px 0;white-space:pre-wrap}
 .rp-q-ch{display:flex;flex-wrap:wrap;gap:2px 14px;font-size:.82rem;color:#374151}.rp-q-exp{margin-top:6px;background:var(--soft);border-radius:8px;padding:8px 10px;font-size:.85rem;white-space:pre-wrap}
 .rp-memo{border:1px solid var(--line);border-radius:8px;min-height:112px;padding:6px 10px;color:var(--muted);font-size:.75rem;margin-top:8px;background:repeating-linear-gradient(#fff 0 27px,#E5E7EB 27px 28px);break-inside:avoid}
@@ -170,7 +171,7 @@ input[type=password]:focus,input[type=date]:focus{outline:none;border-color:var(
 #msg-list{overflow-y:auto;flex:1}
 .msg-th{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border-bottom:1px solid #F3F4F6;font-size:14px}
 .msg-th:hover{background:#FAFAFB}.msg-th.on{background:var(--c-msg-s)}
-.msg-av{flex:none;width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#F58529,#DD2A7B 55%,#8134AF);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.msg-av{flex:none;width:38px;height:38px;border-radius:50%;background:var(--c-msg-s);color:var(--c-msg);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
 .msg-un{display:inline-block;min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:#E5383B;color:#fff;font-size:11px;font-weight:800;line-height:20px;text-align:center}
 .msg-main{flex:1;display:flex;flex-direction:column;min-width:0;min-height:0}
 .msg-head{padding:12px 16px;border-bottom:1px solid #E5E7EB}
@@ -178,7 +179,7 @@ input[type=password]:focus,input[type=date]:focus{outline:none;border-color:var(
 .msg-row{display:flex;align-items:flex-end;gap:6px;max-width:100%}
 .msg-row.me{flex-direction:row-reverse}
 .msg-b{max-width:75%;padding:9px 13px;border-radius:18px;background:#EFEFF1;color:#111;white-space:pre-wrap;word-break:break-word;font-size:14.5px;line-height:1.45}
-.msg-row.me .msg-b{background:linear-gradient(135deg,#7B3FE4,#C2398F);color:#fff}
+.msg-row.me .msg-b{background:var(--c-msg);color:#fff}
 .msg-t{font-size:10.5px;color:#9CA3AF;flex:none;text-align:right;line-height:1.2}
 .msg-row:not(.me) .msg-t{text-align:left}
 .msg-day{align-self:center;font-size:11.5px;color:#9CA3AF;margin:8px 0 2px}
@@ -189,7 +190,7 @@ input[type=password]:focus,input[type=date]:focus{outline:none;border-color:var(
 .msg-send:disabled{opacity:.5}
 @media (max-width:700px){.msg-wrap{flex-direction:column;height:auto}.msg-side{width:auto;border-right:0;border-bottom:1px solid #E5E7EB;max-height:220px}.msg-main{height:70vh}}
 .sb-chat{height:min(68vh,620px)}
-.sb-chat-btn{display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#7B3FE4,#C2398F);color:#fff;font-weight:700;padding:13px;border-radius:12px}
+.sb-chat-btn{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--c-msg);color:#fff;font-weight:600;padding:13px;border-radius:12px}
 .sb-cls{text-align:left;background:#fff;border:1px solid #E5E7EB;border-radius:12px;padding:14px}.sb-cls:hover{border-color:var(--accent)}
 .sb-ex{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #E5E7EB;border-radius:12px;padding:12px 14px}.sb-ex:hover{border-color:var(--accent)}
 .sb-todo{flex:none;background:var(--accent);color:#fff;font-weight:700;font-size:13px;padding:8px 12px;border-radius:8px}
@@ -204,6 +205,7 @@ input[type=password]:focus,input[type=date]:focus{outline:none;border-color:var(
 input.dn-over[type=number]{border-color:#ef4444!important;background:#fef2f2!important}
 @media print{#hero,header,footer,#tab-selector,#tab-book,#tab-editor,#past-controls{display:none!important}body{background:#fff!important}main{padding:0!important;max-width:none!important}#print-area{box-shadow:none!important;border-radius:0!important;padding:0!important;max-width:none!important}.pq{break-inside:avoid}#pv-controls{display:none!important}.pvgap{background:none!important;box-shadow:none!important;min-height:0!important}.pvgap::after{display:none!important}#pv-paper{box-shadow:none!important;border-radius:0!important;padding:0!important;max-width:none!important}}
 </style>
+<style>i[data-lucide],svg.lucide{display:inline-block;width:1.05em;height:1.05em;vertical-align:-.17em;margin-right:.35em;stroke-width:2;flex:none}</style>
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
 <input type="file" id="any-file" accept=".json" multiple class="hidden" onchange="importAny(this.files)">
@@ -212,7 +214,7 @@ input.dn-over[type=number]{border-color:#ef4444!important;background:#fef2f2!imp
   <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
     <h1 class="logo cursor-pointer" onclick="goHome()" title="처음 화면으로"><span class="logo-tile"><i>51</i>Sb</span>Sci-Bank</h1>
     <nav id="top-nav" aria-label="메뉴"></nav>
-    <button type="button" id="msg-btn" onclick="switchTab('msg')" style="--c:var(--c-msg);--cs:var(--c-msg-s)"><span class="tab-sym">💬</span>메시지<span id="msg-badge" class="hidden"></span></button>
+    <button type="button" id="msg-btn" onclick="switchTab('msg')" style="--c:var(--c-msg);--cs:var(--c-msg-s)"><span class="tab-sym">메</span>메시지<span id="msg-badge" class="hidden"></span></button>
   </div>
   <div id="sub-nav" class="hidden"></div>
 </header>
@@ -229,12 +231,12 @@ input.dn-over[type=number]{border-color:#ef4444!important;background:#fef2f2!imp
     <button onclick="switchTab('past')" style="--c:var(--c-past);--cs:var(--c-past-s)"><span class="tab-sym">기</span><span class="tab-name">기출</span><span class="tab-desc">학교별 기출 시험지와 변형 세트를 보고 인쇄합니다</span></button>
     <button onclick="switchTab('cls')" style="--c:var(--c-cls);--cs:var(--c-cls-s)"><span class="tab-sym">수</span><span class="tab-name">수업</span><span class="tab-desc">같은 수업을 듣는 학생을 묶고, 수업별로 시험지를 냅니다</span></button>
     <button onclick="switchTab('stu')" style="--c:var(--c-stu);--cs:var(--c-stu-s)"><span class="tab-sym">학</span><span class="tab-name">학생</span><span class="tab-desc">학년·이름으로 학생을 찾고 답 입력·보고서를 봅니다</span></button>
-    <button onclick="switchTab('msg')" style="--c:var(--c-msg);--cs:var(--c-msg-s)"><span class="tab-sym">💬</span><span class="tab-name">메시지</span><span class="tab-desc">학생이 보낸 질문을 읽고 답장합니다</span></button>
+    <button onclick="switchTab('msg')" style="--c:var(--c-msg);--cs:var(--c-msg-s)"><span class="tab-sym">메</span><span class="tab-name">메시지</span><span class="tab-desc">학생이 보낸 질문을 읽고 답장합니다</span></button>
   </div>
   <div class="hero-import">
-    <span><b>📥 JSON 한번에 불러오기</b> 단원별 문제·기출 문제(변형 포함)·시중 교재·EBS·백업 파일을 섞어서 골라도 알아서 나눠 넣습니다.</span>
-    <label for="any-file" class="hi-btn">📂 파일 고르기</label>
-    <button type="button" onclick="importFolder()" class="hi-btn">📁 폴더째 불러오기</button>
+    <span><b>JSON 한번에 불러오기</b> 단원별 문제·기출 문제(변형 포함)·시중 교재·EBS·백업 파일을 섞어서 골라도 알아서 나눠 넣습니다.</span>
+    <label for="any-file" class="hi-btn"><i data-lucide="folder-open"></i>파일 고르기</label>
+    <button type="button" onclick="importFolder()" class="hi-btn"><i data-lucide="folder"></i>폴더째 불러오기</button>
   </div>
 </div>
 
@@ -242,28 +244,28 @@ input.dn-over[type=number]{border-color:#ef4444!important;background:#fef2f2!imp
   <nav id="steps" class="hidden max-w-4xl mx-auto flex flex-wrap items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm"></nav>
   <div id="bk-banner" class="hidden max-w-4xl mx-auto flex flex-wrap items-center gap-2 bg-amber-50 border border-amber-300 text-amber-900 rounded-xl px-4 py-3 text-sm">
     <span class="flex-1 min-w-[12rem]"></span>
-    <button type="button" onclick="exportBackup()" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-2 rounded-lg text-xs font-bold">⬇ 지금 백업</button>
+    <button type="button" onclick="exportBackup()" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-2 rounded-lg text-xs font-semibold"><i data-lucide="download"></i>지금 백업</button>
     <button type="button" onclick="bkSnooze()" class="text-xs text-amber-700 underline">하루 동안 숨기기</button>
   </div>
   <section id="tab-selector" class="hidden bg-white rounded-xl shadow-md p-6 max-w-3xl mx-auto space-y-6">
     <div class="border-b pb-3 space-y-3">
       <div>
-        <h2 class="text-xl font-bold text-gray-900">🎯 단원별 문제 추출 및 DB 관리</h2>
+        <h2 class="text-xl font-semibold text-gray-900">단원별 문제 추출 및 DB 관리</h2>
         <p class="text-sm text-gray-500 mt-1">JSON 파일을 여러 개(또는 폴더째) 올리면 종류를 보고 단원별 문제·기출 문제·시중 교재로 <b>알아서 나눠 합칩니다</b>(중복 문제는 제외). 그림이 있는 문제도 이 브라우저에 자동 저장됩니다.</p>
       </div>
       <div class="flex flex-wrap gap-2 items-center">
-        <label for="any-file" class="cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-bold shadow">📂 JSON 불러오기</label>
-        <button type="button" onclick="importFolder()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-bold shadow">📁 폴더째 불러오기</button>
-        <button onclick="exportDB()" class="bg-gray-700 hover:bg-gray-800 text-white px-3 py-2 rounded-lg text-xs font-bold shadow">⬇ DB 내보내기</button>
-        <button onclick="resetDB()" class="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-2 rounded-lg text-xs font-bold">DB 비우기</button>
+        <label for="any-file" class="cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-semibold shadow"><i data-lucide="folder-open"></i>JSON 불러오기</label>
+        <button type="button" onclick="importFolder()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-semibold shadow"><i data-lucide="folder"></i>폴더째 불러오기</button>
+        <button onclick="exportDB()" class="bg-gray-700 hover:bg-gray-800 text-white px-3 py-2 rounded-lg text-xs font-semibold shadow"><i data-lucide="download"></i>DB 내보내기</button>
+        <button onclick="resetDB()" class="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-2 rounded-lg text-xs font-semibold">DB 비우기</button>
         <span id="db-stats" class="text-xs text-gray-600 ml-auto"></span>
       </div>
     </div>
 
     <div id="draft-resume" class="hidden flex flex-wrap items-center gap-2 bg-indigo-50 border border-indigo-200 rounded-xl px-4 py-3 text-sm">
       <span class="flex-1 font-medium text-indigo-800"></span>
-      <button type="button" onclick="switchTab('preview')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-bold">👁 이어서 보기</button>
-      <button type="button" onclick="switchTab('editor')" class="bg-white hover:bg-gray-100 border px-3 py-2 rounded-lg text-xs font-bold">✏ 편집</button>
+      <button type="button" onclick="switchTab('preview')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-semibold"><i data-lucide="eye"></i>이어서 보기</button>
+      <button type="button" onclick="switchTab('editor')" class="bg-white hover:bg-gray-100 border px-3 py-2 rounded-lg text-xs font-semibold"><i data-lucide="pencil"></i>편집</button>
     </div>
 
     <form id="filter-form" onsubmit="goDifficulty(event)" class="space-y-4">
@@ -277,25 +279,25 @@ input.dn-over[type=number]{border-color:#ef4444!important;background:#fef2f2!imp
           <div class="flex gap-1"><button type="button" onclick="selectAllUnits(true)" class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-2 py-1 rounded font-semibold">전체 선택</button><button type="button" onclick="selectAllUnits(false)" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-2 py-1 rounded font-semibold">선택 해제</button></div>
         </div>
         <div id="unit-list" class="space-y-2 max-h-96 overflow-y-auto pr-1"></div>
-        <p id="unit-total" class="text-right text-sm font-bold text-indigo-600 mt-2"></p>
+        <p id="unit-total" class="text-right text-sm font-semibold text-indigo-600 mt-2"></p>
       </div>
-      <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition shadow-md">다음: 난이도·문항 수 선택 ➔</button>
+      <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-lg transition shadow-md">다음: 난이도·문항 수 선택<i data-lucide="arrow-right"></i></button>
     </form>
   </section>
 
   <section id="tab-book" class="hidden bg-white rounded-xl shadow-md p-6 max-w-3xl mx-auto space-y-6">
     <div class="border-b pb-3 space-y-3">
       <div>
-        <h2 class="text-xl font-bold text-gray-900">📘 시중 교재 문제</h2>
+        <h2 class="text-xl font-semibold text-gray-900">시중 교재 문제</h2>
         <p class="text-sm text-gray-500 mt-1">변환한 교재 폴더(<b>OneDrive\Claude\JSON변환</b>)를 한 번 불러오면 이 브라우저에 저장되고, 교과 → 교재 → 단원 순서로 문제를 고를 수 있습니다. 같은 파일을 다시 불러오면 새 내용으로 바뀝니다.</p>
       </div>
       <div class="book-mode flex gap-1" role="tablist">
-        <button type="button" data-m="book" onclick="bookSetMode('book')">📘 시중 교재</button>
-        <button type="button" data-m="ebs" onclick="bookSetMode('ebs')">📝 EBS 수능·모의고사</button>
+        <button type="button" data-m="book" onclick="bookSetMode('book')"><i data-lucide="book-open"></i>시중 교재</button>
+        <button type="button" data-m="ebs" onclick="bookSetMode('ebs')"><i data-lucide="file-plus"></i>EBS 수능·모의고사</button>
       </div>
       <div class="flex flex-wrap gap-2 items-center">
-        <label for="any-file" class="cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-bold shadow">📂 JSON 불러오기</label>
-        <button type="button" onclick="importFolder()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-bold shadow">📁 폴더째 불러오기</button>
+        <label for="any-file" class="cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-semibold shadow"><i data-lucide="folder-open"></i>JSON 불러오기</label>
+        <button type="button" onclick="importFolder()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-semibold shadow"><i data-lucide="folder"></i>폴더째 불러오기</button>
         <span id="book-stats" class="text-xs text-gray-600 ml-auto"></span>
       </div>
     </div>
@@ -321,24 +323,24 @@ input.dn-over[type=number]{border-color:#ef4444!important;background:#fef2f2!imp
           <div class="flex gap-1"><button type="button" onclick="selectAllUnits(true,'b')" class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-2 py-1 rounded font-semibold">전체 선택</button><button type="button" onclick="selectAllUnits(false,'b')" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-2 py-1 rounded font-semibold">선택 해제</button></div>
         </div>
         <div id="bunit-list" class="space-y-2 max-h-96 overflow-y-auto pr-1"></div>
-        <p id="bunit-total" class="text-right text-sm font-bold text-indigo-600 mt-2"></p>
+        <p id="bunit-total" class="text-right text-sm font-semibold text-indigo-600 mt-2"></p>
       </div>
-      <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition shadow-md">다음: 난이도·문항 수 선택 ➔</button>
+      <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-lg transition shadow-md">다음: 난이도·문항 수 선택<i data-lucide="arrow-right"></i></button>
     </form>
   </section>
 
   <section id="tab-editor" class="hidden space-y-6">
     <div class="flex flex-col sm:flex-row justify-between items-center bg-white p-4 rounded-xl shadow-md gap-4">
       <div>
-        <h2 class="text-lg font-bold text-gray-900">📝 추출 문제 검수 및 시험지 저장</h2>
+        <h2 class="text-lg font-semibold text-gray-900">추출 문제 검수 및 시험지 저장</h2>
         <p class="text-sm text-gray-500">문항·그림을 고친 뒤 <b>시험지 저장</b>을 누르면 이 브라우저의 출제 문제에 저장됩니다. 한글 파일이 필요하면 <b>다운로드</b>를 누르세요. (시험지 틀은 미리보기에서 선택)</p>
       </div>
       <div class="space-x-2">
         <button onclick="switchTab(srcTab())" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg font-medium transition text-sm">← 조건 다시 선택</button>
-        <button onclick="switchTab('preview')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition text-sm">👁 미리보기</button>
-        <button onclick="addNewQuestion()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium transition text-sm">➕ 문제 추가</button>
-        <button onclick="saveExamNow()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition text-sm">💾 시험지 저장</button>
-        <button onclick="exportHwpx()" class="bg-gray-700 text-white px-4 py-2 rounded-lg font-medium transition text-sm">⬇ 다운로드 (.hwpx)</button>
+        <button onclick="switchTab('preview')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition text-sm"><i data-lucide="eye"></i>미리보기</button>
+        <button onclick="addNewQuestion()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium transition text-sm"><i data-lucide="plus"></i>문제 추가</button>
+        <button onclick="saveExamNow()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition text-sm"><i data-lucide="save"></i>시험지 저장</button>
+        <button onclick="exportHwpx()" class="bg-gray-700 text-white px-4 py-2 rounded-lg font-medium transition text-sm"><i data-lucide="download"></i>다운로드 (.hwpx)</button>
       </div>
     </div>
     <div id="question-list" class="space-y-4"></div>
@@ -352,7 +354,7 @@ input.dn-over[type=number]{border-color:#ef4444!important;background:#fef2f2!imp
 
   <section id="tab-diff" class="hidden bg-white rounded-xl shadow-md p-6 max-w-3xl mx-auto space-y-4">
     <div class="border-b pb-3">
-      <h2 class="text-xl font-bold text-gray-900">🎚 난이도별 문항 수 선택</h2>
+      <h2 class="text-xl font-semibold text-gray-900">난이도별 문항 수 선택</h2>
       <p class="text-sm text-gray-500 mt-1">선택한 단원마다 상·중·하 문항 수를 입력하세요.</p>
     </div>
     <div>
@@ -360,20 +362,20 @@ input.dn-over[type=number]{border-color:#ef4444!important;background:#fef2f2!imp
       <input type="text" id="exam-name" value="과학 맞춤 시험지" placeholder="시험지 이름을 입력하세요" class="w-full border rounded-lg p-3">
     </div>
     <div id="diff-list" class="space-y-2"></div>
-    <p id="diff-total" class="text-right text-sm font-bold text-indigo-600"></p>
+    <p id="diff-total" class="text-right text-sm font-semibold text-indigo-600"></p>
     <div class="flex gap-2">
       <button onclick="switchTab(srcTab())" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-3 rounded-lg font-medium text-sm">← 단원 다시 선택</button>
-      <button onclick="extractNow()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg shadow-md">문제 추출 및 미리보기 ➔</button>
+      <button onclick="extractNow()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg shadow-md">문제 추출 및 미리보기<i data-lucide="arrow-right"></i></button>
     </div>
   </section>
 
   <section id="tab-preview" class="hidden space-y-4">
     <div id="pv-controls" class="bg-white rounded-xl shadow-md p-4 max-w-4xl mx-auto flex flex-wrap items-center gap-4">
       <button onclick="switchTab('diff')" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-2 rounded-lg font-medium text-sm">← 난이도 다시 선택</button>
-      <button onclick="switchTab('editor')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg font-medium text-sm">✏ 문항 편집</button>
+      <button onclick="switchTab('editor')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg font-medium text-sm"><i data-lucide="pencil"></i>문항 편집</button>
       <label class="text-sm flex items-center gap-2 flex-1 min-w-[14rem]">시험지 이름 <input type="text" id="pv-name" oninput="$('exam-name').value=this.value;renderPreview()" class="flex-1 border rounded-lg p-2 text-sm"></label>
       <label class="text-sm flex items-center gap-2">문제 간격 <input type="range" id="pv-gap" min="0" max="200" step="4" value="40" oninput="renderPreview()"><span id="pv-gap-v" class="w-12 text-xs text-gray-500"></span></label>
-      <span class="text-xs text-gray-400 w-full order-last">💡 문제 사이 빈 줄을 클릭하고 Enter: 빈 줄 추가 · Backspace: 빈 줄 삭제</span>
+      <span class="text-xs text-gray-400 w-full order-last">문제 사이 빈 줄을 클릭하고 Enter: 빈 줄 추가 · Backspace: 빈 줄 삭제</span>
       <div class="flex items-center gap-3 text-sm"><span class="font-semibold text-gray-600">시험지 틀</span>
         <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="exam-tpl" value="1" checked onchange="renderPreview()" class="w-4 h-4 accent-indigo-600">시험지1(학습지)</label>
         <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="exam-tpl" value="2" onchange="renderPreview()" class="w-4 h-4 accent-indigo-600">시험지2(정기고사)</label>
@@ -381,9 +383,9 @@ input.dn-over[type=number]{border-color:#ef4444!important;background:#fef2f2!imp
       </div>
       <label class="text-sm cursor-pointer"><input type="checkbox" id="pv-ans" onchange="renderPreview()" class="mr-1">정답·해설 포함</label>
       <label class="text-sm flex items-center gap-2" title="수업을 고르면 그 수업 학생의 개인 페이지에 이 시험지가 보입니다">수업 <select id="pv-cls" onchange="pvSetClass(this.value)" class="border rounded-lg p-2 text-sm"></select></label>
-      <button onclick="saveExamNow()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium text-sm">💾 시험지 저장</button>
-      <button onclick="exportHwpx()" class="bg-gray-700 text-white px-4 py-2 rounded-lg font-medium text-sm">⬇ 다운로드 (.hwpx)</button>
-      <button onclick="window.print()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium text-sm">🖨 인쇄</button>
+      <button onclick="saveExamNow()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium text-sm"><i data-lucide="save"></i>시험지 저장</button>
+      <button onclick="exportHwpx()" class="bg-gray-700 text-white px-4 py-2 rounded-lg font-medium text-sm"><i data-lucide="download"></i>다운로드 (.hwpx)</button>
+      <button onclick="window.print()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium text-sm"><i data-lucide="printer"></i>인쇄</button>
     </div>
     <div id="pv-paper" class="bg-white rounded-xl shadow-md p-8 max-w-4xl mx-auto"></div>
   </section>
@@ -392,12 +394,12 @@ input.dn-over[type=number]{border-color:#ef4444!important;background:#fef2f2!imp
     <div id="past-controls" class="bg-white rounded-xl shadow-md p-6 max-w-5xl mx-auto space-y-4">
       <div class="flex flex-wrap gap-3 items-center justify-between border-b pb-3">
         <div>
-          <h2 id="past-title" class="text-xl font-bold text-gray-900">📚 기출 문제</h2>
+          <h2 id="past-title" class="text-xl font-semibold text-gray-900">기출 문제</h2>
           <p id="past-desc" class="text-sm text-gray-500 mt-1">학교·학년·과목·년도·학기·차수를 고르면 해당 시험지가 표시됩니다.</p>
         </div>
         <div class="flex gap-2 items-center">
-          <label for="any-file" class="cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-bold shadow">📂 JSON 불러오기</label>
-          <button type="button" onclick="importFolder()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-bold shadow">📁 폴더째 불러오기</button>
+          <label for="any-file" class="cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-semibold shadow"><i data-lucide="folder-open"></i>JSON 불러오기</label>
+          <button type="button" onclick="importFolder()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-semibold shadow"><i data-lucide="folder"></i>폴더째 불러오기</button>
           <span id="past-stats" class="text-xs text-gray-600"></span>
         </div>
       </div>
@@ -405,18 +407,18 @@ input.dn-over[type=number]{border-color:#ef4444!important;background:#fef2f2!imp
       <div class="flex items-center gap-4 flex-wrap">
         <label class="text-sm cursor-pointer"><input type="checkbox" id="past-answers" onchange="renderPast(curPast)" class="mr-1">정답·해설 포함</label>
         <select id="past-set" onchange="renderPast(curPast)" class="border rounded-lg p-2 text-sm"><option value="0">원본</option></select>
-        <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition text-sm">🖨 인쇄</button>
-        <button onclick="pastDownload()" class="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded-lg font-medium transition text-sm">⬇ 다운로드 (.hwpx)</button>
+        <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition text-sm"><i data-lucide="printer"></i>인쇄</button>
+        <button onclick="pastDownload()" class="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded-lg font-medium transition text-sm"><i data-lucide="download"></i>다운로드 (.hwpx)</button>
       </div>
       <div class="flex items-center gap-4 flex-wrap text-sm">
-        <span class="font-bold text-gray-600">시험지 틀</span>
+        <span class="font-semibold text-gray-600">시험지 틀</span>
         <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="past-tpl" value="1" checked onchange="renderPast(curPast)" class="w-4 h-4 accent-indigo-600">시험지1(학습지)</label>
         <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="past-tpl" value="2" onchange="renderPast(curPast)" class="w-4 h-4 accent-indigo-600">시험지2(정기고사)</label>
         <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="past-tpl" value="3" onchange="renderPast(curPast)" class="w-4 h-4 accent-indigo-600">시험지3(모의평가)</label>
       </div>
       <div class="flex items-center gap-2 flex-wrap border-t pt-3">
-        <label class="text-sm cursor-pointer"><input type="checkbox" id="past-edit" onchange="renderPast(curPast)" class="mr-1">🖼 그림 넣기·바꾸기</label>
-        <label for="past-figs" class="cursor-pointer bg-white hover:bg-gray-50 border px-3 py-2 rounded-lg text-xs font-bold" title="파일 이름의 숫자를 문항 번호로 봅니다 (예: 5.png, q05.png, 5번.jpg)">🖼 그림 파일 한꺼번에 넣기</label>
+        <label class="text-sm cursor-pointer"><input type="checkbox" id="past-edit" onchange="renderPast(curPast)" class="mr-1"><i data-lucide="image"></i>그림 넣기·바꾸기</label>
+        <label for="past-figs" class="cursor-pointer bg-white hover:bg-gray-50 border px-3 py-2 rounded-lg text-xs font-semibold" title="파일 이름의 숫자를 문항 번호로 봅니다 (예: 5.png, q05.png, 5번.jpg)"><i data-lucide="image"></i>그림 파일 한꺼번에 넣기</label>
         <input type="file" id="past-figs" accept="image/*" multiple class="hidden" onchange="pastFigFiles(this)">
       </div>
     </div>
@@ -893,7 +895,7 @@ function bookSubj() {
   const names = Object.keys(by).sort((a, b) => exRank(a) - exRank(b) || a.localeCompare(b, 'ko'));
   const chip = (cls, val, label, n) => `<label><input type="checkbox" class="${cls} accent-indigo-600" value="${esc(val)}" checked onchange="bookPick()">${esc(label)} <span class="text-xs text-gray-400">${n}</span></label>`;
   $('book-list').innerHTML = names.length ? names.map(b => chip('bk-b', b, b, by[b])).join('')
-    : `<p class="text-sm text-gray-400">${bookRecs().length ? `이 교과의 ${ebs ? 'EBS' : '교재'} 문제가 없습니다.` : '먼저 📁 폴더째 불러오기로 JSON변환 폴더를 고르세요.'}</p>`;
+    : `<p class="text-sm text-gray-400">${bookRecs().length ? `이 교과의 ${ebs ? 'EBS' : '교재'} 문제가 없습니다.` : '먼저 폴더째 불러오기로 JSON변환 폴더를 고르세요.'}</p>`;
   $('book-years-box').classList.toggle('hidden', !ebs || !names.length);
   $('book-years').innerHTML = ebs ? Object.keys(ys).sort((a, b) => b.localeCompare(a)).map(y => chip('bk-y', y, y ? y + '년' : '연도 모름', ys[y])).join('') : '';
   bookPick();
@@ -942,7 +944,7 @@ async function bookLoad(recs) {
       const arr = await bookArr(f);
       rs.forEach(r => { const q = arr[r.i]; if (q && q.unit === r.unit && valid(q)) got.set(r, q); });
     }
-  } catch(e) { toast('교재 파일을 읽지 못했습니다. 📁 폴더째 불러오기로 JSON변환 폴더를 다시 불러와 주세요.'); return null; }
+  } catch(e) { toast('교재 파일을 읽지 못했습니다. 폴더째 불러오기로 JSON변환 폴더를 다시 불러와 주세요.'); return null; }
   if (got.size < recs.length) toast(`교재 파일이 바뀌어 ${recs.length - got.size}문항을 찾지 못했습니다. 교재 JSON을 다시 불러오면 목록이 새로 만들어집니다.`);
   return recs.map(r => got.get(r)).filter(Boolean);
 }
@@ -1031,13 +1033,13 @@ async function importAny(files) {
   bkRefresh();
   const L = [];
   if (c.q || c.dup) L.push(`단원별 문제 +${c.q}` + (c.dup ? ` (중복 제외 ${c.dup})` : ''));
-  if (c.img) L.push(`🖼 기존 문제에 그림 ${c.img}개 추가`);
+  if (c.img) L.push(`기존 문제에 그림 ${c.img}개 추가`);
   if (c.past || c.prep) L.push(`기출 시험지 +${c.past}` + (c.prep ? ` · 새 내용으로 바꿈 ${c.prep}` : ''));
   if (c.book) L.push(`시중 교재 문제 ${c.book}개`);
   if (c.ebs) L.push(`EBS 문제 ${c.ebs}개`);
   if (c.bk) L.push(`백업 ${c.bk}개: 학생 +${c.st} · 시험지 +${c.ex} · 풀이 기록 +${c.rs}`);
-  if (c.unk) L.push(`⚠ 단원명이 목록과 다른 문제 ${c.unk}개 (추출되지 않을 수 있음)`);
-  if (c.bad) L.push(`⚠ 형식을 알 수 없는 파일 ${c.bad}개: ${badN.slice(0, 3).join(', ')}${badN.length > 3 ? ' 등' : ''}`);
+  if (c.unk) L.push(`단원명이 목록과 다른 문제 ${c.unk}개 (추출되지 않을 수 있음)`);
+  if (c.bad) L.push(`형식을 알 수 없는 파일 ${c.bad}개: ${badN.slice(0, 3).join(', ')}${badN.length > 3 ? ' 등' : ''}`);
   toast(`불러오기 완료 (파일 ${list.length}개)\n` + (L.join('\n') || '새로 추가된 내용이 없습니다'));
 }
 let diffUnits = [], pvExtra = [];
@@ -1109,8 +1111,8 @@ function renderPreview() {
   if (document.activeElement !== $('pv-name')) $('pv-name').value = examName();
   const qs = currentQuestions;
   $('pv-paper').innerHTML = qrBox(tpl) + pvHead(tpl, qs.length) + '<div class="pv-cols">' +
-    qs.map((q, i) => `<div class="pq">${i ? `<div class="pvgap" tabindex="0" data-i="${i}" onkeydown="pvKey(event,${i})" style="height:${Math.max(0, +gap + 24*(pvExtra[i]||0))}px"></div>` : ''}${q.imageOnly ? `<p class="font-bold">${i+1}. </p>${q.image ? `<img src="${esc(q.image)}" data-rn="${i}" class="my-1 w-full">` : ''}` : fmtQ(q.question, i + 1, q.image ? `<img src="${esc(q.image)}" class="my-2 max-h-64">` : '')}${bareChoices(q) ? '' : (q.choices || []).map(c => `<p class="ml-4 text-sm">${fx(c)}</p>`).join('')}</div>`).join('') + '</div>' +
-    (ans ? `<div class="pq border-t pt-4 mt-8"><h3 class="font-bold mb-2">[정답 및 해설]</h3>${qs.map((q, i) => `<p class="text-sm">${i+1}번 정답: ${fx(q.answer)} ${q.explanation ? '해설: ' + fx(q.explanation) : ''}</p>`).join('')}</div>` : '');
+    qs.map((q, i) => `<div class="pq">${i ? `<div class="pvgap" tabindex="0" data-i="${i}" onkeydown="pvKey(event,${i})" style="height:${Math.max(0, +gap + 24*(pvExtra[i]||0))}px"></div>` : ''}${q.imageOnly ? `<p class="font-semibold">${i+1}. </p>${q.image ? `<img src="${esc(q.image)}" data-rn="${i}" class="my-1 w-full">` : ''}` : fmtQ(q.question, i + 1, q.image ? `<img src="${esc(q.image)}" class="my-2 max-h-64">` : '')}${bareChoices(q) ? '' : (q.choices || []).map(c => `<p class="ml-4 text-sm">${fx(c)}</p>`).join('')}</div>`).join('') + '</div>' +
+    (ans ? `<div class="pq border-t pt-4 mt-8"><h3 class="font-semibold mb-2">[정답 및 해설]</h3>${qs.map((q, i) => `<p class="text-sm">${i+1}번 정답: ${fx(q.answer)} ${q.explanation ? '해설: ' + fx(q.explanation) : ''}</p>`).join('')}</div>` : '');
   // 그림 문항: 그림 속 원래 번호를 시험지 번호로 바꾸고, 따로 붙인 번호 줄은 숨김
   $('pv-paper').querySelectorAll('img[data-rn]').forEach(img => {
     const i = +img.dataset.rn, q = qs[i];
@@ -1210,33 +1212,33 @@ function renderEditor() {
     d.className = 'bg-white p-6 rounded-xl shadow-md space-y-4 border border-gray-100';
     d.innerHTML = `
       <div class="flex justify-between items-center border-b pb-3">
-        <span class="font-bold text-indigo-600">문항 ${i+1} (${esc(q.grade)} / ${esc(q.unit)})${q.type ? ` <span class="text-xs bg-indigo-50 text-indigo-600 rounded px-2 py-0.5">${esc(q.type)}</span>` : ''}</span>
+        <span class="font-semibold text-indigo-600">문항 ${i+1} (${esc(q.grade)} / ${esc(q.unit)})${q.type ? ` <span class="text-xs bg-indigo-50 text-indigo-600 rounded px-2 py-0.5">${esc(q.type)}</span>` : ''}</span>
         <div class="flex items-center gap-1 text-sm">
           <button onclick="moveQuestion(${i},-1)" ${i ? '' : 'disabled'} class="px-2 py-1 bg-gray-100 hover:bg-gray-200 disabled:opacity-30" title="위로">▲</button>
           <button onclick="moveQuestion(${i},1)" ${i < currentQuestions.length - 1 ? '' : 'disabled'} class="px-2 py-1 bg-gray-100 hover:bg-gray-200 disabled:opacity-30" title="아래로">▼</button>
-          <button onclick="replaceQuestion(${i})" class="px-2 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold" title="같은 단원·난이도의 다른 문제로 교체">🔄 다른 문제</button>
+          <button onclick="replaceQuestion(${i})" class="px-2 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold" title="같은 단원·난이도의 다른 문제로 교체"><i data-lucide="refresh-cw"></i>다른 문제</button>
           <button onclick="deleteQuestion(${i})" class="px-2 py-1 text-red-500 hover:text-red-700 font-semibold">삭제</button>
         </div>
       </div>
       <div>
-        <label class="block text-xs font-bold text-gray-500 mb-1">질문 내용</label>
+        <label class="block text-xs font-semibold text-gray-500 mb-1">질문 내용</label>
         <textarea rows="3" oninput="currentQuestions[${i}].question=this.value" class="w-full border rounded-lg p-2 text-sm">${esc(q.question)}</textarea>
       </div>
       <div class="flex items-center gap-3 flex-wrap">
         ${q.image ? `<img src="${esc(q.image)}" class="max-h-40 border rounded">` : '<span class="text-xs text-gray-400">그림 없음</span>'}
-        <label class="cursor-pointer text-xs bg-gray-100 hover:bg-gray-200 rounded px-3 py-2 font-bold">🖼 그림 ${q.image ? '교체' : '첨부'}
+        <label class="cursor-pointer text-xs bg-gray-100 hover:bg-gray-200 rounded px-3 py-2 font-semibold"><i data-lucide="image"></i>그림 ${q.image ? '교체' : '첨부'}
           <input type="file" accept="image/png,image/jpeg" class="hidden" onchange="setImage(${i},this.files[0])"></label>
         ${q.image ? `<button onclick="delete currentQuestions[${i}].image;renderEditor()" class="text-xs text-red-500">그림 삭제</button>` : ''}
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-        ${q.choices.map((ch, k) => `<div><label class="block text-xs font-bold text-gray-500 mb-1">보기 ${k+1}</label>
+        ${q.choices.map((ch, k) => `<div><label class="block text-xs font-semibold text-gray-500 mb-1">보기 ${k+1}</label>
           <input type="text" value="${esc(ch)}" oninput="currentQuestions[${i}].choices[${k}]=this.value" class="w-full border rounded-lg p-2 text-sm"></div>`).join('')}
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-        <div><label class="block text-xs font-bold text-gray-500 mb-1">정답</label>
+        <div><label class="block text-xs font-semibold text-gray-500 mb-1">정답</label>
           <div class="flex gap-1">${[1,2,3,4,5].map(n => `<button type="button" data-n="${n}" onclick="setAnswer(${i},${n},this)" class="ans-btn flex-1 border py-1.5 text-lg ${numAns(q.answer) === n ? 'ans-on' : ''}">${circ(n)}</button>`).join('')}</div>
           ${numAns(q.answer) ? '' : `<input type="text" value="${esc(q.answer)}" oninput="currentQuestions[${i}].answer=this.value" placeholder="주관식 정답" class="w-full border rounded-lg p-2 text-sm mt-1">`}</div>
-        <div><label class="block text-xs font-bold text-gray-500 mb-1">해설</label>
+        <div><label class="block text-xs font-semibold text-gray-500 mb-1">해설</label>
           <input type="text" value="${esc(q.explanation)}" oninput="currentQuestions[${i}].explanation=this.value" class="w-full border rounded-lg p-2 text-sm"></div>
       </div>`;
     c.appendChild(d);
@@ -1367,7 +1369,7 @@ function askSplit(s) {
   while ((m = re.exec(s)) && m.index < q) k = m.index + 1;
   return k > 0 ? [s.slice(0, k).trim(), s.slice(k).trim()] : [s, ''];
 }
-const qHtml = s => qSegs(s).map(g => g.t === 'tbl' ? `<table class="qtbl">${g.rows.map(r => `<tr>${r.map(c => `<td>${fx(c)}</td>`).join('')}</tr>`).join('')}</table>` : `<div class="font-bold whitespace-pre-wrap">${fx(g.s)}</div>`).join('');
+const qHtml = s => qSegs(s).map(g => g.t === 'tbl' ? `<table class="qtbl">${g.rows.map(r => `<tr>${r.map(c => `<td>${fx(c)}</td>`).join('')}</tr>`).join('')}</table>` : `<div class="font-semibold whitespace-pre-wrap">${fx(g.s)}</div>`).join('');
 /* 문단: cfg = [paraPrIDRef, styleIDRef, charPrIDRef] */
 let hxEqN = 0;
 const hxEq = (a, b) => { const id = 1800000000 + (++hxEqN), w = Math.max(a.length, b.length) * 520 + 500; return `<hp:equation id="${id}" zOrder="0" numberingType="EQUATION" textWrap="TOP_AND_BOTTOM" textFlow="BOTH_SIDES" lock="0" dropcapstyle="None" version="Equation Version 60" baseLine="66" textColor="#000000" baseUnit="1000" lineMode="CHAR" font="HancomEQN"><hp:sz width="${w}" widthRelTo="ABSOLUTE" height="2250" heightRelTo="ABSOLUTE" protect="0"/><hp:pos treatAsChar="1" affectLSpacing="0" flowWithText="1" allowOverlap="0" holdAnchorAndSO="0" vertRelTo="PARA" horzRelTo="PARA" vertAlign="TOP" horzAlign="LEFT" vertOffset="0" horzOffset="0"/><hp:outMargin left="56" right="56" top="0" bottom="0"/><hp:shapeComment>수식입니다.</hp:shapeComment><hp:script>{${X(a)}} over {${X(b)}}</hp:script></hp:equation>`; };
@@ -1479,14 +1481,14 @@ function renderPastSelects() {
   const box = $('past-selects'); box.innerHTML = '';
   const vm = pastMode === 'var';
   $('past-set').style.display = vm ? '' : 'none';
-  $('past-title').textContent = vm ? '🔄 기출 변형 문제' : '📚 기출 문제';
+  $('past-title').textContent = vm ? '기출 변형 문제' : '기출 문제';
   $('past-desc').textContent = vm ? '기출 시험지를 고른 뒤 변형 세트(1~5)를 선택하면 해당 변형 문제가 표시됩니다.' : '학교·학년·과목·년도·학기·차수를 고르면 해당 시험지가 표시됩니다.';
   let pool = vm ? pastDB.filter(x => (x.variants || []).length) : pastDB;
   PF.forEach((f, idx) => {
     const vals = [...new Set(pool.map(x => x[f]))].sort((a, b) => a.localeCompare(b, 'ko', {numeric:true}));
     if (!vals.includes(pastSel[f])) pastSel[f] = vals[0];
     const w = document.createElement('div');
-    w.innerHTML = `<label class="block text-xs font-bold text-gray-500 mb-1">${PL[f]}</label><select class="w-full border rounded-lg p-2 text-sm">${vals.map(v => `<option value="${esc(v)}" ${v === pastSel[f] ? 'selected' : ''}>${esc(sfx(v, PD[f] || ''))}</option>`).join('')}</select>`;
+    w.innerHTML = `<label class="block text-xs font-semibold text-gray-500 mb-1">${PL[f]}</label><select class="w-full border rounded-lg p-2 text-sm">${vals.map(v => `<option value="${esc(v)}" ${v === pastSel[f] ? 'selected' : ''}>${esc(sfx(v, PD[f] || ''))}</option>`).join('')}</select>`;
     w.querySelector('select').onchange = e => { pastSel[f] = e.target.value; PF.slice(idx + 1).forEach(k => delete pastSel[k]); renderPastSelects(); };
     box.appendChild(w);
     pool = pool.filter(x => x[f] === pastSel[f]);
@@ -1522,12 +1524,12 @@ function renderPast(x) {
   sel.innerHTML = (pastMode === 'var' ? '' : '<option value="0">원본</option>') + Array.from({length:nv}, (_, k) => `<option value="${k+1}">변형 ${k+1}세트</option>`).join('');
   sel.value = cur;
   const qs = cur ? (x.variants[cur-1].questions || []) : x.questions, ed = $('past-edit').checked;
-  const tools = (q, i) => !ed ? '' : `<div class="no-print flex gap-2 items-center my-1"><label class="cursor-pointer text-xs border rounded-lg px-2 py-1 bg-white hover:bg-gray-50">🖼 ${q.image ? '그림 바꾸기' : '그림 넣기'}<input type="file" accept="image/*" class="hidden" onchange="pastFigPick(${i}, this)"></label>${q.image ? `<button onclick="pastFigDel(${i})" class="text-xs text-red-500">그림 지우기</button>` : ''}</div>`;
+  const tools = (q, i) => !ed ? '' : `<div class="no-print flex gap-2 items-center my-1"><label class="cursor-pointer text-xs border rounded-lg px-2 py-1 bg-white hover:bg-gray-50"><i data-lucide="image"></i>${q.image ? '그림 바꾸기' : '그림 넣기'}<input type="file" accept="image/*" class="hidden" onchange="pastFigPick(${i}, this)"></label>${q.image ? `<button onclick="pastFigDel(${i})" class="text-xs text-red-500">그림 지우기</button>` : ''}</div>`;
   const tpl = pastTpl();
   el.dataset.tpl = tpl;
   el.innerHTML = pvHead(tpl, qs.length, {qs: pastQs(x, qs), name: pastName(x, cur), id: null}) + '<div class="pv-cols">' +
     qs.map((q, i) => `<div class="pq mb-6">${fmtQ(q.question, i+1, (q.image ? `<img src="${esc(q.image)}" class="my-2 max-h-64">` : '') + tools(q, i))}${(q.choices || []).map(c => `<p class="ml-4 text-sm">${fx(c)}</p>`).join('')}</div>`).join('') + '</div>' +
-    (ans ? `<div class="pq border-t pt-4 mt-8"><h3 class="font-bold mb-2">[정답 및 해설]</h3>${qs.map((q, i) => `<p class="text-sm">${i+1}번 정답: ${fx(q.answer)} ${q.explanation ? '해설: ' + fx(q.explanation) : ''}</p>`).join('')}</div>` : '');
+    (ans ? `<div class="pq border-t pt-4 mt-8"><h3 class="font-semibold mb-2">[정답 및 해설]</h3>${qs.map((q, i) => `<p class="text-sm">${i+1}번 정답: ${fx(q.answer)} ${q.explanation ? '해설: ' + fx(q.explanation) : ''}</p>`).join('')}</div>` : '');
 }
 
 /* 기출 화면의 시험지 틀(시험지1·2·3)과 한글 파일 내려받기 */
@@ -1569,7 +1571,7 @@ async function pastFigFiles(inp) {
     try { q.image = await figData(f); ok.push(+m[1]); } catch(e) { miss.push(f.name); }
   }
   if (ok.length) { pastSave(); $('past-edit').checked = true; renderPast(curPast); }
-  toast(`그림 ${ok.length}개를 넣었습니다${ok.length ? ` (${ok.sort((a, b) => a - b).join(', ')}번)` : ''}` + (miss.length ? `\n⚠ 번호를 찾지 못한 파일: ${miss.join(', ')}` : ''));
+  toast(`그림 ${ok.length}개를 넣었습니다${ok.length ? ` (${ok.sort((a, b) => a - b).join(', ')}번)` : ''}` + (miss.length ? `\n번호를 찾지 못한 파일: ${miss.join(', ')}` : ''));
 }
 
 /* ===== 학생 ===== */
@@ -1607,24 +1609,24 @@ function stuGo(...v) { stuView = v; renderStu(); bkRefresh(); }
 function renderStu() {
   const b = $('stu-body'), [v, a, c] = stuView;
   if (v === 'grade') {
-    b.innerHTML = `<h2 class="text-xl font-bold text-center my-6">학년을 선택하세요</h2><div class="grid grid-cols-3 gap-3 max-w-xl mx-auto mb-6">${GR.map(g => `<button onclick="stuGo('list','${g}')" class="stu-btn text-lg">${g}</button>`).join('')}</div>
+    b.innerHTML = `<h2 class="text-xl font-semibold text-center my-6">학년을 선택하세요</h2><div class="grid grid-cols-3 gap-3 max-w-xl mx-auto mb-6">${GR.map(g => `<button onclick="stuGo('list','${g}')" class="stu-btn text-lg">${g}</button>`).join('')}</div>
       <div class="max-w-xl mx-auto border rounded-xl p-4 bg-indigo-50 space-y-2 mb-4">
-        <b class="text-sm">☁ 서버(Supabase) 연결</b>
-        <div class="flex gap-2 flex-wrap"><button onclick="sbSetPin()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-bold">PIN 설정</button><button onclick="sbSyncStudents(true)" class="bg-white hover:bg-gray-100 border px-3 py-2 rounded-lg text-xs font-bold">학생 명단 동기화</button><button onclick="syncSB()" class="bg-white hover:bg-gray-100 border px-3 py-2 rounded-lg text-xs font-bold">지금 답 가져오기</button></div>
+        <b class="text-sm">서버(Supabase) 연결</b>
+        <div class="flex gap-2 flex-wrap"><button onclick="sbSetPin()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-semibold">PIN 설정</button><button onclick="sbSyncStudents(true)" class="bg-white hover:bg-gray-100 border px-3 py-2 rounded-lg text-xs font-semibold">학생 명단 동기화</button><button onclick="syncSB()" class="bg-white hover:bg-gray-100 border px-3 py-2 rounded-lg text-xs font-semibold">지금 답 가져오기</button></div>
         <p id="sb-status" class="text-xs text-gray-500">${sbOn() ? '' : '파일 맨 위 SB_CONFIG에 Supabase 주소·키·페이지 주소를 입력하면 사용할 수 있습니다.'}</p>
-        <p id="sync-status" class="text-xs text-gray-500">${syLast || (stuDB.pin ? '🔄 기기 연동 준비 중…' : '🔄 PIN을 설정하면 학생·수업·만든 시험지가 PC·휴대폰 사이에서 자동으로 맞춰집니다.')}</p>
+        <p id="sync-status" class="text-xs text-gray-500">${syLast || (stuDB.pin ? '기기 연동 준비 중…' : 'PIN을 설정하면 학생·수업·만든 시험지가 PC·휴대폰 사이에서 자동으로 맞춰집니다.')}</p>
       </div>
       <div class="max-w-xl mx-auto border rounded-xl p-4 bg-gray-50 space-y-2">
-        <b class="text-sm">💾 백업</b>
+        <b class="text-sm">백업</b>
         <p class="text-xs text-gray-500">학생·시험지·정오표·문제 DB·기출을 한 파일로 저장하고 다시 불러옵니다. 브라우저 데이터를 지우거나 컴퓨터를 바꾸기 전에 꼭 백업하세요.<br><span id="bk-last"></span></p>
-        <div class="flex gap-2 flex-wrap"><button onclick="exportBackup()" class="bg-gray-700 hover:bg-gray-800 text-white px-3 py-2 rounded-lg text-xs font-bold">⬇ 백업 파일 저장</button>
+        <div class="flex gap-2 flex-wrap"><button onclick="exportBackup()" class="bg-gray-700 hover:bg-gray-800 text-white px-3 py-2 rounded-lg text-xs font-semibold"><i data-lucide="download"></i>백업 파일 저장</button>
           <input type="file" id="bk-file" accept=".json" class="hidden" onchange="importBackup(this.files[0])">
-          <label for="bk-file" class="cursor-pointer bg-white hover:bg-gray-100 border px-3 py-2 rounded-lg text-xs font-bold">📂 백업 파일 불러오기 (합치기)</label></div>
+          <label for="bk-file" class="cursor-pointer bg-white hover:bg-gray-100 border px-3 py-2 rounded-lg text-xs font-semibold"><i data-lucide="folder-open"></i>백업 파일 불러오기 (합치기)</label></div>
         <p class="text-xs text-gray-400">※ 보안을 위해 PIN은 백업 파일에 들어가지 않습니다. 새 컴퓨터에서는 PIN 설정을 다시 해 주세요.</p>
       </div>`;
   } else if (v === 'name') {
     const q = (a || '').trim(), ss = q ? stuDB.students.filter(s => s.name.includes(q)).sort((x, y) => x.name.localeCompare(y.name, 'ko') || x.grade.localeCompare(y.grade, 'ko')) : [];
-    b.innerHTML = `<h2 class="text-xl font-bold text-center my-6">이름으로 학생 찾기</h2>
+    b.innerHTML = `<h2 class="text-xl font-semibold text-center my-6">이름으로 학생 찾기</h2>
       <input id="stu-q" type="search" value="${esc(q)}" placeholder="이름 일부를 입력하세요 (예: 민)" class="block w-full max-w-xl mx-auto border rounded-xl p-3 text-lg mb-5">
       ${q ? (ss.length ? `<div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-2 max-w-4xl mx-auto">${ss.map(s => `<button onclick="stuGo('detail','${s.id}')" class="stu-btn">${esc(s.name)}<span class="block text-xs font-normal text-gray-400 mt-0.5">${s.grade}${clsOf(s.id).length ? ' · ' + esc(clsOf(s.id).map(c => c.name).join(', ')) : ''}</span></button>`).join('')}</div>` : '<p class="text-center text-gray-400 py-10">찾는 학생이 없습니다.</p>')
         : `<p class="text-center text-gray-400 py-6">등록된 학생 ${stuDB.students.length}명</p>`}`;
@@ -1633,50 +1635,50 @@ function renderStu() {
     if (!q) i.focus();
   } else if (v === 'list') {
     const ss = stuDB.students.filter(s => s.grade === a).sort((x, y) => x.name.localeCompare(y.name, 'ko'));
-    b.innerHTML = `<div class="flex items-center gap-3 mb-4 flex-wrap"><button onclick="stuGo('grade')" class="stu-back">← 학년 선택</button><h2 class="text-xl font-bold">${a} 학생 (${ss.length}명)</h2>
-      <button onclick="issueAccounts(stuDB.students.filter(s => s.grade==='${a}').map(s => s.id), false)" class="stu-back ml-auto" title="계정이 없는 학생에게 아이디·임시 비밀번호를 만들고 카드를 인쇄합니다">🔑 계정 발급·카드 인쇄</button>
-      <form onsubmit="stuAdd(event,'${a}')" class="flex gap-2"><input id="stu-new" type="text" placeholder="학생 이름" class="border rounded-lg p-2 text-sm w-36"><button class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-sm font-bold">➕ 등록</button></form></div>` +
+    b.innerHTML = `<div class="flex items-center gap-3 mb-4 flex-wrap"><button onclick="stuGo('grade')" class="stu-back">← 학년 선택</button><h2 class="text-xl font-semibold">${a} 학생 (${ss.length}명)</h2>
+      <button onclick="issueAccounts(stuDB.students.filter(s => s.grade==='${a}').map(s => s.id), false)" class="stu-back ml-auto" title="계정이 없는 학생에게 아이디·임시 비밀번호를 만들고 카드를 인쇄합니다"><i data-lucide="key-round"></i>계정 발급·카드 인쇄</button>
+      <form onsubmit="stuAdd(event,'${a}')" class="flex gap-2"><input id="stu-new" type="text" placeholder="학생 이름" class="border rounded-lg p-2 text-sm w-36"><button class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-sm font-semibold">등록</button></form></div>` +
       (ss.length ? `<div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-2">${ss.map(s => `<button onclick="stuGo('detail','${s.id}')" class="stu-btn">${esc(s.name)}<span class="block text-xs font-normal text-gray-400 mt-0.5">${s.lid ? esc(s.lid) : '계정 없음'}</span></button>`).join('')}</div>` : '<p class="text-center text-gray-400 py-12">등록된 학생이 없습니다. 위에서 학생을 등록하세요.</p>');
   } else {
     const s = stuDB.students.find(x => x.id === a);
     if (!s) { stuGo('grade'); return; }
     const acct = s.lid ? `<span class="text-xs text-gray-500">아이디 <b class="text-gray-800">${esc(s.lid)}</b> · ${s.mustChange === false ? '비밀번호 변경함' : '임시 비밀번호 사용 중'}</span>` : '<span class="text-xs text-gray-400">계정 없음</span>';
-    const head = `<div class="flex items-center gap-3 mb-4 flex-wrap no-print"><button onclick="stuGo(${v === 'detail' ? `'list','${s.grade}'` : `'detail','${s.id}'`})" class="stu-back">← ${v === 'detail' ? s.grade + ' 학생 목록' : '학생 정보'}</button><h2 class="text-xl font-bold">${s.grade} ${esc(s.name)}</h2>${acct}
-      <div class="ml-auto flex gap-2 flex-wrap items-center"><button onclick="stuGo('report','${s.id}')" class="stu-back">📄 학습 보고서</button><button onclick="issueAccounts(['${s.id}'], true)" class="stu-back">🔑 ${s.lid ? '비밀번호 초기화' : '계정 발급'}</button><button onclick="stuDel('${s.id}')" class="text-xs text-red-500">학생 삭제</button></div></div>`;
+    const head = `<div class="flex items-center gap-3 mb-4 flex-wrap no-print"><button onclick="stuGo(${v === 'detail' ? `'list','${s.grade}'` : `'detail','${s.id}'`})" class="stu-back">← ${v === 'detail' ? s.grade + ' 학생 목록' : '학생 정보'}</button><h2 class="text-xl font-semibold">${s.grade} ${esc(s.name)}</h2>${acct}
+      <div class="ml-auto flex gap-2 flex-wrap items-center"><button onclick="stuGo('report','${s.id}')" class="stu-back"><i data-lucide="file-text"></i>학습 보고서</button><button onclick="issueAccounts(['${s.id}'], true)" class="stu-back"><i data-lucide="key-round"></i>${s.lid ? '비밀번호 초기화' : '계정 발급'}</button><button onclick="stuDel('${s.id}')" class="text-xs text-red-500">학생 삭제</button></div></div>`;
     if (v === 'report') {
       b.innerHTML = head + `<div class="no-print flex flex-wrap items-end gap-3 p-3 mb-5 bg-gray-50 rounded-xl border">
         <label class="text-xs text-gray-500">시작일<input type="date" id="rp-from" value="${rpFrom}" class="block p-2 text-sm"></label>
         <label class="text-xs text-gray-500">종료일<input type="date" id="rp-to" value="${rpTo}" class="block p-2 text-sm"></label>
         <button onclick="rpFrom='';rpTo='';stuGo('report','${s.id}')" class="stu-back">전체 기간</button>
-        <div class="ml-auto flex gap-2 flex-wrap"><button onclick="window.print()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold">🖨 보고서 인쇄</button>
-        <button onclick="rpVariant('${s.id}')" class="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-bold" title="선택한 기간에 틀린 문제와 같은 단원·난이도의 다른 문제로 시험지를 만듭니다">🔄 이 기간 틀린 문제로 변형 문제 출제</button></div></div><div id="rp-box"></div>`;
+        <div class="ml-auto flex gap-2 flex-wrap"><button onclick="window.print()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold"><i data-lucide="printer"></i>보고서 인쇄</button>
+        <button onclick="rpVariant('${s.id}')" class="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-semibold" title="선택한 기간에 틀린 문제와 같은 단원·난이도의 다른 문제로 시험지를 만듭니다"><i data-lucide="refresh-cw"></i>이 기간 틀린 문제로 변형 문제 출제</button></div></div><div id="rp-box"></div>`;
       const draw = () => { rpFrom = $('rp-from').value; rpTo = $('rp-to').value; $('rp-box').innerHTML = buildReport(teacherReportItems(s.id), {who: `${s.grade} ${s.name}`, from: rpFrom, to: rpTo}); };
       $('rp-from').onchange = draw; $('rp-to').onchange = draw; draw();
     } else if (v === 'entry') {
       const e = stuDB.exams.find(x => x.id === c);
       if (!e) { toast('답을 입력할 시험지를 선택하세요.'); stuGo('detail', a); return; }
       const old = (stuDB.results.find(r => r.studentId === a && r.examId === c) || {}).answers || [];
-      b.innerHTML = head + `<h3 class="font-bold mb-2">${esc(e.name)} · 답 입력 <span id="ans-count" class="text-sm font-normal text-gray-500"></span></h3>
+      b.innerHTML = head + `<h3 class="font-semibold mb-2">${esc(e.name)} · 답 입력 <span id="ans-count" class="text-sm font-normal text-gray-500"></span></h3>
         <div class="p-3 mb-3 bg-indigo-50 rounded-xl border border-indigo-100 space-y-2">
           <input id="ans-quick" type="text" inputmode="numeric" autocomplete="off" placeholder="한 번에 입력: 예) 24153 31245 (0 또는 - 는 빈 답)" class="w-full border rounded-lg p-2 text-sm tracking-widest">
-          <p class="text-xs text-gray-500">⌨ 문항 줄을 클릭한 뒤 숫자 <b>1~5</b>를 누르면 답이 체크되고 다음 문항으로 넘어갑니다 · <b>Backspace</b>: 지우고 이전 문항 · <b>↑↓</b>: 이동</p>
+          <p class="text-xs text-gray-500">문항 줄을 클릭한 뒤 숫자 <b>1~5</b>를 누르면 답이 체크되고 다음 문항으로 넘어갑니다 · <b>Backspace</b>: 지우고 이전 문항 · <b>↑↓</b>: 이동</p>
         </div><form onsubmit="stuSaveAns(event,'${a}','${c}')">` +
-        e.questions.map((q, i) => `<div class="ans-row flex items-center gap-3 border-b py-2 px-2 rounded" tabindex="0" data-i="${i}"><span class="w-12 font-bold">${i+1}번</span>${[1,2,3,4,5].map(n => `<label class="cursor-pointer text-lg"><input type="radio" name="a${i}" value="${n}" ${old[i] === n ? 'checked' : ''} tabindex="-1" class="mr-0.5 accent-indigo-600">${circ(n)}</label>`).join('')}</div>`).join('') +
-        `<button class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg">저장</button></form>`;
+        e.questions.map((q, i) => `<div class="ans-row flex items-center gap-3 border-b py-2 px-2 rounded" tabindex="0" data-i="${i}"><span class="w-12 font-semibold">${i+1}번</span>${[1,2,3,4,5].map(n => `<label class="cursor-pointer text-lg"><input type="radio" name="a${i}" value="${n}" ${old[i] === n ? 'checked' : ''} tabindex="-1" class="mr-0.5 accent-indigo-600">${circ(n)}</label>`).join('')}</div>`).join('') +
+        `<button class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg">저장</button></form>`;
       bindAnsEntry(e.questions.length);
     } else if (v === 'cls') {
       const cl = CL().find(x => x.id === c);
       if (!cl) { stuGo('detail', a); return; }
       const exs = clsExams(cl.id);
-      b.innerHTML = head + `<h3 class="font-bold mb-3">📚 ${esc(cl.name)} 수업에서 낸 시험지 (${exs.length})</h3><div class="space-y-2">${exs.map(e => {
+      b.innerHTML = head + `<h3 class="font-semibold mb-3">${esc(cl.name)} 수업에서 낸 시험지 (${exs.length})</h3><div class="space-y-2">${exs.map(e => {
         const r = stuDB.results.find(x => x.studentId === a && x.examId === e.id);
         const ok = r ? e.questions.filter((q, i) => r.answers[i] && r.answers[i] === numAns(q.answer)).length : 0;
-        return `<div class="flex items-center gap-3 border rounded-xl px-4 py-3 flex-wrap"><div class="flex-1 min-w-[12rem]"><div class="font-bold">${esc(e.name)}</div><div class="text-xs text-gray-500">${new Date(e.at).toLocaleDateString('ko-KR')} · ${e.questions.length}문항</div></div>
-          ${r ? `<span class="font-bold ${ok === e.questions.length ? 'text-emerald-600' : 'text-gray-800'}">${ok}/${e.questions.length}</span>` : '<span class="text-sm text-red-500">미제출</span>'}
-          <button onclick="exOpen('${e.id}')" class="stu-back">문제 보기</button><button onclick="stuGo('entry','${a}','${e.id}')" class="bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-bold">✏ 답 ${r ? '고치기' : '입력'}</button></div>`; }).join('') || '<p class="text-gray-400 text-center py-10">이 수업에서 아직 낸 시험지가 없습니다.</p>'}</div>`;
+        return `<div class="flex items-center gap-3 border rounded-xl px-4 py-3 flex-wrap"><div class="flex-1 min-w-[12rem]"><div class="font-semibold">${esc(e.name)}</div><div class="text-xs text-gray-500">${new Date(e.at).toLocaleDateString('ko-KR')} · ${e.questions.length}문항</div></div>
+          ${r ? `<span class="font-semibold ${ok === e.questions.length ? 'text-emerald-600' : 'text-gray-800'}">${ok}/${e.questions.length}</span>` : '<span class="text-sm text-red-500">미제출</span>'}
+          <button onclick="exOpen('${e.id}')" class="stu-back">문제 보기</button><button onclick="stuGo('entry','${a}','${e.id}')" class="bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-semibold"><i data-lucide="pencil"></i>답 ${r ? '고치기' : '입력'}</button></div>`; }).join('') || '<p class="text-gray-400 text-center py-10">이 수업에서 아직 낸 시험지가 없습니다.</p>'}</div>`;
     } else {
       const myCls = clsOf(a);
-      const clsBox = `<div class="mb-5"><h3 class="font-bold mb-2">📚 듣는 수업</h3>${myCls.length ? `<div class="flex gap-2 flex-wrap">${myCls.map(c => `<button onclick="stuGo('cls','${s.id}','${c.id}')" class="stu-btn px-4">${esc(c.name)}<span class="block text-xs font-normal text-gray-400 mt-0.5">시험지 ${clsExams(c.id).length}개</span></button>`).join('')}</div>` : '<p class="text-sm text-gray-400">아직 듣는 수업이 없습니다. 수업 탭에서 넣을 수 있습니다.</p>'}</div>`;
+      const clsBox = `<div class="mb-5"><h3 class="font-semibold mb-2">듣는 수업</h3>${myCls.length ? `<div class="flex gap-2 flex-wrap">${myCls.map(c => `<button onclick="stuGo('cls','${s.id}','${c.id}')" class="stu-btn px-4">${esc(c.name)}<span class="block text-xs font-normal text-gray-400 mt-0.5">시험지 ${clsExams(c.id).length}개</span></button>`).join('')}</div>` : '<p class="text-sm text-gray-400">아직 듣는 수업이 없습니다. 수업 탭에서 넣을 수 있습니다.</p>'}</div>`;
       const rs = stuDB.results.filter(r => r.studentId === a).sort((x, y) => y.at - x.at);
       const opts = stuDB.exams.slice().sort((x, y) => y.at - x.at).map(e => `<option value="${e.id}">${esc(e.name)} (${new Date(e.at).toLocaleDateString('ko-KR')} · ${e.questions.length}문항)</option>`).join('');
       const cards = rs.map(r => {
@@ -1685,13 +1687,13 @@ function renderStu() {
         const hasR = Array.isArray(r.retry);
         const rows = e.questions.map((q, i) => { const k = numAns(q.answer), st = r.answers[i] || 0, good = st && st === k; if (good) ok++;
           const ra = hasR ? r.retry[i] || 0 : 0, rg = ra && ra === k; if (rg) ok2++;
-          return `<tr class="${good ? '' : 'bg-red-50'}"><td>${i+1}</td><td class="text-left">${esc(q.unit)}</td><td>${dif(q)}</td><td>${circ(k) || esc(q.answer)}</td><td>${st ? circ(st) : '-'}</td><td class="font-bold ${good ? 'text-emerald-600' : 'text-red-500'}">${good ? 'O' : 'X'}</td>${hasR ? `<td>${good ? '' : ra ? circ(ra) : '-'}</td><td class="font-bold ${rg ? 'text-emerald-600' : 'text-red-500'}">${good ? '' : rg ? 'O' : 'X'}</td>` : ''}</tr>`; }).join('');
+          return `<tr class="${good ? '' : 'bg-red-50'}"><td>${i+1}</td><td class="text-left">${esc(q.unit)}</td><td>${dif(q)}</td><td>${circ(k) || esc(q.answer)}</td><td>${st ? circ(st) : '-'}</td><td class="font-semibold ${good ? 'text-emerald-600' : 'text-red-500'}">${good ? 'O' : 'X'}</td>${hasR ? `<td>${good ? '' : ra ? circ(ra) : '-'}</td><td class="font-semibold ${rg ? 'text-emerald-600' : 'text-red-500'}">${good ? '' : rg ? 'O' : 'X'}</td>` : ''}</tr>`; }).join('');
         return `<div class="border rounded-xl p-4 space-y-3"><div class="flex justify-between flex-wrap gap-2"><b>${esc(e.name)}</b><span class="text-sm text-gray-500">${new Date(r.at).toLocaleDateString('ko-KR')} · ${ok}/${e.questions.length}${hasR ? ` → 다시 풀기 후 ${ok2}/${e.questions.length}` : ''}</span></div>
           <table class="stu-tbl"><thead><tr><th>번호</th><th>단원</th><th>난이도</th><th>정답</th><th>학생 답</th><th>정오</th>${hasR ? '<th>다시 푼 답</th><th>정오</th>' : ''}</tr></thead><tbody>${rows}</tbody></table>
-          <button onclick="stuVariant('${e.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg">🔄 이 시험지의 변형문제 출제하기</button></div>`; }).join('');
-      b.innerHTML = head + clsBox + `<h3 class="font-bold mb-2">📝 전체 풀이 기록</h3><div class="flex gap-2 flex-wrap mb-5 p-3 bg-gray-50 rounded-xl border">
+          <button onclick="stuVariant('${e.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg"><i data-lucide="refresh-cw"></i>이 시험지의 변형문제 출제하기</button></div>`; }).join('');
+      b.innerHTML = head + clsBox + `<h3 class="font-semibold mb-2">전체 풀이 기록</h3><div class="flex gap-2 flex-wrap mb-5 p-3 bg-gray-50 rounded-xl border">
         <select id="stu-exam" class="flex-1 min-w-[12rem] border rounded-lg p-2 text-sm">${opts || '<option value="">저장된 시험지가 없습니다</option>'}</select>
-        <button onclick="stuGo('entry','${s.id}',$('stu-exam').value)" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-bold">✏ 답 입력</button></div>` +
+        <button onclick="stuGo('entry','${s.id}',$('stu-exam').value)" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold"><i data-lucide="pencil"></i>답 입력</button></div>` +
         `<div class="space-y-4">${cards || '<p class="text-center text-gray-400 py-10">아직 푼 시험지가 없습니다. 위에서 시험지를 선택해 답을 입력하세요.</p>'}</div>`;
     }
   }
@@ -1996,13 +1998,13 @@ async function syncState() {
       const local = syDoc(), ls = JSON.stringify(local);
       const ver = await sbCall('sb_state_ver', {p: stuDB.pin});
       if (ver === null || ver === undefined) throw new Error('서버에 update5 SQL이 없습니다');
-      if (ver === base.ver && ls === JSON.stringify(base.doc)) { syStat(`🔄 기기 연동됨 · ${new Date().toLocaleTimeString('ko-KR')} 확인`); break; }
+      if (ver === base.ver && ls === JSON.stringify(base.doc)) { syStat(`기기 연동됨 · ${new Date().toLocaleTimeString('ko-KR')} 확인`); break; }
       let merged = local, rs = JSON.stringify(base.doc);
       if (ver !== base.ver) { const g = await sbCall('sb_state_get', {p: stuDB.pin}); merged = syMerge(base.doc || {}, local, g.doc || {}); rs = JSON.stringify(g.doc || {}); }
       const ms = JSON.stringify(merged);
       let nv = ver;
       if (ms !== rs) {
-        syStat('🔄 서버에 올리는 중…');
+        syStat('서버에 올리는 중…');
         await syUpload(merged);
         nv = await sbCall('sb_state_put', {p: stuDB.pin, d: merged, base: ver});
         if (nv < 0) continue;
@@ -2015,10 +2017,10 @@ async function syncState() {
         if (fin !== merged) syAgain = true;
       }
       base.ver = nv; base.doc = merged; await idbSet(SYK, base).catch(() => {});
-      syStat(`🔄 기기 연동됨 · ${new Date().toLocaleTimeString('ko-KR')}` + (ms !== ls ? ' · 다른 기기 변경 반영' : ' · 올림'));
+      syStat(`기기 연동됨 · ${new Date().toLocaleTimeString('ko-KR')}` + (ms !== ls ? ' · 다른 기기 변경 반영' : ' · 올림'));
       break;
     }
-  } catch(e) { const m = String(e.message || e); syStat('🔄 기기 연동 실패: ' + (m.includes('bad pin') ? 'PIN이 맞지 않습니다.' : /sb_state_ver|PGRST202/.test(m) ? '서버에 연동 기능(update5 SQL)이 없습니다.' : '인터넷 연결을 확인하세요.')); }
+  } catch(e) { const m = String(e.message || e); syStat('기기 연동 실패: ' + (m.includes('bad pin') ? 'PIN이 맞지 않습니다.' : /sb_state_ver|PGRST202/.test(m) ? '서버에 연동 기능(update5 SQL)이 없습니다.' : '인터넷 연결을 확인하세요.')); }
   finally { syBusy = false; if (syAgain) sySoon(); }
 }
 setInterval(() => { if (!document.hidden) syncState(); }, 6000);
@@ -2049,8 +2051,8 @@ async function syncSB() {
     msgPollBadge();
     const up = await sbPushOldExams();
     if (up) toast(`예전 시험지 ${up}개의 해설·단원 정보를 서버에 올렸습니다. 이제 학생 화면에서도 보입니다.`);
-    if (st) st.textContent = `☁ 연결됨 · ${new Date().toLocaleTimeString('ko-KR')} 확인` + (n ? ` · 새 답 ${n}건 반영` : '');
-  } catch(e) { if (st) st.textContent = '☁ 연결 실패: PIN·서버 설정·인터넷을 확인하세요.'; }
+    if (st) st.textContent = `연결됨 · ${new Date().toLocaleTimeString('ko-KR')} 확인` + (n ? ` · 새 답 ${n}건 반영` : '');
+  } catch(e) { if (st) st.textContent = '연결 실패: PIN·서버 설정·인터넷을 확인하세요.'; }
 }
 /* ===== 학생 화면 (GitHub Pages 주소): 아이디·비밀번호 로그인 → 답안 제출(?e=코드) / 내 학습 페이지(?me=1) ===== */
 const tokGet = () => { try { return localStorage.getItem('sb_tok'); } catch(e) { return null; } };
@@ -2073,8 +2075,8 @@ function sbConfirm(title, note, items, okLabel) {
   return new Promise(res => {
     const blank = items.filter(x => !x.a).length, m = document.createElement('div');
     m.className = 'sb-modal';
-    m.innerHTML = `<div class="sb-sheet" role="dialog" aria-modal="true"><h2 class="text-lg font-bold">${title}</h2><p class="text-sm text-gray-500 mt-1">${note}</p>
-      ${blank ? `<p class="text-sm font-bold text-red-600 mt-2">답을 고르지 않은 문항이 ${blank}개 있습니다.</p>` : ''}
+    m.innerHTML = `<div class="sb-sheet" role="dialog" aria-modal="true"><h2 class="text-lg font-semibold">${title}</h2><p class="text-sm text-gray-500 mt-1">${note}</p>
+      ${blank ? `<p class="text-sm font-semibold text-red-600 mt-2">답을 고르지 않은 문항이 ${blank}개 있습니다.</p>` : ''}
       <div class="sb-grid">${items.map(x => `<div class="${x.a ? '' : 'blank'}">${x.no}번<b>${x.a ? circ(x.a) : '—'}</b></div>`).join('')}</div>
       <div class="flex gap-2"><button class="flex-1 sb-ghost" data-r="0">다시 확인</button><button class="flex-1 sb-primary" data-r="1">${okLabel}</button></div></div>`;
     m.querySelectorAll('button').forEach(b => b.onclick = () => { m.remove(); res(b.dataset.r === '1'); });
@@ -2099,7 +2101,7 @@ async function sbRoute() {
 }
 function sbLogin(note) {
   const R = sbR(); R.className = 'max-w-sm mx-auto p-4 space-y-4';
-  R.innerHTML = sbTop() + `<form id="sb-login" class="bg-white border rounded-xl p-5 space-y-3"><h1 class="text-xl font-bold">로그인</h1>${note ? `<p class="text-sm text-gray-600">${note}</p>` : ''}
+  R.innerHTML = sbTop() + `<form id="sb-login" class="bg-white border rounded-xl p-5 space-y-3"><h1 class="text-xl font-semibold">로그인</h1>${note ? `<p class="text-sm text-gray-600">${note}</p>` : ''}
     <input id="sb-lid" type="text" autocomplete="username" autocapitalize="off" placeholder="아이디 (예: sci홍길동)" class="w-full p-3">
     <input id="sb-pw" type="password" autocomplete="current-password" placeholder="비밀번호" class="w-full p-3">
     <button class="w-full sb-primary">로그인</button><p id="sb-err" class="text-sm text-red-600"></p>
@@ -2116,7 +2118,7 @@ function sbLogin(note) {
 }
 function sbChangePw(forced) {
   const R = sbR(); R.className = 'max-w-sm mx-auto p-4 space-y-4';
-  R.innerHTML = sbTop() + `<form id="sb-cpw" class="bg-white border rounded-xl p-5 space-y-3"><h1 class="text-xl font-bold">비밀번호 바꾸기</h1>
+  R.innerHTML = sbTop() + `<form id="sb-cpw" class="bg-white border rounded-xl p-5 space-y-3"><h1 class="text-xl font-semibold">비밀번호 바꾸기</h1>
     ${forced ? '<p class="text-sm text-gray-600">처음 로그인했습니다. 나만 아는 새 비밀번호로 바꿔 주세요.</p>' : ''}
     <input id="sb-old" type="password" autocomplete="current-password" placeholder="${forced ? '임시 비밀번호' : '지금 비밀번호'}" class="w-full p-3">
     <input id="sb-new" type="password" autocomplete="new-password" placeholder="새 비밀번호 (6자 이상)" class="w-full p-3">
@@ -2151,14 +2153,14 @@ function sbBindOpts(row, arr, i) {
 function sbAnswer(code, st) {
   const R = sbR(), n = st.n, ans = Array(n).fill(0);
   R.className = 'max-w-md mx-auto p-4 space-y-4';
-  R.innerHTML = sbTop() + `<div><h1 class="text-xl font-bold">${esc(st.name)}</h1><p class="text-sm text-gray-500">${n}문항 · 답을 모두 고른 뒤 제출하세요. 다시 누르면 선택이 지워집니다.</p></div>
-    <div id="sb-rows" class="bg-white rounded-xl border p-3 space-y-1.5">${Array.from({length: n}, (_, i) => `<div class="flex items-center gap-2" data-i="${i}"><span class="w-10 font-bold text-sm">${i+1}번</span>${sbOpts(0)}</div>`).join('')}</div>
+  R.innerHTML = sbTop() + `<div><h1 class="text-xl font-semibold">${esc(st.name)}</h1><p class="text-sm text-gray-500">${n}문항 · 답을 모두 고른 뒤 제출하세요. 다시 누르면 선택이 지워집니다.</p></div>
+    <div id="sb-rows" class="bg-white rounded-xl border p-3 space-y-1.5">${Array.from({length: n}, (_, i) => `<div class="flex items-center gap-2" data-i="${i}"><span class="w-10 font-semibold text-sm">${i+1}번</span>${sbOpts(0)}</div>`).join('')}</div>
     <button id="sb-go" class="w-full sb-primary">제출하기</button><a href="?me=1" class="block text-center underline text-sm text-gray-500">내 학습 페이지</a>`;
   sbBindTop();
   [...$('sb-rows').children].forEach((row, i) => sbBindOpts(row, ans, i));
   $('sb-go').onclick = async () => {
     if (!await sbConfirm('답안을 제출할까요?', '처음 제출한 답으로 점수와 등수가 정해집니다. 제출 후 틀린 문제는 한 번만 다시 풀 수 있습니다.', ans.map((a, i) => ({no: i + 1, a})), '제출하기')) return;
-    try { sbResult(code, await sbCall('sb_submit2', {t: tokGet(), c: code, ans}), '✅ 제출했습니다.'); } catch(e) { sbFail(e); }
+    try { sbResult(code, await sbCall('sb_submit2', {t: tokGet(), c: code, ans}), '제출했습니다.'); } catch(e) { sbFail(e); }
   };
 }
 /* 제출 결과: O·X를 누르면 해설, 틀린 문제는 한 번만 다시 풀기 */
@@ -2168,15 +2170,15 @@ function sbResult(code, st, flash, retrying) {
   const wrong = mk.map((m, i) => m === 0 ? i : -1).filter(i => i >= 0), re = Array(n).fill(0);
   const badge = (m, a) => `<button type="button" class="sb-mark ${m === 1 ? 'o' : m === 0 ? 'x' : ''}" title="해설 보기">${m === 1 ? 'O' : m === 0 ? 'X' : '-'}</button>`;
   R.className = 'max-w-md mx-auto p-4 space-y-4';
-  R.innerHTML = sbTop() + `${flash ? `<p class="text-center font-bold text-emerald-700 bg-emerald-50 rounded-lg py-2">${flash}</p>` : ''}
-    <div><h1 class="text-xl font-bold">${esc(st.name)}</h1><p class="text-sm text-gray-600 mt-1">${graded ? `처음 제출 <b class="text-lg text-gray-900">${s1} / ${n}</b>${hasR ? ` → 다시 풀기 후 <b class="text-lg text-gray-900">${s2} / ${n}</b>` : ''}` : '채점 정보가 아직 없습니다. 선생님께 문의하세요.'}</p>
+  R.innerHTML = sbTop() + `${flash ? `<p class="text-center font-semibold text-emerald-700 bg-emerald-50 rounded-lg py-2">${flash}</p>` : ''}
+    <div><h1 class="text-xl font-semibold">${esc(st.name)}</h1><p class="text-sm text-gray-600 mt-1">${graded ? `처음 제출 <b class="text-lg text-gray-900">${s1} / ${n}</b>${hasR ? ` → 다시 풀기 후 <b class="text-lg text-gray-900">${s2} / ${n}</b>` : ''}` : '채점 정보가 아직 없습니다. 선생님께 문의하세요.'}</p>
     <p class="text-xs text-gray-400 mt-1">${retrying ? '틀린 문제의 답을 다시 고르세요.' : 'O·X를 누르면 해설을 볼 수 있습니다.'}</p></div>
     <div id="sb-rows" class="bg-white rounded-xl border p-3 space-y-1">${Array.from({length: n}, (_, i) => {
       const m = mk[i], a = a1[i] || 0, again = hasR && m === 0, ra = again ? st.retry[i] || 0 : 0;
       const line = retrying && m === 0 ? `<span class="text-xs text-gray-400 w-8">${a ? circ(a) : '-'}</span>${sbOpts(0)}`
         : `<span class="flex-1 text-lg">${a ? circ(a) : '<span class="text-gray-400 text-sm">답 없음</span>'}${again ? ` <span class="text-sm text-gray-500">→ 다시 푼 답 ${ra ? circ(ra) : '없음'} <b class="${rm[i] === 1 ? 'text-emerald-600' : 'text-red-500'}">${rm[i] === 1 ? 'O' : 'X'}</b></span>` : ''}</span>`;
-      return `<div data-i="${i}"><div class="flex items-center gap-2"><span class="w-10 font-bold text-sm">${i+1}번</span>${line}${badge(m, a)}</div><div class="sb-exp hidden">${exp[i] ? esc(exp[i]) : '해설이 없습니다.'}</div></div>`; }).join('')}</div>
-    <div id="sb-act" class="space-y-2"></div>${retrying ? '' : '<button id="sb-ask" class="w-full sb-ghost">💬 이 시험지에 대해 선생님께 질문</button>'}<a href="?me=1" class="block text-center underline text-sm text-gray-500">내 학습 페이지</a>`;
+      return `<div data-i="${i}"><div class="flex items-center gap-2"><span class="w-10 font-semibold text-sm">${i+1}번</span>${line}${badge(m, a)}</div><div class="sb-exp hidden">${exp[i] ? esc(exp[i]) : '해설이 없습니다.'}</div></div>`; }).join('')}</div>
+    <div id="sb-act" class="space-y-2"></div>${retrying ? '' : '<button id="sb-ask" class="w-full sb-ghost"><i data-lucide="message-circle"></i>이 시험지에 대해 선생님께 질문</button>'}<a href="?me=1" class="block text-center underline text-sm text-gray-500">내 학습 페이지</a>`;
   sbBindTop();
   if ($('sb-ask')) $('sb-ask').onclick = () => sbChat(`[${st.name}] 번 문제 질문: `, () => sbResult(code, st));
   [...$('sb-rows').children].forEach((row, i) => {
@@ -2189,7 +2191,7 @@ function sbResult(code, st, flash, retrying) {
     $('sb-cancel').onclick = () => sbResult(code, st);
     $('sb-re').onclick = async () => {
       if (!await sbConfirm('다시 푼 답을 제출할까요?', '다시 풀기는 한 번만 할 수 있습니다. 점수와 등수는 처음 제출 기준 그대로입니다.', wrong.map(i => ({no: i + 1, a: re[i]})), '다시 제출하기')) return;
-      try { sbResult(code, await sbCall('sb_retry', {t: tokGet(), c: code, ans: a1.map((a, i) => mk[i] === 0 ? re[i] : a)}), '✅ 다시 푼 답을 제출했습니다.'); } catch(e) { sbFail(e); }
+      try { sbResult(code, await sbCall('sb_retry', {t: tokGet(), c: code, ans: a1.map((a, i) => mk[i] === 0 ? re[i] : a)}), '다시 푼 답을 제출했습니다.'); } catch(e) { sbFail(e); }
     };
   } else if (graded && !hasR && wrong.length) {
     act.innerHTML = `<button id="sb-again" class="w-full sb-primary">틀린 ${wrong.length}문제 다시 풀기 (한 번만 가능)</button>`;
@@ -2203,7 +2205,7 @@ const sbChatStop = () => { clearInterval(sbChatTimer); sbChatTimer = null; };
 async function sbChat(prefill, back) {
   sbChatStop();
   const R = sbR(); R.className = 'max-w-md mx-auto p-4 space-y-3';
-  R.innerHTML = sbTop() + `<div class="flex items-center gap-2"><button id="sb-back" class="sb-ghost px-3 text-sm">← 뒤로</button><h1 class="text-lg font-bold">💬 선생님께 질문</h1></div>
+  R.innerHTML = sbTop() + `<div class="flex items-center gap-2"><button id="sb-back" class="sb-ghost px-3 text-sm">← 뒤로</button><h1 class="text-lg font-semibold">선생님께 질문</h1></div>
     <div class="bg-white border rounded-xl overflow-hidden flex flex-col sb-chat"><div id="msg-log" class="msg-log"><p class="text-center text-gray-400 text-sm py-10">불러오는 중…</p></div>
     <form id="msg-form" class="msg-form"><textarea id="msg-in" rows="1" maxlength="2000" placeholder="궁금한 것을 적어 보세요"></textarea><button class="msg-send">보내기</button></form></div>
     <p class="text-xs text-gray-400 text-center">선생님이 확인하면 답장이 이곳에 옵니다.</p>`;
@@ -2225,7 +2227,7 @@ async function sbChat(prefill, back) {
 /* 학생: 수업 하나의 시험지 목록 */
 function sbClassPage(c) {
   const R = sbR(); R.className = 'max-w-md mx-auto p-4 space-y-4';
-  R.innerHTML = sbTop() + `<div class="flex items-center gap-2"><button id="sb-back" class="sb-ghost px-3 text-sm">← 내 페이지</button><h1 class="text-lg font-bold">📚 ${esc(c.name)}</h1></div>
+  R.innerHTML = sbTop() + `<div class="flex items-center gap-2"><button id="sb-back" class="sb-ghost px-3 text-sm">← 내 페이지</button><h1 class="text-lg font-semibold">${esc(c.name)}</h1></div>
     <div class="space-y-2">${(c.exams || []).map(e => `<a href="?e=${encodeURIComponent(e.code)}" class="sb-ex"><span class="flex-1 min-w-0"><b class="block truncate">${esc(e.name)}</b><span class="text-xs text-gray-500">${new Date(e.at).toLocaleDateString('ko-KR')} · ${e.n}문항</span></span>${e.submitted ? `<span class="text-right"><b class="text-lg">${e.score == null ? '제출함' : e.score + ' / ' + e.n}</b><span class="block text-xs text-gray-400">결과·해설 보기</span></span>` : '<span class="sb-todo">답 입력하기</span>'}</a>`).join('') || '<p class="text-center text-gray-400 py-10">이 수업에서 아직 낸 시험지가 없습니다.</p>'}</div>`;
   sbBindTop();
   $('sb-back').onclick = sbMyPage;
@@ -2240,13 +2242,13 @@ async function sbMyPage() {
     qs: (x.info || Array.from({length: x.n}, () => ({}))).map((q, i) => ({q: q.q || '', ch: q.ch || [], exp: q.exp || '', unit: q.unit || '', sub: q.sub || '', lv: q.lv || '', type: q.type || '', img: q.img, ans: (x.key || [])[i] || 0}))}));
   let from = '', to = '';
   const cls = sbClasses || [];
-  R.innerHTML = sbTop() + (unread >= 0 ? `<button id="sb-chat" class="no-print w-full sb-chat-btn">💬 선생님께 질문하기${unread ? `<span class="msg-un">${unread}</span><span class="text-xs font-normal">새 답장</span>` : ''}</button>` : '') +
-    (sbClasses ? `<div class="no-print"><h2 class="font-bold mb-2">📚 내 수업</h2>${cls.length ? `<div class="grid sm:grid-cols-2 gap-2">${cls.map((c, i) => { const todo = (c.exams || []).filter(e => !e.submitted).length;
-        return `<button data-c="${i}" class="sb-cls"><b class="block text-base">${esc(c.name)}</b><span class="text-xs text-gray-500">시험지 ${(c.exams || []).length}개${todo ? ` · <span class="text-red-500 font-bold">안 푼 시험지 ${todo}개</span>` : ''}</span></button>`; }).join('')}</div>` : '<p class="text-sm text-gray-400 bg-white border rounded-xl p-4">아직 등록된 수업이 없습니다.</p>'}</div>` : '') +
+  R.innerHTML = sbTop() + (unread >= 0 ? `<button id="sb-chat" class="no-print w-full sb-chat-btn"><i data-lucide="message-circle"></i>선생님께 질문하기${unread ? `<span class="msg-un">${unread}</span><span class="text-xs font-normal">새 답장</span>` : ''}</button>` : '') +
+    (sbClasses ? `<div class="no-print"><h2 class="font-semibold mb-2">내 수업</h2>${cls.length ? `<div class="grid sm:grid-cols-2 gap-2">${cls.map((c, i) => { const todo = (c.exams || []).filter(e => !e.submitted).length;
+        return `<button data-c="${i}" class="sb-cls"><b class="block text-base">${esc(c.name)}</b><span class="text-xs text-gray-500">시험지 ${(c.exams || []).length}개${todo ? ` · <span class="text-red-500 font-semibold">안 푼 시험지 ${todo}개</span>` : ''}</span></button>`; }).join('')}</div>` : '<p class="text-sm text-gray-400 bg-white border rounded-xl p-4">아직 등록된 수업이 없습니다.</p>'}</div>` : '') +
     `<div class="no-print bg-white border rounded-xl p-4 space-y-3">
       <form id="sb-goex" class="flex gap-2"><input id="sb-code" type="text" placeholder="시험지 코드 6자리" autocapitalize="characters" class="flex-1 p-3 uppercase"><button class="sb-primary px-5">답안 입력</button></form>
       <div class="flex flex-wrap items-end gap-2"><label class="text-xs text-gray-500">시작일<input type="date" id="rp-from" class="block p-2 text-sm"></label><label class="text-xs text-gray-500">종료일<input type="date" id="rp-to" class="block p-2 text-sm"></label>
-      <div class="ml-auto flex gap-2"><button id="sb-cpw" class="sb-ghost px-4 text-sm">비밀번호 바꾸기</button><button onclick="window.print()" class="sb-primary px-4 text-sm">🖨 인쇄</button></div></div></div>
+      <div class="ml-auto flex gap-2"><button id="sb-cpw" class="sb-ghost px-4 text-sm">비밀번호 바꾸기</button><button onclick="window.print()" class="sb-primary px-4 text-sm"><i data-lucide="printer"></i>인쇄</button></div></div></div>
     <div id="rp-box" class="bg-white border rounded-xl p-5"></div>`;
   sbBindTop();
   $('sb-goex').onsubmit = e => { e.preventDefault(); const v = $('sb-code').value.trim(); if (v) location.search = '?e=' + encodeURIComponent(v.toUpperCase()); };
@@ -2260,12 +2262,12 @@ async function sbMyPage() {
 /* ===== 출제 문제 목록 ===== */
 function renderEx() {
   const b = $('ex-body'), list = stuDB.exams.slice().sort((x, y) => y.at - x.at);
-  b.innerHTML = `<div class="flex items-center gap-3 mb-4 flex-wrap"><h2 class="text-xl font-bold">📋 출제한 시험지 (${list.length})</h2>${list.length ? `
+  b.innerHTML = `<div class="flex items-center gap-3 mb-4 flex-wrap"><h2 class="text-xl font-semibold">출제한 시험지 (${list.length})</h2>${list.length ? `
       <label class="ml-auto flex items-center gap-2 text-sm cursor-pointer"><input type="checkbox" id="ex-all" class="w-4 h-4 accent-indigo-600" onchange="document.querySelectorAll('.ex-chk').forEach(c => c.checked = this.checked); exSelCount()">전체 선택</label>
-      <button id="ex-del-sel" onclick="exDelSel()" disabled class="bg-red-600 hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed text-white px-3 py-2 rounded-lg text-sm font-bold">🗑 선택 삭제</button>` : ''}</div>` + (list.length
+      <button id="ex-del-sel" onclick="exDelSel()" disabled class="bg-red-600 hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed text-white px-3 py-2 rounded-lg text-sm font-semibold"><i data-lucide="trash-2"></i>선택 삭제</button>` : ''}</div>` + (list.length
     ? `<div class="space-y-2">${list.map(e => { const n = stuDB.results.filter(r => r.examId === e.id).length;
         const cl = e.classId && CL().find(c => c.id === e.classId);
-        return `<div><div class="flex items-center gap-3 border rounded-xl px-4 py-3 flex-wrap"><input type="checkbox" class="ex-chk w-5 h-5 accent-indigo-600 cursor-pointer" value="${e.id}" onchange="exSelCount()" aria-label="${esc(e.name)} 선택"><div class="flex-1 min-w-[12rem]"><div class="font-bold">${esc(e.name)}${cl ? ` <span class="text-xs font-normal px-2 py-0.5 rounded-full" style="background:var(--c-cls-s);color:var(--c-cls)">${esc(cl.name)}</span>` : ''}</div><div class="text-xs text-gray-500">${new Date(e.at).toLocaleString('ko-KR')} · ${e.questions.length}문항 · 코드 ${exCode(e.id)} · 제출 ${n}명</div></div><button onclick="exOpen('${e.id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-sm font-bold">문제 보기·인쇄</button><button onclick="exDownload('${e.id}')" class="bg-gray-700 text-white px-3 py-2 rounded-lg text-sm font-bold">⬇ 다운로드 (.hwpx)</button><button onclick="exSub('${e.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-sm font-bold">제출 현황</button><button onclick="exDel('${e.id}')" class="text-xs text-red-500">삭제</button></div><div id="ex-sub-${e.id}" class="hidden"></div></div>`; }).join('')}</div>`
+        return `<div><div class="flex items-center gap-3 border rounded-xl px-4 py-3 flex-wrap"><input type="checkbox" class="ex-chk w-5 h-5 accent-indigo-600 cursor-pointer" value="${e.id}" onchange="exSelCount()" aria-label="${esc(e.name)} 선택"><div class="flex-1 min-w-[12rem]"><div class="font-semibold">${esc(e.name)}${cl ? ` <span class="text-xs font-normal px-2 py-0.5 rounded-full" style="background:var(--c-cls-s);color:var(--c-cls)">${esc(cl.name)}</span>` : ''}</div><div class="text-xs text-gray-500">${new Date(e.at).toLocaleString('ko-KR')} · ${e.questions.length}문항 · 코드 ${exCode(e.id)} · 제출 ${n}명</div></div><button onclick="exOpen('${e.id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-sm font-semibold">문제 보기·인쇄</button><button onclick="exDownload('${e.id}')" class="bg-gray-700 text-white px-3 py-2 rounded-lg text-sm font-semibold"><i data-lucide="download"></i>다운로드 (.hwpx)</button><button onclick="exSub('${e.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-sm font-semibold">제출 현황</button><button onclick="exDel('${e.id}')" class="text-xs text-red-500">삭제</button></div><div id="ex-sub-${e.id}" class="hidden"></div></div>`; }).join('')}</div>`
     : '<p class="text-center text-gray-400 py-12">아직 출제한 시험지가 없습니다. 단원별 문제에서 시험지를 만들어 보세요.</p>');
 }
 function exSub(id, pre = 'ex-sub-') {
@@ -2275,11 +2277,11 @@ function exSub(id, pre = 'ex-sub-') {
     .sort((a, b) => a.s.grade.localeCompare(b.s.grade, 'ko') || a.s.name.localeCompare(b.s.name, 'ko'));
   const key = e.questions.map(q => numAns(q.answer));
   const head = e.questions.map((q, i) => `<th>${i+1}</th>`).join('');
-  const keyRow = `<tr class="bg-gray-100 font-bold"><td colspan="2" class="text-left">정답</td>${key.map(k => `<td>${circ(k) || '-'}</td>`).join('')}<td></td></tr>`;
+  const keyRow = `<tr class="bg-gray-100 font-semibold"><td colspan="2" class="text-left">정답</td>${key.map(k => `<td>${circ(k) || '-'}</td>`).join('')}<td></td></tr>`;
   const rows = rs.map(({r, s}) => { let ok = 0;
     const tds = e.questions.map((q, i) => { const st = +(r.answers || [])[i] || 0, good = st && st === key[i]; if (good) ok++;
-      return `<td class="${good ? '' : 'bg-red-50 text-red-500 font-bold'}">${st ? circ(st) : '-'}</td>`; }).join('');
-    return `<tr><td class="text-left">${s.grade}</td><td class="text-left whitespace-nowrap">${esc(s.name)}</td>${tds}<td class="font-bold">${ok}/${e.questions.length}</td></tr>`; }).join('');
+      return `<td class="${good ? '' : 'bg-red-50 text-red-500 font-semibold'}">${st ? circ(st) : '-'}</td>`; }).join('');
+    return `<tr><td class="text-left">${s.grade}</td><td class="text-left whitespace-nowrap">${esc(s.name)}</td>${tds}<td class="font-semibold">${ok}/${e.questions.length}</td></tr>`; }).join('');
   box.innerHTML = rs.length ? `<div class="overflow-x-auto border rounded-xl mt-2 p-2"><table class="stu-tbl"><thead><tr><th>학년</th><th>이름</th>${head}<th>점수</th></tr></thead><tbody>${keyRow}${rows}</tbody></table></div>`
     : '<p class="text-center text-gray-400 py-4 text-sm">아직 제출한 학생이 없습니다.</p>';
   box.classList.remove('hidden');
@@ -2304,7 +2306,7 @@ function exDel(id) {
 }
 function exSelCount() {
   const all = [...document.querySelectorAll('.ex-chk')], k = all.filter(c => c.checked).length, bt = $('ex-del-sel'), a = $('ex-all');
-  if (bt) { bt.disabled = !k; bt.textContent = k ? `🗑 선택 삭제 (${k})` : '🗑 선택 삭제'; }
+  if (bt) { bt.disabled = !k; bt.innerHTML = '<i data-lucide="trash-2"></i>' + (k ? `선택 삭제 (${k})` : '선택 삭제'); }
   if (a) { a.checked = k && k === all.length; a.indeterminate = k > 0 && k < all.length; }
 }
 async function exDelSel() {
@@ -2343,8 +2345,8 @@ function renderCls() {
   const b = $('cls-body'), [v, cid] = clsView, c = CL().find(x => x.id === cid);
   if (v === 'list' || !c) {
     const list = CL().slice().sort((a, b) => a.name.localeCompare(b.name, 'ko'));
-    b.innerHTML = `<div class="flex items-center gap-3 mb-5 flex-wrap"><h2 class="text-xl font-bold">수업 (${list.length})</h2>
-      <form onsubmit="clsAdd(event)" class="ml-auto flex gap-2"><input id="cls-new" type="text" placeholder="수업 이름 (예: 화요일 고2 화학)" class="border rounded-lg p-2 text-sm w-64"><button class="bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-bold">➕ 수업 만들기</button></form></div>` +
+    b.innerHTML = `<div class="flex items-center gap-3 mb-5 flex-wrap"><h2 class="text-xl font-semibold">수업 (${list.length})</h2>
+      <form onsubmit="clsAdd(event)" class="ml-auto flex gap-2"><input id="cls-new" type="text" placeholder="수업 이름 (예: 화요일 고2 화학)" class="border rounded-lg p-2 text-sm w-64"><button class="bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-semibold">수업 만들기</button></form></div>` +
       (list.length ? `<div class="grid sm:grid-cols-2 md:grid-cols-3 gap-3">${list.map(c => { const g = [...new Set(c.members.map(id => (stuDB.students.find(s => s.id === id) || {}).grade).filter(Boolean))];
         return `<button onclick="clsGo('view','${c.id}')" class="stu-btn text-left p-4"><span class="block text-base">${esc(c.name)}</span><span class="block text-xs font-normal text-gray-500 mt-1">학생 ${c.members.length}명${g.length ? ' · ' + g.join('·') : ''} · 시험지 ${clsExams(c.id).length}개</span></button>`; }).join('')}</div>`
         : '<p class="text-center text-gray-400 py-12">아직 수업이 없습니다. 위에서 수업을 만든 뒤 학생을 넣으세요.</p>');
@@ -2355,25 +2357,25 @@ function renderCls() {
   if (v === 'add') {
     const g = clsView[2] || '', q = (clsView[3] || '').trim();
     const cand = stuDB.students.filter(s => (!g || s.grade === g) && (!q || s.name.includes(q))).sort((x, y) => x.grade.localeCompare(y.grade, 'ko') || x.name.localeCompare(y.name, 'ko'));
-    b.innerHTML = `<div class="flex items-center gap-3 mb-4 flex-wrap">${back}<h2 class="text-xl font-bold">학생 넣기</h2></div>
+    b.innerHTML = `<div class="flex items-center gap-3 mb-4 flex-wrap">${back}<h2 class="text-xl font-semibold">학생 넣기</h2></div>
       <div class="flex gap-2 flex-wrap mb-3"><select id="cls-g" onchange="clsGo('add','${c.id}',this.value,$('cls-q').value)" class="border rounded-lg p-2 text-sm"><option value="">전체 학년</option>${GR.map(x => `<option ${x === g ? 'selected' : ''}>${x}</option>`).join('')}</select>
         <input id="cls-q" type="text" value="${esc(q)}" placeholder="이름으로 찾기" class="border rounded-lg p-2 text-sm flex-1 min-w-[10rem]"></div>
       <form onsubmit="clsAddMembers(event,'${c.id}')"><div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-2 mb-4">${cand.map(s => `<label class="flex items-center gap-2 border rounded-lg px-3 py-2 text-sm cursor-pointer"><input type="checkbox" value="${s.id}" ${c.members.includes(s.id) ? 'checked' : ''} class="accent-indigo-600"><span>${esc(s.name)}<span class="block text-xs text-gray-400">${s.grade}</span></span></label>`).join('') || '<p class="text-gray-400 col-span-full text-center py-6">학생이 없습니다.</p>'}</div>
-      <button class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg">저장 (체크한 학생이 이 수업 학생이 됩니다)</button></form>`;
+      <button class="w-full bg-indigo-600 text-white font-semibold py-3 rounded-lg">저장 (체크한 학생이 이 수업 학생이 됩니다)</button></form>`;
     $('cls-q').oninput = e => { clearTimeout(renderCls.t); renderCls.t = setTimeout(() => { clsView[3] = e.target.value; renderCls(); const i = $('cls-q'); i.focus(); i.setSelectionRange(i.value.length, i.value.length); }, 250); };
     return;
   }
   const exs = clsExams(c.id), free = stuDB.exams.filter(e => !e.classId).sort((x, y) => y.at - x.at);
-  b.innerHTML = `<div class="flex items-center gap-3 mb-5 flex-wrap">${back}<h2 class="text-xl font-bold">${esc(c.name)}</h2>
+  b.innerHTML = `<div class="flex items-center gap-3 mb-5 flex-wrap">${back}<h2 class="text-xl font-semibold">${esc(c.name)}</h2>
       <div class="ml-auto flex gap-2"><button onclick="clsRename('${c.id}')" class="stu-back">이름 바꾸기</button><button onclick="clsDel('${c.id}')" class="text-xs text-red-500">수업 삭제</button></div></div>
-    <div class="flex items-center gap-2 mb-2"><h3 class="font-bold">학생 ${mem.length}명</h3><button onclick="clsGo('add','${c.id}')" class="stu-back ml-auto">➕ 학생 넣기·빼기</button></div>
+    <div class="flex items-center gap-2 mb-2"><h3 class="font-semibold">학생 ${mem.length}명</h3><button onclick="clsGo('add','${c.id}')" class="stu-back ml-auto">학생 넣기·빼기</button></div>
     ${mem.length ? `<div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2 mb-6">${mem.map(s => `<button onclick="stuOpen('${s.id}')" class="stu-btn">${esc(s.name)}<span class="block text-xs font-normal text-gray-400 mt-0.5">${s.grade}</span></button>`).join('')}</div>` : '<p class="text-gray-400 text-sm mb-6">아직 학생이 없습니다. 학생 넣기를 누르세요.</p>'}
-    <div class="flex items-center gap-2 mb-2 flex-wrap"><h3 class="font-bold">이 수업 시험지 ${exs.length}개</h3>
-      <button onclick="clsNewExam('${c.id}')" class="ml-auto bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-bold">📝 이 수업으로 새 시험지 만들기</button></div>
-    ${free.length ? `<div class="flex gap-2 mb-3"><select id="cls-attach" class="flex-1 border rounded-lg p-2 text-sm">${free.map(e => `<option value="${e.id}">${esc(e.name)} (${new Date(e.at).toLocaleDateString('ko-KR')} · ${e.questions.length}문항)</option>`).join('')}</select><button onclick="clsAttach('${c.id}',$('cls-attach').value)" class="bg-white border px-3 py-2 rounded-lg text-sm font-bold">이미 만든 시험지 넣기</button></div>` : ''}
+    <div class="flex items-center gap-2 mb-2 flex-wrap"><h3 class="font-semibold">이 수업 시험지 ${exs.length}개</h3>
+      <button onclick="clsNewExam('${c.id}')" class="ml-auto bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-semibold"><i data-lucide="file-plus"></i>이 수업으로 새 시험지 만들기</button></div>
+    ${free.length ? `<div class="flex gap-2 mb-3"><select id="cls-attach" class="flex-1 border rounded-lg p-2 text-sm">${free.map(e => `<option value="${e.id}">${esc(e.name)} (${new Date(e.at).toLocaleDateString('ko-KR')} · ${e.questions.length}문항)</option>`).join('')}</select><button onclick="clsAttach('${c.id}',$('cls-attach').value)" class="bg-white border px-3 py-2 rounded-lg text-sm font-semibold">이미 만든 시험지 넣기</button></div>` : ''}
     <div class="space-y-2">${exs.map(e => { const n = stuDB.results.filter(r => r.examId === e.id && c.members.includes(r.studentId)).length;
-      return `<div><div class="flex items-center gap-3 border rounded-xl px-4 py-3 flex-wrap"><div class="flex-1 min-w-[12rem]"><div class="font-bold">${esc(e.name)}</div><div class="text-xs text-gray-500">${new Date(e.at).toLocaleDateString('ko-KR')} · ${e.questions.length}문항 · 코드 ${exCode(e.id)} · 제출 ${n}/${mem.length}명</div></div>
-        <button onclick="exOpen('${e.id}')" class="bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-bold">문제 보기·QR 인쇄</button><button onclick="exSub('${e.id}','cls-sub-')" class="bg-emerald-600 text-white px-3 py-2 rounded-lg text-sm font-bold">제출 현황</button><button onclick="clsAttach('','${e.id}')" class="text-xs text-gray-500">수업에서 빼기</button></div><div id="cls-sub-${e.id}" class="hidden"></div></div>`; }).join('') || '<p class="text-gray-400 text-sm">아직 이 수업에서 낸 시험지가 없습니다.</p>'}</div>`;
+      return `<div><div class="flex items-center gap-3 border rounded-xl px-4 py-3 flex-wrap"><div class="flex-1 min-w-[12rem]"><div class="font-semibold">${esc(e.name)}</div><div class="text-xs text-gray-500">${new Date(e.at).toLocaleDateString('ko-KR')} · ${e.questions.length}문항 · 코드 ${exCode(e.id)} · 제출 ${n}/${mem.length}명</div></div>
+        <button onclick="exOpen('${e.id}')" class="bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-semibold">문제 보기·QR 인쇄</button><button onclick="exSub('${e.id}','cls-sub-')" class="bg-emerald-600 text-white px-3 py-2 rounded-lg text-sm font-semibold">제출 현황</button><button onclick="clsAttach('','${e.id}')" class="text-xs text-gray-500">수업에서 빼기</button></div><div id="cls-sub-${e.id}" class="hidden"></div></div>`; }).join('') || '<p class="text-gray-400 text-sm">아직 이 수업에서 낸 시험지가 없습니다.</p>'}</div>`;
 }
 function clsAdd(ev) {
   ev.preventDefault();
@@ -2444,9 +2446,9 @@ async function msgOpen(sid) {
   if (sid !== undefined) msgSid = sid;
   const b = $('msg-body'), need = msgNeed();
   if (need) { b.innerHTML = `<p class="text-center text-gray-500 py-16">${need}</p>`; return; }
-  if (!$('msg-list')) b.innerHTML = `<div class="msg-wrap"><aside class="msg-side"><div class="p-3 border-b"><select id="msg-new" class="w-full border rounded-lg p-2 text-sm"><option value="">✉ 학생에게 새 메시지…</option></select></div><div id="msg-list"></div></aside><section class="msg-main" id="msg-main"></section></div>`;
+  if (!$('msg-list')) b.innerHTML = `<div class="msg-wrap"><aside class="msg-side"><div class="p-3 border-b"><select id="msg-new" class="w-full border rounded-lg p-2 text-sm"><option value="">학생에게 새 메시지…</option></select></div><div id="msg-list"></div></aside><section class="msg-main" id="msg-main"></section></div>`;
   const sel = $('msg-new');
-  sel.innerHTML = '<option value="">✉ 학생에게 새 메시지…</option>' + stuDB.students.filter(s => s.lid).sort((x, y) => x.grade.localeCompare(y.grade, 'ko') || x.name.localeCompare(y.name, 'ko')).map(s => `<option value="${s.id}">${esc(stuName(s))}</option>`).join('');
+  sel.innerHTML = '<option value="">학생에게 새 메시지…</option>' + stuDB.students.filter(s => s.lid).sort((x, y) => x.grade.localeCompare(y.grade, 'ko') || x.name.localeCompare(y.name, 'ko')).map(s => `<option value="${s.id}">${esc(stuName(s))}</option>`).join('');
   sel.onchange = () => { if (sel.value) msgOpen(sel.value); };
   await msgRefresh(true);
   msgStop(); msgTimer = setInterval(() => msgRefresh(false), 8000);
@@ -2469,7 +2471,7 @@ async function msgChat(full) {
   let list; try { list = await sbCall('sb_msg_list_t', {p: stuDB.pin, sid: s.id}) || []; } catch(e) { return; }
   if (full || !$('msg-log') || main.dataset.sid !== s.id) {
     main.dataset.sid = s.id; msgLastN = -1;
-    main.innerHTML = `<div class="msg-head"><button onclick="stuOpen('${s.id}')" class="font-bold hover:underline">${esc(stuName(s))}</button>${s.lid ? '' : '<span class="text-xs text-red-500 ml-2">계정이 없어 학생이 볼 수 없습니다</span>'}</div><div id="msg-log" class="msg-log"></div>
+    main.innerHTML = `<div class="msg-head"><button onclick="stuOpen('${s.id}')" class="font-semibold hover:underline">${esc(stuName(s))}</button>${s.lid ? '' : '<span class="text-xs text-red-500 ml-2">계정이 없어 학생이 볼 수 없습니다</span>'}</div><div id="msg-log" class="msg-log"></div>
       <form id="msg-form" class="msg-form"><textarea id="msg-in" rows="1" maxlength="2000" placeholder="메시지 입력 (Enter 보내기 · Shift+Enter 줄 바꿈)"></textarea><button class="msg-send">보내기</button></form>`;
     msgBindForm(async txt => { await sbCall('sb_msg_send_t', {p: stuDB.pin, sid: s.id, msg: txt}); msgRefresh(false); });
   }
@@ -2514,7 +2516,7 @@ function bkBanner() {
   let snooze = 0; try { snooze = +localStorage.getItem('sciBankBkSnooze') || 0; } catch(e) {}
   const show = has && (!t || Date.now() - t > 7 * 864e5) && Date.now() > snooze;
   el.classList.toggle('hidden', !show); if (!show) return;
-  el.querySelector('span').innerHTML = `💾 <b>${t ? `마지막 백업 후 ${Math.floor((Date.now() - t) / 864e5)}일이 지났습니다.` : '아직 백업한 적이 없습니다.'}</b> 문제 DB·기출은 이 브라우저에만 저장됩니다. (학생·수업·만든 시험지는 PIN을 설정하면 다른 기기와 자동으로 맞춰집니다.)`;
+  el.querySelector('span').innerHTML = `<b>${t ? `마지막 백업 후 ${Math.floor((Date.now() - t) / 864e5)}일이 지났습니다.` : '아직 백업한 적이 없습니다.'}</b> 문제 DB·기출은 이 브라우저에만 저장됩니다. (학생·수업·만든 시험지는 PIN을 설정하면 다른 기기와 자동으로 맞춰집니다.)`;
 }
 function bkSnooze() { try { localStorage.setItem('sciBankBkSnooze', Date.now() + 864e5); } catch(e) {} bkBanner(); }
 function exportBackup() {
@@ -2545,6 +2547,16 @@ else Promise.all([dbReady, pastReady, stuReady, idbGet(DK).catch(() => null)]).t
   if (TABS.includes(t)) switchTab(t, true);
   bkBanner();
 });
+</script>
+<script>
+// 선 아이콘(lucide): 화면에 새로 그려진 <i data-lucide> 를 svg 로 바꿈
+(function () {
+  if (!window.lucide) return;
+  let q = 0; const run = () => { q = 0; try { lucide.createIcons({attrs: {'aria-hidden': 'true'}}); } catch(e) {} };
+  run();
+  new MutationObserver(ms => { if (!q && ms.some(m => [...m.addedNodes].some(n => n.nodeType === 1 && (n.matches('i[data-lucide]') || n.querySelector('i[data-lucide]'))))) q = requestAnimationFrame(run); })
+    .observe(document.body, {childList: true, subtree: true});
+})();
 </script>
 </body>
 </html>
