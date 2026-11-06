@@ -1668,25 +1668,41 @@ function renderPast(x) {
 const pastTpl = () => (document.querySelector('input[name=past-tpl]:checked') || {}).value || '1';
 const pastName = (x, k) => { const u = pastUnitList(); return `${x.school} ${sfx(x.year,'년')} ${sfx(x.semester,'학기')} ${sfx(x.round,'차')} ${x.subject}${k ? ` 변형 ${k}세트` : ''}${u.length ? ` (${u.length > 2 ? `${u[0]} 외 ${u.length - 1}단원` : u.join(', ')})` : ''}`; };
 /* ===== 기출·변형: 단원별로 골라 보기. 단원 = q.unit, 없으면 자동으로 고른 성취기준의 영역 ===== */
-let pastUnitSel = null, pastUnitKey = '';   // null = 전체
+let pastUnitSel = null, pastUnitKey = '', pastUnitLvl = 'dom';   // null = 전체, dom = 대단원(영역), std = 성취기준
 const pastUnitList = () => pastUnitSel ? [...pastUnitSel].sort((a, b) => a.localeCompare(b, 'ko')) : [];
-function pastUnitOf(x, q) {
+/* 기출 과목 이름 → 성취기준 표 이름 (화학Ⅰ→화학, 통합과학→1학기 통합과학1·2학기 통합과학2, 중학교→과학) */
+function pastStdSubj(x) {
+  let s = String(x.subject || '').replace(/\s+/g, '').replace(/[ⅠⅡ]$|I{1,2}$/, '');
+  s = {물리: '물리학', 생명: '생명과학', 생물: '생명과학', 지구: '지구과학', 지학: '지구과학'}[s] || s;
+  if (STD22[s]) return s;
+  if (/^통합과학/.test(s)) return String(x.semester) === '2' ? '통합과학2' : '통합과학1';
+  const k = Object.keys(STD22).find(n => n !== '과학' && s.startsWith(n));
+  return k || (/^중/.test(String(x.grade || '')) || s === '과학' ? '과학' : s);
+}
+function pastUnitOf(x, q, lvl = pastUnitLvl) {
   const u = String(q.unit || '').replace(/^\[[^\]]*\]\s*(\d+\.\s*)?/, '').trim();
   if (u) return u;
-  const r = stdOf({...q, grade: q.grade || x.grade, unit: `[${x.subject}]`});
-  return r ? r[1] : '기타';
+  const r = stdOf({...q, grade: q.grade || x.grade, unit: `[${pastStdSubj(x)}]`});
+  if (!r) return '기타';
+  if (lvl === 'dom') return r[1];
+  const t = r[2].replace(/\s+/g, ' ');
+  return `${r[0].replace(/[\[\]]/g, '')} ${t.length > 16 ? t.slice(0, 16) + '…' : t}`;
 }
 const pastPicked = (x, all) => all.map((q, i) => ({q, i})).filter(p => !pastUnitSel || pastUnitSel.has(pastUnitOf(x, p.q)));
 function pastUnitUI(x, all) {
   const box = $('past-units'); if (!box) return;
   const key = PF.map(f => x[f]).join('|') + '|' + pastMode + '|' + pastCur(x);
-  if (key !== pastUnitKey) { pastUnitKey = key; pastUnitSel = null; }
+  if (key !== pastUnitKey) {
+    pastUnitKey = key; pastUnitSel = null;
+    // 시험 전체가 대단원 하나면 성취기준(중단원 정도)으로 나눠 보여 줌
+    pastUnitLvl = new Set(all.map(q => pastUnitOf(x, q, 'dom'))).size >= 2 ? 'dom' : 'std';
+  }
   const cnt = new Map(); all.forEach(q => { const u = pastUnitOf(x, q); cnt.set(u, (cnt.get(u) || 0) + 1); });
   const us = [...cnt.keys()].sort((a, b) => a === '기타' ? 1 : b === '기타' ? -1 : a.localeCompare(b, 'ko'));
   if (pastUnitSel) pastUnitSel = new Set([...pastUnitSel].filter(u => cnt.has(u)));
   if (pastUnitSel && !pastUnitSel.size) pastUnitSel = null;
   const chip = (on, label, n, js) => `<button type="button" onclick="${js}" class="text-xs px-3 py-1.5 rounded-full border transition ${on ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'}">${on ? '<i data-lucide="check"></i>' : ''}${esc(label)} <span class="${on ? 'text-indigo-100' : 'text-gray-400'}">${n}</span></button>`;
-  box.innerHTML = us.length < 2 && !pastUnitSel ? '' : `<span class="text-sm font-semibold text-gray-600 mr-1">단원</span>` + chip(!pastUnitSel, '전체', all.length, 'pastUnitPick(null)') +
+  box.innerHTML = !all.length ? '' : `<span class="text-sm font-semibold text-gray-600 mr-1">${pastUnitLvl === 'dom' ? '단원' : '단원(성취기준)'}</span>` + chip(!pastUnitSel, '전체', all.length, 'pastUnitPick(null)') +
     us.map((u, k) => chip(!!pastUnitSel && pastUnitSel.has(u), u, cnt.get(u), `pastUnitPick(${k})`)).join('');
   box._units = us;
 }
