@@ -413,7 +413,9 @@ input.dn-over[type=number]{border-color:#ef4444!important;background:#fef2f2!imp
         <select id="past-set" onchange="renderPast(curPast)" class="border rounded-lg p-2 text-sm"><option value="0">원본</option></select>
         <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition text-sm"><i data-lucide="printer"></i>인쇄</button>
         <button onclick="pastDownload()" class="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded-lg font-medium transition text-sm"><i data-lucide="download"></i>다운로드 (.hwpx)</button>
+        <span class="flex items-center gap-2"><select id="past-cls" onchange="pastSetClass(this.value)" class="border rounded-lg p-2 text-sm" title="QR 시험지의 수업"></select><button id="past-reg" onclick="pastRegister()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition text-sm"><i data-lucide="qr-code"></i>QR 시험지로 등록</button></span>
       </div>
+      <div id="past-units" class="flex items-center gap-2 flex-wrap"></div>
       <div class="flex items-center gap-4 flex-wrap text-sm">
         <span class="font-semibold text-gray-600">시험지 틀</span>
         <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="past-tpl" value="1" checked onchange="renderPast(curPast)" class="w-4 h-4 accent-indigo-600">시험지1(학습지)</label>
@@ -1210,7 +1212,7 @@ function pvHead(tpl, n, c = {}) {
   const qs = c.qs || currentQuestions, id = 'id' in c ? c.id : curExamId, t = esc(c.name ?? examName()), g = esc(examGradeText(qs)), sj = esc(subjectLabel(qs));
   const d = new Date(), dt = `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}.`;
   const e = id && stuDB.exams.find(x => x.id === id), cid = e ? e.classId : id ? pendingCls : '', cl = cid && CL().find(c => c.id === cid);
-  const qr = s => id && sbReady() ? `<div id="pv-qr" data-s="${s}"></div>` : id === null ? '' : '<span class="text-[10px] text-gray-400">QR</span>';
+  const qr = s => id && sbReady() ? `<div class="pv-qr" data-s="${s}" data-id="${esc(id)}"></div>` : id === null ? '' : '<span class="text-[10px] text-gray-400">QR</span>';
   if (tpl === '2') return `<div class="pv-n2"><div class="pv-n2q">${id && sbReady() ? qr(44) : ''}</div><div class="text-sm">${t}</div><div class="pv-n2t">${g} ${sj}</div><div class="pv-n2r"><span>성명</span><span>${dt}</span><span>문항수 : ${n}문항</span></div></div>`;
   if (tpl === '3') return `<div class="pv-n3"><div class="pv-n3y">${d.getFullYear()}학년도 모의평가</div><div class="pv-n3m"><span class="pv-n3o">제 4 교시</span><span class="pv-n3t">과학탐구 영역<small>(${sj})</small></span><span class="pv-n3q">${qr(64)}</span></div><div class="pv-n3r"><span>성명</span><span class="flex-1"></span><span>수험 번호</span><span class="flex-[2]"></span></div></div>`;
   return `<div class="pv-n1"><div class="pv-n1a"><div class="pv-n1s"><span>${esc(cl ? cl.name : '')}</span><span>${dt}</span></div><div class="pv-n1t">${t}</div></div><div class="pv-n1q">${qr(76)}</div><div class="pv-n1b"><span>이름 : ______________</span><span>문항수 : ${n}문항</span></div></div>`;
@@ -1643,31 +1645,103 @@ const pastCur = x => pastMode === 'var' ? Math.min(Math.max(parseInt($('past-set
 function renderPast(x) {
   curPast = x;
   const el = $('print-area');
-  if (!x) { el.innerHTML = '<p class="text-center text-gray-400 py-12">등록된 시험지가 없습니다. 위의 "기출 JSON 불러오기"로 시험지를 추가하세요.</p>'; return; }
+  if (!x) { if ($('past-units')) $('past-units').innerHTML = ''; el.innerHTML = '<p class="text-center text-gray-400 py-12">등록된 시험지가 없습니다. 위의 "기출 JSON 불러오기"로 시험지를 추가하세요.</p>'; return; }
   const ans = $('past-answers').checked;
   const sel = $('past-set'), nv = (x.variants || []).length, cur = pastCur(x);
   sel.innerHTML = (pastMode === 'var' ? '' : '<option value="0">원본</option>') + Array.from({length:nv}, (_, k) => `<option value="${k+1}">변형 ${k+1}세트</option>`).join('');
   sel.value = cur;
-  const qs = cur ? (x.variants[cur-1].questions || []) : x.questions, ed = $('past-edit').checked;
+  const all = cur ? (x.variants[cur-1].questions || []) : x.questions, ed = $('past-edit').checked;
+  pastUnitUI(x, all);
+  const pk = pastPicked(x, all), qs = pk.map(p => p.q), on = pk.map(p => p.i);
   const tools = (q, i) => !ed ? '' : `<div class="no-print flex gap-2 items-center my-1"><label class="cursor-pointer text-xs border rounded-lg px-2 py-1 bg-white hover:bg-gray-50"><i data-lucide="image"></i>${q.image ? '그림 바꾸기' : '그림 넣기'}<input type="file" accept="image/*" class="hidden" onchange="pastFigPick(${i}, this)"></label>${q.image ? `<button onclick="pastFigDel(${i})" class="text-xs text-red-500">그림 지우기</button>` : ''}</div>`;
   const tpl = pastTpl();
   el.dataset.tpl = tpl;
-  el.innerHTML = pvHead(tpl, qs.length, {qs: pastQs(x, qs), name: pastName(x, cur), id: null}) + '<div class="pv-cols">' +
-    qs.map((q, i) => `<div class="pq mb-6">${fmtQ(q.question, i+1, (q.image ? `<img src="${esc(q.image)}" class="my-2 max-h-64">` : '') + tools(q, i))}${(q.choices || []).map(c => `<p class="ml-4 text-sm">${fx(c)}</p>`).join('')}</div>`).join('') + '</div>' +
+  const pe = pastExam(x);
+  pastRegUI(x, pe); setTimeout(drawQR, 0);
+  el.innerHTML = pvHead(tpl, qs.length, {qs: pastQs(x, qs), name: pastName(x, cur), id: pe ? pe.id : null}) + '<div class="pv-cols">' +
+    (qs.length ? '' : '<p class="text-center text-gray-400 py-12 no-print">고른 단원에 해당하는 문항이 없습니다.</p>') +
+    qs.map((q, i) => `<div class="pq mb-6">${fmtQ(q.question, i+1, (q.image ? `<img src="${esc(q.image)}" class="my-2 max-h-64">` : '') + tools(q, on[i]))}${(q.choices || []).map(c => `<p class="ml-4 text-sm">${fx(c)}</p>`).join('')}</div>`).join('') + '</div>' +
     (ans ? `<div class="pq border-t pt-4 mt-8"><h3 class="font-semibold mb-2">[정답 및 해설]</h3>${qs.map((q, i) => `<p class="text-sm">${i+1}번 정답: ${fx(q.answer)} ${q.explanation ? '해설: ' + fx(q.explanation) : ''}</p>`).join('')}</div>` : '');
 }
 
 /* 기출 화면의 시험지 틀(시험지1·2·3)과 한글 파일 내려받기 */
 const pastTpl = () => (document.querySelector('input[name=past-tpl]:checked') || {}).value || '1';
-const pastName = (x, k) => `${x.school} ${sfx(x.year,'년')} ${sfx(x.semester,'학기')} ${sfx(x.round,'차')} ${x.subject}${k ? ` 변형 ${k}세트` : ''}`;
+const pastName = (x, k) => { const u = pastUnitList(); return `${x.school} ${sfx(x.year,'년')} ${sfx(x.semester,'학기')} ${sfx(x.round,'차')} ${x.subject}${k ? ` 변형 ${k}세트` : ''}${u.length ? ` (${u.length > 2 ? `${u[0]} 외 ${u.length - 1}단원` : u.join(', ')})` : ''}`; };
+/* ===== 기출·변형: 단원별로 골라 보기. 단원 = q.unit, 없으면 자동으로 고른 성취기준의 영역 ===== */
+let pastUnitSel = null, pastUnitKey = '';   // null = 전체
+const pastUnitList = () => pastUnitSel ? [...pastUnitSel].sort((a, b) => a.localeCompare(b, 'ko')) : [];
+function pastUnitOf(x, q) {
+  const u = String(q.unit || '').replace(/^\[[^\]]*\]\s*(\d+\.\s*)?/, '').trim();
+  if (u) return u;
+  const r = stdOf({...q, grade: q.grade || x.grade, unit: `[${x.subject}]`});
+  return r ? r[1] : '기타';
+}
+const pastPicked = (x, all) => all.map((q, i) => ({q, i})).filter(p => !pastUnitSel || pastUnitSel.has(pastUnitOf(x, p.q)));
+function pastUnitUI(x, all) {
+  const box = $('past-units'); if (!box) return;
+  const key = PF.map(f => x[f]).join('|') + '|' + pastMode + '|' + pastCur(x);
+  if (key !== pastUnitKey) { pastUnitKey = key; pastUnitSel = null; }
+  const cnt = new Map(); all.forEach(q => { const u = pastUnitOf(x, q); cnt.set(u, (cnt.get(u) || 0) + 1); });
+  const us = [...cnt.keys()].sort((a, b) => a === '기타' ? 1 : b === '기타' ? -1 : a.localeCompare(b, 'ko'));
+  if (pastUnitSel) pastUnitSel = new Set([...pastUnitSel].filter(u => cnt.has(u)));
+  if (pastUnitSel && !pastUnitSel.size) pastUnitSel = null;
+  const chip = (on, label, n, js) => `<button type="button" onclick="${js}" class="text-xs px-3 py-1.5 rounded-full border transition ${on ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'}">${on ? '<i data-lucide="check"></i>' : ''}${esc(label)} <span class="${on ? 'text-indigo-100' : 'text-gray-400'}">${n}</span></button>`;
+  box.innerHTML = us.length < 2 && !pastUnitSel ? '' : `<span class="text-sm font-semibold text-gray-600 mr-1">단원</span>` + chip(!pastUnitSel, '전체', all.length, 'pastUnitPick(null)') +
+    us.map((u, k) => chip(!!pastUnitSel && pastUnitSel.has(u), u, cnt.get(u), `pastUnitPick(${k})`)).join('');
+  box._units = us;
+}
+function pastUnitPick(k) {
+  if (k === null) pastUnitSel = null;
+  else { const u = $('past-units')._units[k]; pastUnitSel = pastUnitSel || new Set(); pastUnitSel.has(u) ? pastUnitSel.delete(u) : pastUnitSel.add(u); if (!pastUnitSel.size) pastUnitSel = null; }
+  renderPast(curPast);
+}
 const pastQs = (x, qs) => qs.map(q => ({...q, grade: q.grade || x.grade, unit: q.unit || `[${x.subject}]`}));
 function pastDownload() {
-  const x = curPast, qs = pastShown();
+  const x = curPast, qs = pastPickedQs();
   if (!x || !qs || !qs.length) { toast('내려받을 기출 문제가 없습니다.'); return; }
-  exportHwpx(pastQs(x, qs), pastName(x, pastCur(x)), null, {tpl: pastTpl(), ans: $('past-answers').checked, gap: 0, extra: []});
+  const pe = pastExam(x);
+  exportHwpx(pastQs(x, qs), pastName(x, pastCur(x)), pe ? pe.id : null, {tpl: pastTpl(), ans: $('past-answers').checked, gap: 0, extra: []});
+}
+/* ===== 기출 → QR 시험지 등록 (누를 때만). 같은 기출의 같은 세트는 늘 같은 id라 다시 눌러도 하나만 생김 ===== */
+function pastExamId(x, k) {
+  const u = pastUnitList();   // 단원을 골랐으면 다른 시험지로 취급
+  const s = PF.map(f => String(x[f] ?? '')).join('|') + '|' + k + (u.length ? '|' + u.join('|') : '');
+  let h = 2166136261; for (const ch of s) { h ^= ch.codePointAt(0); h = Math.imul(h, 16777619) >>> 0; }
+  return 'pe' + h.toString(36).padStart(7, '0');   // 시험지 코드 = 끝 6자리
+}
+const pastExam = (x = curPast) => x ? stuDB.exams.find(e => e.id === pastExamId(x, pastCur(x))) || null : null;
+function pastRegUI(x, pe) {
+  const b = $('past-reg'), sel = $('past-cls'); if (!b || !sel) return;
+  const cur = pe ? pe.classId || '' : sel.value;
+  sel.innerHTML = '<option value="">수업 없음</option>' + CL().slice().sort((a, b) => a.name.localeCompare(b.name, 'ko')).map(c => `<option value="${c.id}" ${c.id === cur ? 'selected' : ''}>${esc(c.name)}</option>`).join('');
+  b.disabled = !x;
+  b.innerHTML = pe ? `<i data-lucide="qr-code"></i>QR 등록됨 · 코드 ${exCode(pe.id)}` : '<i data-lucide="qr-code"></i>QR 시험지로 등록';
+  b.className = (pe ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-indigo-600 hover:bg-indigo-700') + ' text-white px-4 py-2 rounded-lg font-medium transition text-sm disabled:opacity-50';
+  b.title = pe ? '다시 누르면 문항·정답을 서버에 다시 올립니다.' : '지금 보이는 세트를 시험지로 등록해 QR을 붙입니다.';
+}
+function pastRegister() {
+  const x = curPast, qs = pastPickedQs();
+  if (!x || !qs || !qs.length) { toast('등록할 기출 문제가 없습니다.'); return; }
+  const k = pastCur(x), id = pastExamId(x, k), cid = $('past-cls').value;
+  let e = stuDB.exams.find(y => y.id === id), isNew = !e;
+  if (!e) { e = {id, at: Date.now()}; stuDB.exams.push(e); }
+  if (cid && CL().some(c => c.id === cid)) e.classId = cid; else delete e.classId;
+  e.name = pastName(x, k); e.questions = JSON.parse(JSON.stringify(pastQs(x, qs))); e.past = true;
+  stuSave();
+  if (sbOn() && stuDB.pin) sbPushExam(e).catch(() => toast('서버에 올리지 못했습니다. 인터넷 연결을 확인하세요.'));
+  renderPast(x);
+  toast(!sbReady() ? '시험지로 등록했습니다. QR은 Supabase 연결 설정 뒤에 표시됩니다.' : (isNew ? '시험지로 등록했습니다. ' : '문항·정답을 다시 올렸습니다. ') + `시험지 코드 ${exCode(id)}`);
+}
+function pastSetClass(cid) {
+  const e = pastExam(); if (!e) return;   // 등록 전이면 등록할 때 이 수업으로 들어감
+  if (cid) e.classId = cid; else delete e.classId;
+  stuSave(); sbPushExamClass(e); renderPast(curPast);
+  const c = CL().find(y => y.id === cid); toast(c ? `"${c.name}" 수업에 넣었습니다.` : '수업에서 뺐습니다.');
 }
 /* ===== 기출 문제: 직접 그린 그림 넣기 (변형 문제는 JSON의 variants로 불러옴) ===== */
 const pastShown = () => { const x = curPast, k = x ? pastCur(x) : 0; return !x ? null : k ? x.variants[k-1].questions : x.questions; };
+/* 단원 고르기를 반영한 문항 (미리보기·다운로드·QR 등록용, 번호는 1번부터 다시) */
+const pastPickedQs = () => { const all = pastShown(); return all && pastPicked(curPast, all).map(p => p.q); };
 const pastSave = () => idbSet(PK, pastDB).catch(() => toast('기출 시험지를 브라우저에 저장하지 못했습니다.'));
 /* 그림 파일 → data URL (긴 변 1200px 이하, 큰 파일은 JPEG) */
 async function figData(file) {
@@ -2034,10 +2108,12 @@ function qrBox(tpl) {
 }
 function qrUrl(id = curExamId) { return `${SB_CONFIG.pageUrl.split('#')[0].split('?')[0]}?e=${exCode(id)}`; }
 function drawQR() {
-  const el = $('pv-qr'); if (!el || !sbReady() || typeof QRCode === 'undefined') return;
-  el.innerHTML = '';
-  const s = +el.dataset.s || 110;
-  new QRCode(el, {text: qrUrl(), width: s, height: s, correctLevel: QRCode.CorrectLevel.L});
+  if (!sbReady() || typeof QRCode === 'undefined') return;
+  document.querySelectorAll('.pv-qr').forEach(el => {
+    el.innerHTML = '';
+    const s = +el.dataset.s || 110;
+    new QRCode(el, {text: qrUrl(el.dataset.id || curExamId), width: s, height: s, correctLevel: QRCode.CorrectLevel.L});
+  });
 }
 const SP = new URLSearchParams(location.search);
 /* ===== Supabase ===== */
