@@ -1653,12 +1653,13 @@ function renderStu() {
         <button onclick="rpFrom='';rpTo='';stuGo('report','${s.id}')" class="stu-back">전체 기간</button>
         <div class="ml-auto flex gap-2 flex-wrap"><button onclick="window.print()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold"><i data-lucide="printer"></i>보고서 인쇄</button>
         <button onclick="rpVariant('${s.id}')" class="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-semibold" title="선택한 기간에 틀린 문제와 같은 단원·난이도의 다른 문제로 시험지를 만듭니다"><i data-lucide="refresh-cw"></i>이 기간 틀린 문제로 변형 문제 출제</button></div></div><div id="rp-cls"></div><div id="rp-box"></div>`;
-      const all = teacherReportItems(s.id), names = Object.fromEntries(CL().map(c => [c.id, c.name]));
+      const all = teacherReportItems(s.id), used = new Set(all.map(x => x.cls));
+      const names = Object.fromEntries(CL().filter(c => (c.members || []).includes(s.id) || used.has(c.id)).map(c => [c.id, c.name]));
       const draw = () => {
         rpFrom = $('rp-from').value; rpTo = $('rp-to').value;
         const tabs = rpClsTabs(all, names, rpCls);
         if (!tabs || !tabs.includes(`data-rc="${rpCls}"`)) rpCls = '';
-        $('rp-cls').innerHTML = rpClsTabs(all, names, rpCls);
+        $('rp-cls').innerHTML = rpClsTabs(all, names, rpCls) || '<p class="no-print text-xs text-gray-500 mb-3">이 학생이 듣는 수업이 없어 수업 탭이 없습니다. 수업 화면에서 학생과 시험지를 수업에 넣으면 수업별로 나뉘어 보입니다.</p>';
         $('rp-cls').querySelectorAll('.rp-tab').forEach(t => t.onclick = () => { rpCls = t.dataset.rc; draw(); });
         const cn = rpCls ? (rpCls === '-' ? '수업 없음' : names[rpCls]) : '';
         $('rp-box').innerHTML = buildReport(rpClsPick(all, names, rpCls), {who: `${s.grade} ${s.name}` + (cn ? ` · ${cn}` : ''), from: rpFrom, to: rpTo});
@@ -1808,9 +1809,10 @@ function teacherReportItems(sid) {
 /* 보고서 수업 탭: items[].cls(수업 id, 없으면 '') · names = {id: 이름} · cur = 고른 수업('' 전체, '-' 수업 없음) */
 function rpClsTabs(items, names, cur) {
   const n = {}; items.forEach(x => { const k = x.cls && names[x.cls] ? x.cls : '-'; n[k] = (n[k] || 0) + 1; });
-  const ks = Object.keys(names).filter(k => n[k]).sort((a, b) => names[a].localeCompare(names[b], 'ko'));
+  const ks = Object.keys(names).sort((a, b) => names[a].localeCompare(names[b], 'ko'));
   if (!ks.length) return '';
   if (n['-']) ks.push('-');
+  ks.forEach(k => { n[k] = n[k] || 0; });
   const b = (k, label, c) => `<button type="button" class="rp-tab${cur === k ? ' on' : ''}" data-rc="${k}">${esc(label)}<span>${c}</span></button>`;
   return `<div class="rp-tabs no-print">${b('', '전체', items.length)}${ks.map(k => b(k, k === '-' ? '수업 없음' : names[k], n[k])).join('')}</div>`;
 }
