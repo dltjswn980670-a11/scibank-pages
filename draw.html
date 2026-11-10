@@ -7,52 +7,142 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
 <style>
-:root{--bg:#F2F4F7;--surface:#fff;--ink:#16202E;--muted:#5E6878;--line:#DDE2E9;--accent:#3E8E2F;--accent-s:#EAF5E6}
+:root{--bg:#EEF1F4;--surface:#fff;--ink:#16202E;--muted:#5E6878;--line:#DDE2E9;--accent:#3E8E2F;--accent-s:#EAF5E6;--paper:#FBFCFD}
 *{box-sizing:border-box}
+html,body{height:100%}
 body{margin:0;font-family:'Pretendard Variable',Pretendard,-apple-system,'Malgun Gothic',sans-serif;background:var(--bg);color:var(--ink);letter-spacing:-.01em}
-header{display:flex;align-items:center;gap:10px;padding:10px 16px;background:#fff;border-bottom:1px solid var(--line);flex-wrap:wrap}
+header{display:flex;align-items:center;gap:8px;padding:9px 14px;background:#fff;border-bottom:1px solid var(--line);flex-wrap:wrap}
 header h1{font-size:1.05rem;margin:0 8px 0 0;font-weight:800}
 button,select,input{font:inherit}
 .btn{display:inline-flex;align-items:center;gap:6px;padding:7px 11px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:.82rem;font-weight:600;color:var(--ink);cursor:pointer}
-.btn:hover{background:#f6f7f9}.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn:hover{background:#f6f7f9}.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}.btn.pri:hover{background:#357a28}
+.btn.magic{border-color:#7C5CC4;color:#4B3391;background:#F4F0FC}.btn.magic:hover{background:#ECE5FA}
 .btn svg,.tool svg{width:16px;height:16px}
-.wrap{display:grid;grid-template-columns:56px 220px minmax(0,1fr);gap:12px;padding:12px;height:calc(100vh - 58px)}
-.tools{display:flex;flex-direction:column;gap:6px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:6px}
-.tool{width:42px;height:42px;display:flex;align-items:center;justify-content:center;border-radius:9px;border:1px solid transparent;background:none;cursor:pointer;color:var(--muted)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{display:grid;grid-template-columns:52px minmax(250px,300px) minmax(0,1fr) minmax(280px,330px);gap:10px;padding:10px;height:calc(100vh - 56px)}
+.tools{display:flex;flex-direction:column;gap:6px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:5px}
+.tool{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:9px;border:1px solid transparent;background:none;cursor:pointer;color:var(--muted)}
 .tool:hover{background:#f6f7f9}.tool.on{background:var(--accent-s);border-color:var(--accent);color:var(--ink)}
-.side{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;overflow:auto;display:flex;flex-direction:column;gap:12px}
-.side h3{font-size:.78rem;margin:0 0 6px;color:var(--muted);font-weight:700}
-.lib{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-.lib button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:.68rem;font-weight:600;color:var(--muted);cursor:pointer}
-.lib button:hover{border-color:var(--accent);color:var(--ink)}
-.lib svg{width:40px;height:34px}
+/* 모형 선택창 (왼쪽) */
+.pick{background:#fff;border:1px solid var(--line);border-radius:12px;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.pick-head{padding:10px 10px 8px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+.ff{display:flex;gap:5px}.ff input{flex:1;min-width:0;border:1px solid var(--line);border-radius:8px;padding:6px 9px;font-size:.8rem}.ff .btn{padding:6px 10px}
+#fmsg{color:#B42318}
+.pick-head h2,.pv h2{font-size:.9rem;margin:0;font-weight:800}
+.cats{display:flex;flex-wrap:wrap;gap:4px}
+.cats button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:4px 10px;font-size:.76rem;font-weight:600;color:var(--muted);cursor:pointer}
+.cats button.on{background:var(--ink);border-color:var(--ink);color:#fff}
+#q{border:1px solid var(--line);border-radius:8px;padding:6px 9px;font-size:.8rem;width:100%}
+.grid{flex:1;overflow:auto;padding:8px;display:grid;grid-template-columns:repeat(2,1fr);gap:7px;align-content:start}
+.card{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px 7px;border:1px solid var(--line);border-radius:9px;background:var(--paper);font-size:.74rem;font-weight:700;color:var(--ink);cursor:pointer}
+.card:hover{border-color:var(--accent)}.card.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-s) inset;background:#F6FBF3}
+.card svg{width:100%;height:74px}
+.card .n{position:absolute;top:4px;right:5px;font-size:.62rem;font-weight:700;color:#4B3391;background:#F1ECFB;border-radius:6px;padding:0 5px}
+.style{border-top:1px solid var(--line);padding:8px 10px;font-size:.8rem}
+.style summary{cursor:pointer;font-weight:700;color:var(--muted);font-size:.78rem}
+.style .in{display:flex;flex-direction:column;gap:8px;padding-top:8px}
 .row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:.8rem}
 .row label{color:var(--muted);font-weight:600}
-.sw{width:22px;height:22px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--line);cursor:pointer}
+.sw{width:21px;height:21px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--line);cursor:pointer;padding:0}
 .sw.on{box-shadow:0 0 0 2px var(--ink)}
-.stage{position:relative;overflow:auto;background:#e9ecf1;border-radius:12px;border:1px solid var(--line);display:flex;align-items:flex-start;justify-content:center;padding:20px}
+/* 캔버스 */
+.stage{position:relative;overflow:auto;background:#E3E7EC;border-radius:12px;border:1px solid var(--line);display:flex;align-items:flex-start;justify-content:center;padding:18px;min-height:0}
 #cv{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12);touch-action:none;user-select:none;flex:none}
 #cv .obj{cursor:move}
-.hint{font-size:.72rem;color:var(--muted);line-height:1.5}
 #txt{position:absolute;display:none;border:2px solid var(--accent);border-radius:6px;padding:4px 6px;font-size:16px;min-width:160px;background:#fff;z-index:5}
-@media (max-width:860px){.wrap{grid-template-columns:1fr;height:auto}.tools{flex-direction:row;flex-wrap:wrap}.side{max-height:none}.stage{min-height:70vh;padding:8px}}
+/* 미리보기창 (오른쪽) */
+.pv{background:#fff;border:1px solid var(--line);border-radius:12px;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.pv-tabs{display:flex;border-bottom:1px solid var(--line)}
+.pv-tabs button{flex:1;border:0;background:none;padding:10px 6px;font-size:.8rem;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent}
+.pv-tabs button.on{color:var(--ink);border-bottom-color:var(--accent)}
+.pv-tabs .x{flex:none;width:40px;display:none}
+.pv-body{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:10px}
+.pv-body[hidden]{display:none}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chips button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:5px 9px;font-size:.76rem;font-weight:600;color:var(--ink);cursor:pointer}
+.chips button.on{border-color:#7C5CC4;background:#F1ECFB;color:#3B2780}
+.chips button:hover{border-color:#7C5CC4}
+.pvbox{border:1px solid var(--line);border-radius:10px;background:var(--paper);padding:8px;display:flex;align-items:center;justify-content:center;min-height:200px}
+.pvbox svg{width:100%;height:auto;max-height:380px}
+.empty{color:var(--muted);font-size:.82rem;line-height:1.6;text-align:center;padding:24px 8px}
+.chk{display:flex;align-items:center;gap:6px;font-size:.8rem;font-weight:600}
+.acts{display:flex;gap:6px;flex-wrap:wrap}
+.acts .btn{flex:1;justify-content:center}
+.hint{font-size:.72rem;color:var(--muted);line-height:1.55;margin:0}
+.sub{font-size:.72rem;font-weight:700;color:var(--muted);margin:2px 0 -4px}
+#meas{position:absolute;width:0;height:0;visibility:hidden}
+@media (max-width:1180px){
+  .wrap{grid-template-columns:52px minmax(230px,280px) minmax(0,1fr)}
+  .pv{position:fixed;right:12px;top:66px;bottom:12px;width:min(340px,calc(100vw - 24px));z-index:30;box-shadow:0 10px 30px rgba(22,32,46,.18);display:none}
+  .pv.open{display:flex}.pv-tabs .x{display:block}
+}
+@media (max-width:760px){
+  .wrap{grid-template-columns:44% minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);height:calc(100vh - 100px)}
+  .tools{grid-column:1/-1;flex-direction:row;flex-wrap:wrap}
+  .grid{grid-template-columns:1fr}
+  .stage{padding:8px}
+  header .lbl{display:none}
+}
+/* ===== 2026-11 정리: 제도판처럼 — 판은 붙이고 가는 선으로만 나눔, 캔버스 바닥만 모눈 ===== */
+:root{--bg:#F4F6F8;--ink:#172030;--muted:#5B6576;--line:#E1E5EB;--soft:#F0F2F5}
+header{gap:2px;padding:6px 12px;min-height:52px}
+header h1{display:flex;align-items:center;gap:9px;font-size:1rem;margin-right:14px;letter-spacing:-.03em}
+header h1::before{content:'';width:22px;height:22px;border:2px solid var(--ink);border-radius:5px;background:linear-gradient(var(--accent),var(--accent)) 50%/8px 2px no-repeat,linear-gradient(var(--accent),var(--accent)) 50%/2px 8px no-repeat}
+header>.btn{border-color:transparent;background:transparent;padding:7px 9px;color:var(--muted)}
+header>.btn:hover{background:var(--soft);color:var(--ink)}
+header>.btn:nth-of-type(4),header>.btn:nth-of-type(6){margin-right:6px;position:relative}
+header>.btn:nth-of-type(4)::after,header>.btn:nth-of-type(6)::after{content:'';position:absolute;right:-5px;top:8px;bottom:8px;width:1px;background:var(--line)}
+header>.btn.magic{border-color:transparent;background:#F4F0FC;color:#4B3391}
+header>.btn.magic:hover{background:#ECE5FA}
+header>.btn.pri{background:var(--accent);color:#fff;margin-left:4px}
+header>.btn.pri:hover{background:#357a28;color:#fff}
+header>label.btn{color:var(--muted)}
+.wrap{gap:0;padding:0;height:calc(100vh - 52px);background:#fff}
+.tools,.pick,.pv{border:0;border-radius:0}
+.tools{border-right:1px solid var(--line);padding:8px 6px;gap:4px;align-items:center}
+.tool{width:38px;height:38px;border-radius:8px}
+.tool.on{border-color:transparent;background:var(--ink);color:#fff}
+.pick{border-right:1px solid var(--line)}
+.pv{border-left:1px solid var(--line)}
+.pick-head{padding:14px 12px 10px;gap:10px}
+.pick-head h2,.pv h2{font-size:.95rem;letter-spacing:-.02em}
+.cats{gap:4px}
+.cats button{border:0;background:var(--soft);border-radius:999px;padding:5px 11px}
+.cats button:hover{color:var(--ink)}
+.cats button.on{background:var(--ink);color:#fff}
+#q,.ff input{background:var(--soft);border-color:transparent}
+#q:focus,.ff input:focus{outline:none;background:#fff;border-color:var(--accent)}
+.grid{gap:6px;padding:10px 12px}
+.card{border-color:transparent;background:var(--soft);border-radius:10px;padding:8px 4px 9px;font-weight:600}
+.card:hover{border-color:var(--line);background:#fff}
+.card.on{border-color:var(--accent);background:#fff;box-shadow:none}
+.style{padding:10px 12px}
+.stage{border:0;border-radius:0;padding:28px;background-color:#ECEFF3;background-image:radial-gradient(#C9D0DA 1px,transparent 1px);background-size:16px 16px}
+#cv{box-shadow:0 0 0 1px #D5DBE3,0 6px 20px rgba(23,32,48,.07)}
+.pv-tabs button{padding:13px 6px}
+.pv-body{padding:14px}
+.pvbox{border-color:var(--line);background-color:#fff;background-image:radial-gradient(#E3E7EC 1px,transparent 1px);background-size:12px 12px}
+.chips button{border-radius:999px}
+@media (max-width:1180px){.pv{border:1px solid var(--line);border-radius:12px;top:60px}}
+@media (max-width:760px){.wrap{height:calc(100vh - 96px)}.tools{border-right:0;border-bottom:1px solid var(--line);flex-direction:row}header>.btn:nth-of-type(4)::after,header>.btn:nth-of-type(6)::after{display:none}}
 </style>
 </head>
 <body>
 <header>
   <h1>과학 그림판</h1>
-  <button class="btn" onclick="undo()" title="되돌리기 (Ctrl+Z)"><i data-lucide="undo-2"></i>되돌리기</button>
+  <button class="btn" onclick="undo()" title="되돌리기 (Ctrl+Z)"><i data-lucide="undo-2"></i><span class="lbl">되돌리기</span></button>
   <button class="btn" onclick="redo()" title="다시 하기 (Ctrl+Y)"><i data-lucide="redo-2"></i></button>
-  <button class="btn" onclick="delSel()" title="선택 지우기 (Delete)"><i data-lucide="trash-2"></i>지우기</button>
-  <button class="btn" onclick="dupSel()" title="복제 (Ctrl+D)"><i data-lucide="copy"></i>복제</button>
+  <button class="btn" onclick="delSel()" title="선택 지우기 (Delete)"><i data-lucide="trash-2"></i><span class="lbl">지우기</span></button>
+  <button class="btn" onclick="dupSel()" title="복제 (Ctrl+D)"><i data-lucide="copy"></i></button>
   <button class="btn" onclick="order(1)" title="맨 앞으로"><i data-lucide="bring-to-front"></i></button>
   <button class="btn" onclick="order(-1)" title="맨 뒤로"><i data-lucide="send-to-back"></i></button>
   <button class="btn" onclick="rot(-15)" title="왼쪽으로 15° 돌리기"><i data-lucide="rotate-ccw"></i></button>
   <button class="btn" onclick="rot(15)" title="오른쪽으로 15° 돌리기"><i data-lucide="rotate-cw"></i></button>
   <button class="btn" onclick="flip()" title="좌우 뒤집기"><i data-lucide="flip-horizontal-2"></i></button>
   <span style="flex:1"></span>
-  <label class="btn" title="따라 그릴 그림(오투 그림 등)을 바탕에 깔기"><i data-lucide="image"></i>바탕 그림<input type="file" accept="image/*" hidden onchange="bgLoad(this)"></label>
-  <button class="btn" onclick="clearAll()"><i data-lucide="file-plus"></i>새 그림</button>
+  <button class="btn magic" onclick="pvShow('conv')" title="펜으로 그린 그림을 교재 그림으로 바꾸기"><i data-lucide="wand-sparkles"></i>교재 그림으로 바꾸기</button>
+  <label class="btn" title="따라 그릴 그림을 바탕에 깔기"><i data-lucide="image"></i><span class="lbl">바탕 그림</span><input type="file" accept="image/*" hidden onchange="bgLoad(this)"></label>
+  <button class="btn" onclick="clearAll()"><i data-lucide="file-plus"></i><span class="lbl">새 그림</span></button>
   <button class="btn" onclick="saveSVG()"><i data-lucide="file-code"></i>SVG</button>
   <button class="btn pri" onclick="savePNG()"><i data-lucide="download"></i>PNG 저장</button>
 </header>
@@ -66,42 +156,397 @@ button,select,input{font:inherit}
     <button class="tool" data-t="ellipse" title="원·타원 (O) — Shift: 정원"><i data-lucide="circle"></i></button>
     <button class="tool" data-t="text" title="글자 (T) — H_2O, x^2, 10^{-3}"><i data-lucide="type"></i></button>
   </div>
-  <div class="side">
-    <div>
-      <h3>선 색</h3>
-      <div class="row" id="strokes"></div>
+
+  <aside class="pick" aria-label="모형 선택">
+    <div class="pick-head">
+      <h2>모형 고르기</h2>
+      <div class="cats" id="cats"></div>
+      <input id="q" type="search" placeholder="모형 찾기 (예: 세포, 화산, 전선)">
+      <form id="ff" class="ff"><input id="fq" placeholder="화학식으로 그리기: H2O, CH4, NaCl, Na, Cl-" autocomplete="off" aria-label="화학식"><button class="btn pri" type="submit">그리기</button></form>
+      <p class="hint" id="fmsg" hidden></p>
     </div>
-    <div>
-      <h3>채우기</h3>
-      <div class="row" id="fills"></div>
-    </div>
-    <div class="row"><label>굵기</label><input type="range" id="sw" min="1" max="10" value="2" style="flex:1"><span id="swv">2</span></div>
-    <div class="row"><label>점선</label><input type="checkbox" id="dash"><label style="margin-left:8px">글자 크기</label><input type="number" id="fs" value="18" min="8" max="72" style="width:58px"></div>
-    <div class="row"><label>캔버스</label><select id="size" onchange="setSize(this.value)"><option value="800x500">가로 800×500</option><option value="600x600">정사각 600×600</option><option value="500x700">세로 500×700</option><option value="1000x400">넓게 1000×400</option></select></div>
-    <div><h3>실험 기구</h3><div class="lib" id="lib-lab"></div></div>
-    <div><h3>전기·자기·힘</h3><div class="lib" id="lib-phy"></div></div>
-    <div><h3>생명·지구·우주</h3><div class="lib" id="lib-bio"></div></div>
-    <p class="hint">기구를 누르면 가운데에 놓입니다. 끌어서 옮기고, 선택한 뒤 오른쪽 아래 점을 끌면 크기가 바뀝니다. 글자는 H_2O → H₂O, x^2 → x², 10^{-3}처럼 쓰면 첨자로 그려집니다. 그림은 이 브라우저에 자동 저장됩니다.</p>
-  </div>
+    <div class="grid" id="grid"></div>
+    <details class="style">
+      <summary>선·채우기·캔버스</summary>
+      <div class="in">
+        <div><div class="sub">선 색</div><div class="row" id="strokes" style="margin-top:8px"></div></div>
+        <div><div class="sub">채우기</div><div class="row" id="fills" style="margin-top:8px"></div></div>
+        <div class="row"><label for="sw">굵기</label><input type="range" id="sw" min="1" max="10" value="2" style="flex:1"><span id="swv">2</span></div>
+        <div class="row"><label for="dash">점선</label><input type="checkbox" id="dash"><label for="fs" style="margin-left:8px">글자 크기</label><input type="number" id="fs" value="18" min="8" max="72" style="width:58px"></div>
+        <div class="row"><label for="size">캔버스</label><select id="size" onchange="setSize(this.value)"><option value="800x500">가로 800×500</option><option value="600x600">정사각 600×600</option><option value="500x700">세로 500×700</option><option value="1000x400">넓게 1000×400</option></select></div>
+      </div>
+    </details>
+  </aside>
+
   <div class="stage" id="stage">
     <svg id="cv" xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500">
       <g id="bg"></g><g id="layer"></g><g id="ui"></g>
     </svg>
     <input id="txt" type="text" placeholder="글자 입력 후 Enter">
   </div>
+
+  <aside class="pv" id="pv" aria-label="미리보기">
+    <div class="pv-tabs">
+      <button data-m="model" class="on">모형 미리보기</button>
+      <button data-m="conv">펜 그림 바꾸기</button>
+      <button class="x" onclick="pvClose()" title="닫기" aria-label="미리보기 닫기">✕</button>
+    </div>
+    <div class="pv-body" id="pv-model">
+      <div class="empty" id="pvEmpty">왼쪽에서 모형을 고르면 여기에서 크게 보고,<br>세부 모습을 바꾼 뒤 그림에 넣을 수 있습니다.</div>
+      <div id="pvMain" hidden style="display:flex;flex-direction:column;gap:10px">
+        <h2 id="pvTitle"></h2>
+        <div class="sub">세부 모습</div>
+        <div class="chips" id="vars"></div>
+        <div class="pvbox"><svg id="pvsvg" xmlns="http://www.w3.org/2000/svg"></svg></div>
+        <label class="chk"><input type="checkbox" id="lab" checked> 이름표 보이기</label>
+        <div class="acts">
+          <button class="btn pri" id="ins"><i data-lucide="plus"></i>그림에 넣기</button>
+          <button class="btn" id="rep" disabled><i data-lucide="replace"></i>선택한 모형 바꾸기</button>
+        </div>
+        <p class="hint" id="pvHint">캔버스에서 넣은 모형을 선택한 뒤 위의 세부 모습을 누르면 그 자리에서 바로 바뀝니다.</p>
+      </div>
+    </div>
+    <div class="pv-body" id="pv-conv" hidden>
+      <p class="hint">펜으로 그린 선을 매끄럽게 다듬고, 무엇을 그렸는지에 맞춰 색과 이름표를 넣습니다. 캔버스의 펜 선 전체를 바꿉니다.</p>
+      <div class="sub">무엇을 그렸나요?</div>
+      <div class="chips" id="subs"></div>
+      <label class="chk"><input type="checkbox" id="cLab" checked> 이름표 달기</label>
+      <label class="chk"><input type="checkbox" id="cSnap" checked> 거의 동그란 선은 원으로, 거의 곧은 선은 직선으로</label>
+      <label class="chk"><input type="checkbox" id="cFill" checked> 빠진 구조 채우기 (세포라면 교과서처럼 소기관을 갖춤)</label>
+      <label class="chk"><input type="checkbox" id="cModel"> 내 선 대신 정교한 모형으로 바꾸기</label>
+      <div class="pvbox"><svg id="cvsvg" xmlns="http://www.w3.org/2000/svg"></svg></div>
+      <div class="acts"><button class="btn pri" id="cGo"><i data-lucide="wand-sparkles"></i>이렇게 바꾸기</button></div>
+      <p class="hint" id="cInfo"></p>
+    </div>
+  </aside>
 </div>
+<svg id="meas" xmlns="http://www.w3.org/2000/svg"></svg>
 <script>
 const NS = 'http://www.w3.org/2000/svg';
 const $ = id => document.getElementById(id);
 const cv = $('cv'), layer = $('layer'), ui = $('ui'), bg = $('bg');
-const ST = {tool: 'sel', stroke: '#16202E', fill: 'none', sel: null};
+const ST = {tool: 'sel', stroke: '#16202E', fill: 'none', sel: null, cat: '생명', pick: null, vi: 0, pvMode: 'model', subj: '자동'};
 const STROKES = ['#16202E', '#6B7280', '#DC2626', '#2563EB', '#16A34A', '#D97706', '#7C3AED', '#FFFFFF'];
 const FILLS = ['none', '#FFFFFF', '#E5E7EB', '#9CA3AF', '#DBEAFE', '#FEE2E2', '#DCFCE7', '#FEF3C7', '#16202E'];
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const f1 = n => Math.round(n * 10) / 10;
 
-/* ===== 기구 모양 (0,0 기준, 선 색은 currentColor, 채우기 칸은 class="f") ===== */
-const LIB = {
-  lab: {
+/* ================= 그리기 도우미 ================= */
+let _s = 1; const seed = n => { _s = n; }; const rnd = () => (_s = (_s * 16807) % 2147483647) / 2147483647;
+const T = (x, y, t, o = '') => `<text x="${f1(x)}" y="${f1(y)}" stroke="none" fill="#1F2937" font-size="11" font-weight="500" ${o}>${t}</text>`;
+const tube = (d, c1, c2, w) => `<path d="${d}" fill="none" stroke="${c1}" stroke-width="${w}"/><path d="${d}" fill="none" stroke="${c2}" stroke-width="${f1(w - 2.6)}"/>`;
+const dots = (a, r = 1.6, c = '#334155') => a.map(([x, y]) => `<circle cx="${f1(x)}" cy="${f1(y)}" r="${r}" fill="${c}" stroke="none"/>`).join('');
+const ball = (x, y, r, c, s, t = '', tc = '#fff') => `<circle cx="${f1(x)}" cy="${f1(y)}" r="${r}" fill="${c}" stroke="${s}" stroke-width="1.2"/>${t ? `<text x="${f1(x)}" y="${f1(y + r * .36)}" font-size="${f1(r * .95)}" font-weight="700" text-anchor="middle" fill="${tc}" stroke="none">${t}</text>` : ''}`;
+const head = (x, y, a, c, h = 7) => `<path d="M${f1(x)} ${f1(y)} L${f1(x - h * Math.cos(a - .45))} ${f1(y - h * Math.sin(a - .45))} L${f1(x - h * Math.cos(a + .45))} ${f1(y - h * Math.sin(a + .45))} Z" fill="${c}" stroke="none"/>`;
+const arw = (x1, y1, x2, y2, c = '#1D4ED8', w = 2, h = 7) => `<path d="M${f1(x1)} ${f1(y1)} L${f1(x2)} ${f1(y2)}" stroke="${c}" stroke-width="${w}" fill="none"/>` + head(x2, y2, Math.atan2(y2 - y1, x2 - x1), c, h);
+const carw = (d, x2, y2, deg, c = '#1D4ED8', w = 2, h = 7) => `<path d="${d}" stroke="${c}" stroke-width="${w}" fill="none"/>` + head(x2, y2, deg * Math.PI / 180, c, h);
+const mito = (x, y, a, sc = 1) => `<g transform="translate(${x} ${y}) rotate(${a}) scale(${sc})"><ellipse rx="20" ry="9" fill="#F6A25E" stroke="#C25A1C" stroke-width="1.5"/><path d="M-15 0 l3-5.5 l4 11 l4-11 l4 11 l4-11 l4 11 l3-5.5" fill="none" stroke="#C25A1C" stroke-width="1"/></g>`;
+const chloro = (x, y, a, sc = 1) => `<g transform="translate(${x} ${y}) rotate(${a}) scale(${sc})"><ellipse rx="17" ry="8.5" fill="#62BF68" stroke="#2F7D32" stroke-width="1.4"/><path d="M-12 0 h24" stroke="#2F7D32" stroke-width=".7"/>${[-9, 0, 9].map(d => `<rect x="${d - 2.5}" y="-4" width="5" height="8" rx="1" fill="#2F7D32" stroke="none"/>`).join('')}</g>`;
+const nucleus = (cx, cy, rx, ry) => `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="#CDB8F0" stroke="#6B4FB5" stroke-width="2.2"/><ellipse cx="${cx}" cy="${cy}" rx="${f1(rx * .9)}" ry="${f1(ry * .89)}" fill="none" stroke="#9D85DA" stroke-width=".9" stroke-dasharray="7 3"/><path d="M${cx - rx * .55} ${cy - ry * .35} q${rx * .17} ${-ry * .22} ${rx * .33} 0 t${rx * .33} 1 M${cx - rx * .6} ${cy + ry * .38} q${rx * .22} ${ry * .19} ${rx * .39} 0" fill="none" stroke="#8E74CF" stroke-width="1.1"/><ellipse cx="${f1(cx + rx * .15)}" cy="${f1(cy + ry * .06)}" rx="${f1(rx * .3)}" ry="${f1(ry * .28)}" fill="#6B4FB5" stroke="none"/>`;
+const cloud = (parts, fill = '#FFFFFF', st = '#94A3B8') => parts.map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" stroke="${st}" stroke-width="2.6"/>`).join('') + parts.map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" stroke="none"/>`).join('');
+const poly = pts => pts.map((p, i) => (i ? 'L' : 'M') + f1(p[0]) + ' ' + f1(p[1])).join(' ');
+
+/* 지층 무늬 */
+const ROCK = {'사암': ['#F1D79A', '#A88A47'], '셰일': ['#B7B1A3', '#5F5848'], '석회암': ['#DCE4E8', '#6D7C86'], '역암': ['#D8B386', '#7A5A35'], '이암': ['#C9B79C', '#6C5A40'], '응회암': ['#E6C7C7', '#8A5E5E']};
+function strata(curves, types, x0, x1, sd = 7) {
+  seed(sd); let out = '';
+  types.forEach((ty, i) => {
+    const top = curves[i], bot = curves[i + 1], [fc, dk] = ROCK[ty], xs = [];
+    for (let x = x0; x <= x1; x += 5) xs.push(x);
+    const pts = xs.map(x => [x, top(x)]).concat(xs.slice().reverse().map(x => [x, bot(x)]));
+    out += `<path d="${poly(pts)} Z" fill="${fc}" stroke="${dk}" stroke-width=".9"/>`;
+    const at = (x, fr) => top(x) + (bot(x) - top(x)) * fr;
+    const n = Math.round((x1 - x0) / 6);
+    if (ty === '사암') for (let k = 0; k < n * 2; k++) { const x = x0 + 3 + rnd() * (x1 - x0 - 6); out += `<circle cx="${f1(x)}" cy="${f1(at(x, .12 + .76 * rnd()))}" r=".9" fill="${dk}" stroke="none"/>`; }
+    if (ty === '셰일' || ty === '이암') [.33, .66].forEach((fr, j) => { for (let x = x0 + 4 + j * 6; x < x1 - 8; x += 15) out += `<path d="M${f1(x)} ${f1(at(x, fr))} L${f1(x + 8)} ${f1(at(x + 8, fr))}" stroke="${dk}" stroke-width=".9"/>`; });
+    if (ty === '석회암') { out += `<path d="${poly(xs.map(x => [x, at(x, .5)]))}" fill="none" stroke="${dk}" stroke-width=".8"/>`; [[0, .5, 0], [.5, 1, 9]].forEach(([a, b, o]) => { for (let x = x0 + 9 + o; x < x1 - 2; x += 18) out += `<path d="M${f1(x)} ${f1(at(x, a))} L${f1(x)} ${f1(at(x, b))}" stroke="${dk}" stroke-width=".8"/>`; }); }
+    if (ty === '역암') for (let k = 0; k < n; k++) { const x = x0 + 5 + rnd() * (x1 - x0 - 10); out += `<ellipse cx="${f1(x)}" cy="${f1(at(x, .2 + .6 * rnd()))}" rx="${f1(2.2 + rnd() * 2.2)}" ry="${f1(1.8 + rnd() * 1.4)}" fill="#EFD9B8" stroke="${dk}" stroke-width=".7"/>`; }
+    if (ty === '응회암') for (let k = 0; k < n; k++) { const x = x0 + 4 + rnd() * (x1 - x0 - 8), y = at(x, .15 + .7 * rnd()); out += `<path d="M${f1(x)} ${f1(y - 2)} l2 3.5 h-4z" fill="${dk}" stroke="none"/>`; }
+  });
+  return out;
+}
+const trilobite = (x, y) => `<g transform="translate(${x} ${y})"><ellipse rx="6.5" ry="8.5" fill="#9A8A70" stroke="#5C5040" stroke-width=".8"/><path d="M-6 -3 h12 M-6.5 1 h13 M-5 5 h10 M0 -8.5 v17" stroke="#5C5040" stroke-width=".6"/></g>`;
+
+/* ================= 모형 정의: 분야 → 모형 → 세부 모습 {box, s, L(이름표)} ================= */
+const C = {};
+const def = (cat, name, v) => { (C[cat] = C[cat] || {})[name] = v; };
+
+/* ---------- 생명 ---------- */
+(() => {
+  const mem = 'M130 8 C200 6 252 40 254 96 C256 150 206 184 132 184 C62 186 8 154 8 96 C8 40 60 10 130 8 Z';
+  const cyto = `<path d="${mem}" fill="#FDE7D3" stroke="#D9774A" stroke-width="3"/>`;
+  const er = ['M78 62 q-12 34 4 66', 'M92 48 q40 -14 70 6', 'M160 70 q14 26 0 56', 'M92 146 q36 14 66 -6'].map(d => tube(d, '#5B8FD0', '#D6E6F8', 6)).join('');
+  const golgi = [0, 1, 2, 3].map(i => tube(`M196 ${94 + i * 8} q18 -9 36 0`, '#D99A2B', '#FBE0A2', 5.5)).join('') + [[238, 96], [240, 124], [192, 126]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="3.4" fill="#FBE0A2" stroke="#D99A2B" stroke-width="1"/>`).join('');
+  const lyso = [[60, 64, 7], [160, 167, 6]].map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#F3A6C8" stroke="#C2477E" stroke-width="1.2"/><circle cx="${x - 2}" cy="${y - 1}" r="1.2" fill="#C2477E" stroke="none"/><circle cx="${x + 2}" cy="${y + 2}" r="1" fill="#C2477E" stroke="none"/>`).join('');
+  const cent = `<g transform="translate(176 38)"><rect x="-8" y="-2.6" width="16" height="5.2" rx="1.6" fill="#A7B4C6" stroke="#475569" stroke-width=".8"/><rect x="6" y="-8" width="5.2" height="16" rx="1.6" fill="#A7B4C6" stroke="#475569" stroke-width=".8"/></g>`;
+  const ribo = dots([[100, 40], [108, 45], [150, 37], [66, 100], [86, 152], [120, 160], [142, 163], [176, 96], [182, 84], [58, 112], [228, 78], [224, 146], [38, 92], [44, 72], [208, 170], [70, 80], [84, 58], [118, 52], [140, 50], [170, 132], [150, 140], [100, 140]]);
+  def('생명', '동물 세포', {
+    '전체 소기관': {box: [262, 192], s: cyto + er + golgi + nucleus(118, 96, 36, 32) + mito(205, 62, 25) + mito(196, 148, -28) + mito(50, 136, 40) + lyso + cent + ribo,
+      L: [[9, 100, '세포막', 'l'], [88, 80, '핵', 'l'], [76, 96, '소포체', 'l'], [100, 40, '라이보솜', 'l'], [60, 64, '라이소좀', 'l'], [124, 98, '인', 'r'], [176, 38, '중심체', 'r'], [205, 62, '마이토콘드리아', 'r'], [214, 100, '골지체', 'r'], [110, 170, '세포질', 'r']]},
+    '기본 구조': {box: [262, 192], s: cyto + nucleus(118, 96, 38, 34) + dots([[60, 60], [70, 130], [190, 60], [200, 140], [170, 165], [50, 100], [220, 100]], 1.8, '#E0A57F'),
+      L: [[9, 100, '세포막', 'l'], [60, 140, '세포질', 'l'], [150, 90, '핵', 'r']]}
+  });
+
+  const wall = `<rect x="3" y="3" width="254" height="184" rx="12" fill="#B9DC8E" stroke="#4D7C0F" stroke-width="2"/><rect x="11" y="11" width="238" height="168" rx="8" fill="#F1F8E3" stroke="#6B9A2E" stroke-width="1.3"/>`;
+  const vac = `<path d="M100 46 C138 32 200 36 220 58 C236 80 230 124 208 142 C184 160 128 158 108 142 C88 126 80 66 100 46 Z" fill="#D6ECFA" stroke="#5B9BD5" stroke-width="1.6"/><path d="M112 60 C130 50 160 50 176 56" fill="none" stroke="#fff" stroke-width="3" opacity=".8"/>`;
+  const chl = [[122, 24, 4], [178, 23, -4], [240, 100, 90], [230, 162, -30], [160, 168, 2], [96, 166, -6], [40, 150, 20], [22, 112, 90]].map(([x, y, a]) => chloro(x, y, a)).join('');
+  def('생명', '식물 세포', {
+    '전체 소기관': {box: [260, 190], s: wall + vac + tube('M34 100 q20 12 44 0', '#5B8FD0', '#D6E6F8', 5) + nucleus(52, 64, 24, 21) + chl + mito(70, 124, 30, .8) + mito(84, 30, -20, .8) + dots([[70, 90], [90, 104], [40, 130], [150, 22], [210, 22], [200, 168], [120, 170], [240, 130], [30, 40]]),
+      L: [[4, 40, '세포벽', 'l'], [36, 56, '핵', 'l'], [11, 132, '세포막', 'l'], [70, 124, '마이토콘드리아', 'l'], [56, 102, '소포체', 'l'], [240, 100, '엽록체', 'r'], [190, 100, '액포', 'r'], [128, 164, '세포질', 'r']]},
+    '기본 구조': {box: [260, 190], s: wall + vac + nucleus(52, 64, 24, 21) + [[122, 24, 4], [240, 100, 90], [160, 168, 2], [40, 150, 20]].map(([x, y, a]) => chloro(x, y, a)).join(''),
+      L: [[4, 40, '세포벽', 'l'], [11, 132, '세포막', 'l'], [36, 56, '핵', 'l'], [240, 100, '엽록체', 'r'], [190, 100, '액포', 'r']]}
+  });
+
+  /* 세포 소기관 */
+  const ytop = (x, c, rx, ry) => c - ry * Math.sqrt(Math.max(0, 1 - ((x - 110) / rx) ** 2));
+  let cr = ''; [40, 62, 84, 106, 128, 150, 172].forEach((x, i) => { const t = ytop(x, 55, 96, 40), b = 110 - t; cr += tube(i % 2 ? `M${x} ${f1(b)} V${f1(b - (b - 55) * 1.5)}` : `M${x} ${f1(t)} V${f1(t + (55 - t) * 1.5)}`, '#B4541A', '#F6A25E', 7); });
+  seed(3); let mg = ''; for (let k = 0; k < 26; k++) { const x = 30 + rnd() * 160, y = 30 + rnd() * 50; if (Math.abs((x - 110) / 92) ** 2 + Math.abs((y - 55) / 36) ** 2 < 1) mg += `<circle cx="${f1(x)}" cy="${f1(y)}" r="1.1" fill="#B4541A" stroke="none"/>`; }
+  let gr = '', lam = ''; const gx = [45, 80, 115, 150, 182];
+  gx.forEach((x, i) => { const y0 = (i % 2 ? 46 : 36); for (let k = 0; k < 6; k++) gr += `<rect x="${x - 12}" y="${y0 + k * 5.5}" width="24" height="4.6" rx="2.3" fill="#3E9B45" stroke="#1F6A27" stroke-width=".6"/>`; if (i < gx.length - 1) { const y1 = (i % 2 ? 36 : 46); lam += `<path d="M${x + 12} ${y0 + 12} L${gx[i + 1] - 12} ${y1 + 18}" stroke="#3E9B45" stroke-width="2"/>`; } });
+  let pores = '', chrom = ''; for (let a = 0; a < 360; a += 30) pores += `<rect x="-3" y="-81" width="6" height="12" fill="#F8F5FF" stroke="#6B4FB5" stroke-width=".9" transform="translate(100 85) rotate(${a})"/>`;
+  seed(11); for (let k = 0; k < 9; k++) { const a = rnd() * 6.28, r = 20 + rnd() * 38, x = 100 + r * Math.cos(a), y = 85 + r * Math.sin(a); chrom += `<path d="M${f1(x)} ${f1(y)} q5 -7 10 0 t10 0 t10 -2" fill="none" stroke="#8B6FD0" stroke-width="1.4" transform="rotate(${Math.round(rnd() * 180)} ${f1(x)} ${f1(y)})"/>`; }
+  def('생명', '세포 소기관', {
+    '마이토콘드리아': {box: [220, 110], s: `<ellipse cx="110" cy="55" rx="104" ry="48" fill="#F6A25E" stroke="#B4541A" stroke-width="2.2"/><ellipse cx="110" cy="55" rx="96" ry="40" fill="#FCDDB8" stroke="#B4541A" stroke-width="1.4"/>${cr}${mg}`,
+      L: [[200, 31, '외막', 'r'], [195, 37, '내막', 'r'], [40, 45, '크리스타', 'l'], [73, 62, '기질', 'l']]},
+    '엽록체': {box: [220, 110], s: `<ellipse cx="110" cy="55" rx="104" ry="48" fill="#8ED081" stroke="#2E7D32" stroke-width="2.2"/><ellipse cx="110" cy="55" rx="97" ry="41" fill="#D2EEC4" stroke="#2E7D32" stroke-width="1.2"/>${lam}${gr}<ellipse cx="140" cy="86" rx="9" ry="5" fill="#F5F0DC" stroke="#B9A35C" stroke-width=".8"/>`,
+      L: [[205, 36, '외막', 'r'], [198, 40, '내막', 'r'], [45, 46, '그라나', 'l'], [70, 49, '틸라코이드', 'l'], [165, 90, '스트로마', 'r']]},
+    '핵': {box: [200, 170], s: `<circle cx="100" cy="85" r="78" fill="#E3D7F7" stroke="#6B4FB5" stroke-width="2.2"/><circle cx="100" cy="85" r="72" fill="#D3C2F2" stroke="#6B4FB5" stroke-width="1.2"/>${pores}${chrom}<path d="M50 70 q8 -10 16 0 t16 0" fill="none" stroke="#8B6FD0" stroke-width="1.6"/><circle cx="112" cy="94" r="22" fill="#6B4FB5" stroke="none"/>${dots([[104, 88], [118, 90], [110, 102], [122, 100]], 2.2, '#9D85DA')}`,
+      L: [[22, 85, '핵막', 'l'], [58, 66, '염색질', 'l'], [170, 44, '핵공', 'r'], [120, 94, '인', 'r']]}
+  });
+
+  /* 잎 */
+  let veins = ''; for (let x = 52; x <= 190; x += 23) { const y = 74 - (x - 30) * .02, sh = Math.sin(Math.PI * (x - 30) / 190); veins += `<path d="M${x} ${f1(y)} Q${x + 14} ${f1(y - 14 * sh)} ${x + 30} ${f1(y - 34 * sh)} M${x} ${f1(y)} Q${x + 14} ${f1(y + 14 * sh)} ${x + 30} ${f1(y + 34 * sh)}" fill="none" stroke="#CFEABB" stroke-width="1.4"/>`; }
+  let sec = `<rect x="5" y="5" width="260" height="5" fill="#F3E9A8" stroke="#C9B65A" stroke-width=".8"/>`;
+  for (let x = 5; x < 265; x += 20) sec += `<rect x="${x}" y="10" width="20" height="14" rx="2" fill="#F4FBEF" stroke="#6E9E53" stroke-width=".9"/>`;
+  for (let x = 7; x < 262; x += 13) { sec += `<rect x="${x}" y="26" width="11" height="42" rx="5" fill="#BFE3A7" stroke="#4E8A36" stroke-width=".9"/>`; for (let k = 0; k < 4; k++) sec += `<ellipse cx="${x + (k % 2 ? 8 : 3)}" cy="${32 + k * 9}" rx="2" ry="1.5" fill="#3E9B45" stroke="none"/>`; }
+  seed(5); for (let y = 78; y < 132; y += 13) for (let x = 12 + (y % 2) * 6; x < 262; x += 19) { const cx = x + rnd() * 5, cy = y + rnd() * 4, r = 6 + rnd() * 3; if (Math.hypot(cx - 135, cy - 100) < 30 || (cx > 196 && cx < 232 && cy > 112)) continue; sec += `<circle cx="${f1(cx)}" cy="${f1(cy)}" r="${f1(r)}" fill="#D4EDC3" stroke="#4E8A36" stroke-width=".9"/><circle cx="${f1(cx - 2)}" cy="${f1(cy + 1)}" r="1.4" fill="#3E9B45" stroke="none"/>`; }
+  sec += `<circle cx="135" cy="100" r="24" fill="#F7F1D9" stroke="#9A7B3A" stroke-width="1.2"/>`;
+  [[124, 90], [135, 87], [146, 90], [128, 99], [142, 99]].forEach(([x, y]) => sec += `<circle cx="${x}" cy="${y}" r="4.2" fill="#fff" stroke="#7A5C24" stroke-width="1.5"/>`);
+  [[126, 110], [133, 112], [140, 112], [147, 109], [130, 117], [138, 118]].forEach(([x, y]) => sec += `<circle cx="${x}" cy="${y}" r="2.6" fill="#EDE2C0" stroke="#9A7B3A" stroke-width=".7"/>`);
+  for (let x = 5; x < 265; x += 20) { if (x > 190 && x < 226) continue; sec += `<rect x="${x}" y="136" width="20" height="12" rx="2" fill="#F4FBEF" stroke="#6E9E53" stroke-width=".9"/>`; }
+  sec += `<ellipse cx="207" cy="142" rx="7" ry="6.5" fill="#9BD18A" stroke="#3F7D2C" stroke-width="1.1"/><ellipse cx="223" cy="142" rx="7" ry="6.5" fill="#9BD18A" stroke="#3F7D2C" stroke-width="1.1"/>${dots([[205, 140], [208, 144], [221, 140], [224, 144]], 1.3, '#2F7D32')}<rect x="5" y="148" width="260" height="4" fill="#F3E9A8" stroke="#C9B65A" stroke-width=".8"/>`;
+  const gcell = side => `<path d="M100 28 C${100 + side * 34} 28 ${100 + side * 40} 122 100 122 C${100 + side * 10} 104 ${100 + side * 10} 46 100 28 Z" fill="#8FD07D" stroke="#3F7D2C" stroke-width="1.6"/>`;
+  def('생명', '잎', {
+    '겉모습': {box: [218, 130], s: `<path d="M2 80 Q14 78 30 75" stroke="#3F7D2C" stroke-width="5" fill="none"/><path d="M30 75 C50 25 140 10 215 70 C140 132 50 125 30 75 Z" fill="#79C267" stroke="#3F7D2C" stroke-width="2"/>${veins}${tube('M22 76 Q120 68 213 70', '#3F7D2C', '#CFEABB', 4)}`,
+      L: [[80, 52, '잎몸', 't'], [148, 60, '잎맥', 't'], [10, 79, '잎자루', 'b']]},
+    '단면 구조': {box: [270, 156], s: sec, L: [[8, 7, '큐티클층', 'l'], [12, 17, '위표피', 'l'], [20, 47, '울타리 조직', 'l'], [34, 100, '해면 조직', 'l'], [40, 142, '아래표피', 'l'], [157, 98, '관다발(잎맥)', 'r'], [215, 140, '기공', 'r'], [228, 142, '공변세포', 'r']]},
+    '기공(겉모습)': {box: [200, 150], s: `<rect x="0" y="0" width="200" height="150" rx="6" fill="#F2F8EC" stroke="#7AA35F" stroke-width="1.2"/><path d="M0 40 C20 30 40 50 60 30 M60 30 L62 0 M140 0 L138 30 C160 50 180 30 200 42 M0 110 C20 120 40 100 60 120 L62 150 M140 150 L138 120 C160 100 180 120 200 108" fill="none" stroke="#7AA35F" stroke-width="1.2"/>${gcell(-1)}${gcell(1)}<path d="M100 28 C90 46 90 104 100 122 C110 104 110 46 100 28 Z" fill="#2D4A2D" stroke="none"/>${dots([[78, 50], [74, 70], [76, 92], [122, 50], [126, 70], [124, 92], [80, 112], [120, 112]], 2.6, '#2F7D32')}<circle cx="72" cy="80" r="4" fill="#B9A2E6" stroke="#6B4FB5" stroke-width=".8"/><circle cx="128" cy="80" r="4" fill="#B9A2E6" stroke="#6B4FB5" stroke-width=".8"/>`,
+      L: [[100, 75, '기공', 'l'], [126, 60, '공변세포', 'r'], [25, 75, '표피 세포', 'l']]}
+  });
+
+  const petal = 'M100 160 C50 150 20 80 46 40 C70 70 92 110 104 150 Z', sepal = 'M98 168 Q70 160 62 132 Q86 142 104 160 Z';
+  const mir = d => d.replace(/(-?\d+\.?\d*) (-?\d+\.?\d*)/g, (m, x, y) => `${f1(220 - x)} ${y}`);
+  const stamen = (fil, ax, ay, a) => `<path d="${fil}" fill="none" stroke="#C7A33A" stroke-width="2"/><ellipse cx="${ax}" cy="${ay}" rx="5.5" ry="8.5" fill="#F3C431" stroke="#B4871A" stroke-width="1.1" transform="rotate(${a} ${ax} ${ay})"/>`;
+  def('생명', '꽃 구조', {
+    '세로 단면': {box: [220, 230], s: `<path d="M104 230 L104 170 L116 170 L116 230" fill="#6BB35A" stroke="#3F7D2C" stroke-width="1.4"/><path d="M88 174 Q110 150 132 174 Z" fill="#7CC36A" stroke="#3F7D2C" stroke-width="1.2"/><path d="${sepal}" fill="#79C267" stroke="#3F7D2C" stroke-width="1.3"/><path d="${mir(sepal)}" fill="#79C267" stroke="#3F7D2C" stroke-width="1.3"/><path d="${petal}" fill="#F6A9C6" stroke="#C2477E" stroke-width="1.6"/><path d="${mir(petal)}" fill="#F6A9C6" stroke="#C2477E" stroke-width="1.6"/><path d="M60 60 C74 86 88 116 100 148 M160 60 C146 86 132 116 120 148" fill="none" stroke="#E784A9" stroke-width="1"/>${stamen('M100 150 Q84 110 76 80', 75, 74, -15)}${stamen('M102 148 Q92 118 90 96', 89, 90, -8)}${stamen('M120 150 Q136 110 144 80', 145, 74, 15)}${stamen('M118 148 Q128 118 130 96', 131, 90, 8)}<path d="M106 130 L106 72 L114 72 L114 130" fill="#C6E89E" stroke="#3F7D2C" stroke-width="1.2"/><path d="M97 72 Q110 52 123 72 Q110 78 97 72 Z" fill="#E0D14A" stroke="#A68A2E" stroke-width="1.2"/><ellipse cx="110" cy="148" rx="16" ry="20" fill="#B5E08E" stroke="#3F7D2C" stroke-width="1.6"/>${[[105, 140], [115, 146], [106, 155]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="3.4" ry="4.4" fill="#FFF6D6" stroke="#A68A2E" stroke-width=".8"/>`).join('')}${dots([[66, 66], [70, 60], [152, 62], [158, 68]], 1.3, '#D9A400')}`,
+      L: [[50, 72, '꽃잎', 'l'], [75, 72, '꽃밥', 'l'], [86, 122, '수술대', 'l'], [105, 141, '밑씨', 'l'], [80, 150, '꽃받침', 'l'], [118, 64, '암술머리', 'r'], [114, 100, '암술대', 'r'], [125, 152, '씨방', 'r'], [110, 200, '꽃자루', 'r']]}
+  });
+
+  const den = ['M30 40 L18 22 L8 14 M18 22 L14 6', 'M24 52 L8 50 L2 42 M8 50 L1 58', 'M30 78 L16 92 L6 96 M16 92 L14 106', 'M46 30 L44 12 L36 4 M44 12 L54 4', 'M58 84 L60 100 L54 112 M60 100 L70 110'];
+  const term = ['M262 58 L282 40 L296 32 M282 40 L300 44', 'M262 58 L290 60 L304 56', 'M262 58 L280 78 L298 86 M280 78 L292 96'];
+  def('생명', '뉴런', {
+    '운동 뉴런': {box: [310, 120], s: den.map(d => tube(d, '#B5653A', '#F7C6A3', 4)).join('') + tube('M70 58 L262 58', '#B5653A', '#F7C6A3', 5) + term.map(d => tube(d, '#B5653A', '#F7C6A3', 4)).join('') + dots([[296, 32], [300, 44], [304, 56], [298, 86], [292, 96]], 4.5, '#F7C6A3') + [[296, 32], [300, 44], [304, 56], [298, 86], [292, 96]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="4.5" fill="none" stroke="#B5653A" stroke-width="1.3"/>`).join('') + `<path d="M30 40 C42 26 66 30 74 46 C82 60 72 82 54 84 C36 86 20 70 22 56 C23 50 26 44 30 40 Z" fill="#F7C6A3" stroke="#B5653A" stroke-width="1.8"/><ellipse cx="48" cy="58" rx="10" ry="9" fill="#C9A5E8" stroke="#7A4FB5" stroke-width="1"/><circle cx="50" cy="59" r="3" fill="#7A4FB5" stroke="none"/>` + [92, 122, 152, 182, 212].map(x => `<rect x="${x}" y="50" width="24" height="16" rx="7" fill="#F6E7B5" stroke="#B08A2E" stroke-width="1.2"/>`).join('') + `<ellipse cx="134" cy="53" rx="4" ry="2" fill="#C9A5E8" stroke="none"/>`,
+      L: [[18, 22, '가지 돌기', 't'], [48, 52, '핵', 't'], [130, 50, '말이집', 't'], [296, 32, '축삭 돌기 말단', 't'], [40, 80, '신경 세포체', 'b'], [84, 60, '축삭 돌기', 'b'], [149, 60, '랑비에 결절', 'b']]},
+    '시냅스': {box: [240, 182], s: `<path d="M70 0 L70 30 C40 50 40 110 80 116 L160 116 C200 110 200 50 170 30 L170 0" fill="#F7C6A3" stroke="#B5653A" stroke-width="1.8"/>${mito(120, 40, 0, .8)}${[[85, 80], [105, 92], [130, 84], [150, 96], [100, 66], [145, 66], [120, 104]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="8" fill="#FFF4D6" stroke="#B08A2E" stroke-width="1.1"/>` + dots([[x - 3, y - 2], [x + 2, y - 3], [x, y + 2], [x + 3, y + 2]], 1.3, '#2B6CB0')).join('')}${dots([[96, 122], [108, 126], [118, 121], [128, 127], [140, 123], [112, 130], [134, 130], [150, 128]], 1.6, '#2B6CB0')}<path d="M20 182 L20 140 Q120 128 220 140 L220 182" fill="#F2D3BC" stroke="#B5653A" stroke-width="1.8"/>${[80, 100, 120, 140, 160].map(x => `<path d="M${x - 4} 135 v-6 h3 v3 h2 v-3 h3 v6 Z" fill="#7C5CC4" stroke="none"/>`).join('')}${arw(30, 10, 30, 52, '#64748B', 1.6)}${T(36, 34, '흥분 전달', 'font-size="9" fill="#64748B"')}`,
+      L: [[52, 70, '축삭 돌기 말단', 'l'], [100, 125, '시냅스 틈', 'l'], [40, 162, '다음 뉴런', 'l'], [150, 96, '시냅스 소포', 'r'], [150, 127, '신경 전달 물질', 'r'], [160, 131, '수용체', 'r']]}
+  });
+
+  def('생명', '심장', {
+    '앞에서 본 단면': {box: [230, 240], s: tube('M62 18 L62 92', '#1E5AA8', '#6E9BDB', 18) + tube('M66 196 L66 236', '#1E5AA8', '#6E9BDB', 16) + tube('M104 62 C130 56 160 60 200 66', '#1E5AA8', '#6E9BDB', 12) + tube('M112 100 C110 70 100 56 76 50 L50 48', '#1E5AA8', '#6E9BDB', 16) + ['M146 22 v-16', 'M160 18 v-15', 'M174 22 l4 -16'].map(d => tube(d, '#C62828', '#EF6F6F', 7)).join('') + tube('M128 96 C128 40 132 22 150 18 C176 14 190 30 192 52', '#C62828', '#EF6F6F', 18) + tube('M222 88 L176 92', '#C62828', '#EF6F6F', 9) + tube('M222 108 L178 108', '#C62828', '#EF6F6F', 9) +
+      `<path d="M54 92 C40 110 40 150 60 180 C80 210 110 232 132 234 C150 222 186 186 196 150 C204 120 196 96 178 86 C160 78 140 82 128 90 C110 80 74 76 54 92 Z" fill="#E39B8B" stroke="#9C3D2F" stroke-width="2"/><path d="M58 96 C56 112 60 126 72 132 L104 128 C106 112 100 96 86 90 C76 88 64 90 58 96 Z" fill="#7FA7E0" stroke="#2E5A9C" stroke-width="1.4"/><path d="M66 140 L104 136 L112 140 L122 210 C104 204 84 188 72 168 C66 158 64 148 66 140 Z" fill="#7FA7E0" stroke="#2E5A9C" stroke-width="1.4"/><path d="M134 96 C146 86 166 86 180 94 C188 102 188 116 182 124 L144 128 C136 118 132 106 134 96 Z" fill="#EF8A8A" stroke="#A32B2B" stroke-width="1.4"/><path d="M146 138 L182 134 C188 156 176 184 156 206 C146 216 138 220 132 222 L124 146 Z" fill="#EF8A8A" stroke="#A32B2B" stroke-width="1.4"/><path d="M76 131 l8 10 l4 -11 Z M90 130 l4 11 l7 -12 Z M150 129 l7 10 l5 -11 Z M164 128 l4 11 l7 -12 Z" fill="#fff" stroke="#64748B" stroke-width=".8"/>`,
+      L: [[62, 30, '대정맥', 'l'], [55, 48, '폐동맥', 'l'], [70, 110, '우심방', 'l'], [86, 136, '판막', 'l'], [86, 170, '우심실', 'l'], [186, 34, '대동맥', 'r'], [212, 98, '폐정맥', 'r'], [165, 106, '좌심방', 'r'], [160, 176, '좌심실', 'r']]}
+  });
+
+  def('생명', '눈', {
+    '단면 구조': {box: [270, 190], s: `<circle cx="150" cy="95" r="80" fill="#fff" stroke="#64748B" stroke-width="2"/><circle cx="150" cy="95" r="68" fill="#EEF5FB" stroke="none"/><path d="M87.8 51.4 A76 76 0 1 1 87.8 138.6" fill="none" stroke="#8B5A4A" stroke-width="5"/><path d="M91.9 54.2 A71 71 0 1 1 91.9 135.8" fill="none" stroke="#E9897A" stroke-width="4"/><path d="M92 52 C56 66 56 124 92 138 Z" fill="#DDF0FB" stroke="none"/><path d="M92 52 C56 66 56 124 92 138" fill="none" stroke="#5B9BD5" stroke-width="2.4"/><path d="M86 57 L96 60 L96 82 L90 82 Z M86 133 L96 130 L96 108 L90 108 Z" fill="#7B5230" stroke="none"/><path d="M96 58 L112 62 L104 72 Z M96 132 L112 128 L104 118 Z" fill="#A0522D" stroke="none"/><path d="M106 66 L104 72 M106 124 L104 118" stroke="#A0522D" stroke-width=".7"/><ellipse cx="104" cy="95" rx="11" ry="24" fill="#F8F3D6" stroke="#B9A35C" stroke-width="1.4"/><path d="M224 92 L266 98 L266 122 L224 116 Z" fill="#F2D48A" stroke="#B08A2E" stroke-width="1.4"/><ellipse cx="221" cy="88" rx="2.5" ry="4" fill="#E2B33C" stroke="none"/><path d="M4 78 L94 82 L221 92 M4 112 L94 108 L221 92" fill="none" stroke="#F2A93B" stroke-width="1" stroke-dasharray="4 3"/>`,
+      L: [[65, 95, '각막', 'l'], [90, 62, '홍채', 'l'], [98, 112, '수정체', 'l'], [104, 125, '섬모체', 'l'], [177, 19.8, '공막', 'r'], [193.6, 32.7, '맥락막', 'r'], [204.4, 49.4, '망막', 'r'], [221, 88, '황반', 'r'], [222, 104, '맹점', 'r'], [250, 110, '시각 신경', 'r'], [160, 135, '유리체', 'r']]}
+  });
+
+  /* DNA */
+  let s1 = [], s2 = [], rung = ''; const pair = [['#4CAF50', '#F39C12'], ['#3B82F6', '#F2C94C'], ['#F39C12', '#4CAF50'], ['#F2C94C', '#3B82F6']];
+  for (let y = 10; y <= 262; y += 2) { const a = 85 + 50 * Math.sin(y / 22), b = 85 - 50 * Math.sin(y / 22); s1.push([a, y]); s2.push([b, y]); }
+  for (let y = 14, k = 0; y <= 258; y += 12, k++) { const a = 85 + 50 * Math.sin(y / 22), b = 85 - 50 * Math.sin(y / 22); if (Math.abs(a - b) < 8) continue; const m = (a + b) / 2, p = pair[k % 4]; rung += `<path d="M${f1(a)} ${y} L${f1(m)} ${y}" stroke="${p[0]}" stroke-width="5"/><path d="M${f1(m)} ${y} L${f1(b)} ${y}" stroke="${p[1]}" stroke-width="5"/>`; }
+  const pent = (cx, cy, r) => poly([0, 1, 2, 3, 4].map(i => [cx + r * Math.sin(i * 1.2566), cy - r * Math.cos(i * 1.2566)])) + ' Z';
+  def('생명', 'DNA', {
+    '이중 나선': {box: [170, 272], s: rung + tube(poly(s1), '#2F6DB5', '#7FB3E8', 7) + tube(poly(s2), '#C0392B', '#EE8A7E', 7),
+      L: [[135, 34, '당-인산 골격', 'r'], [60, 62, '염기', 'l'], [85, 86, '수소 결합', 'r']]},
+    '뉴클레오타이드': {box: [220, 100], s: `<path d="M58 50 L80 50 M122 50 L148 50" stroke="#475569" stroke-width="2.4"/><circle cx="38" cy="50" r="20" fill="#F2C94C" stroke="#B08A2E" stroke-width="1.6"/>${T(38, 55, 'P', 'font-size="15" text-anchor="middle"')}<path d="${pent(100, 52, 24)}" fill="#F4A7B9" stroke="#C2477E" stroke-width="1.6"/>${T(100, 57, '당', 'font-size="13" text-anchor="middle"')}<rect x="148" y="30" width="66" height="40" rx="6" fill="#7FB3E8" stroke="#2F6DB5" stroke-width="1.6"/>${T(181, 55, '염기', 'font-size="13" text-anchor="middle"')}`,
+      L: [[38, 70, '인산', 'b'], [100, 76, '당(디옥시리보스)', 'b'], [181, 70, '염기(A·T·G·C)', 'b']]}
+  });
+
+  /* 염색체 */
+  const qpt = (p0, p1, p2, t) => [(1 - t) ** 2 * p0[0] + 2 * t * (1 - t) * p1[0] + t * t * p2[0], (1 - t) ** 2 * p0[1] + 2 * t * (1 - t) * p1[1] + t * t * p2[1]];
+  const rod = (p0, p1, p2, c1, c2) => { let s = tube(`M${p0} Q${p1} ${p2}`, c1, c2, 30); [.12, .2, .32, .66, .78, .88].forEach(t => { const a = qpt(p0, p1, p2, t), b = qpt(p0, p1, p2, t + .01), ang = Math.atan2(b[1] - a[1], b[0] - a[0]) + Math.PI / 2; s += `<path d="M${f1(a[0] - 12 * Math.cos(ang))} ${f1(a[1] - 12 * Math.sin(ang))} L${f1(a[0] + 12 * Math.cos(ang))} ${f1(a[1] + 12 * Math.sin(ang))}" stroke="#5B4A99" stroke-width="${t < .25 || t > .75 ? 2.6 : 1.4}"/>`; }); return s; };
+  const chromo = rod([58, 16], [134, 110], [58, 204], '#5B4A99', '#8E7CC3') + rod([142, 16], [66, 110], [142, 204], '#5B4A99', '#A893D9') + `<ellipse cx="100" cy="110" rx="9" ry="6" fill="#5B4A99" stroke="none"/>`;
+  let coil = ''; const bx = [140, 166, 192, 218];
+  bx.forEach((x, i) => { const y = 100 + (i % 2 ? 14 : -14); coil += `<circle cx="${x}" cy="${y}" r="10" fill="#F2C94C" stroke="#B08A2E" stroke-width="1"/><circle cx="${x}" cy="${y}" r="12.5" fill="none" stroke="#2F6DB5" stroke-width="2"/>`; if (i < bx.length - 1) coil += `<path d="M${x + 8} ${y + (i % 2 ? -10 : 10)} C${x + 14} ${y + (i % 2 ? -22 : 22)} ${x + 14} ${y + (i % 2 ? -22 : 22)} ${bx[i + 1] - 8} ${100 + ((i + 1) % 2 ? 14 : -14) + ((i + 1) % 2 ? -10 : 10)}" fill="none" stroke="#2F6DB5" stroke-width="2"/>`; });
+  let mini = ''; for (let x = 232; x <= 276; x += 2) mini += ''; const h1 = [], h2 = []; for (let x = 232; x <= 278; x += 2) { h1.push([x, 86 + 8 * Math.sin(x / 5)]); h2.push([x, 86 - 8 * Math.sin(x / 5)]); }
+  def('생명', '염색체', {
+    '염색체 구조': {box: [200, 220], s: chromo, L: [[48, 40, '염색 분체', 'l'], [152, 40, '염색 분체', 'r'], [100, 110, '동원체', 'r']]},
+    '염색체와 DNA': {box: [282, 150], s: `<g transform="translate(6 18) scale(.55)">${chromo}</g><path d="M72 60 L128 84 M72 90 L128 118" stroke="#94A3B8" stroke-width="1" stroke-dasharray="4 3"/>${coil}<path d="M226 90 L232 86" stroke="#2F6DB5" stroke-width="2"/>${tube(poly(h1), '#2F6DB5', '#7FB3E8', 3.4)}${tube(poly(h2), '#C0392B', '#EE8A7E', 3.4)}`,
+      L: [[40, 30, '염색체', 't'], [166, 114, '히스톤 단백질', 'b'], [192, 86, '뉴클레오솜', 't'], [262, 90, 'DNA', 'b']]}
+  });
+
+  def('생명', '혈구', {
+    '세 가지 혈구': {box: [250, 120], s: `<circle cx="50" cy="52" r="30" fill="#E05353" stroke="#A32B2B" stroke-width="1.6"/><circle cx="50" cy="52" r="14" fill="#EE8A8A" stroke="none"/><path d="M24 104 C24 96 40 98 50 101 C60 98 76 96 76 104 C76 112 60 110 50 107 C40 110 24 112 24 104 Z" fill="#E05353" stroke="#A32B2B" stroke-width="1.3"/><circle cx="142" cy="60" r="34" fill="#F3EDF9" stroke="#8B7BB8" stroke-width="1.6"/>${(() => { seed(8); let g = ''; for (let k = 0; k < 30; k++) { const a = rnd() * 6.28, r = rnd() * 30; g += `<circle cx="${f1(142 + r * Math.cos(a))}" cy="${f1(60 + r * Math.sin(a))}" r=".9" fill="#B9A9DA" stroke="none"/>`; } return g; })()}<path d="M128 52 L146 46 L150 66" stroke="#5B3FA0" stroke-width="6" fill="none"/><circle cx="128" cy="52" r="10" fill="#7C5CC4" stroke="#5B3FA0" stroke-width="1"/><circle cx="146" cy="44" r="9" fill="#7C5CC4" stroke="#5B3FA0" stroke-width="1"/><circle cx="150" cy="68" r="10" fill="#7C5CC4" stroke="#5B3FA0" stroke-width="1"/><path d="M210 36 l6 -4 l5 3 l-1 6 l-7 2 Z M228 56 l7 -3 l4 5 l-4 5 l-6 -2 Z M208 72 l6 -2 l4 4 l-3 5 l-6 -1 Z" fill="#E8B4CF" stroke="#B5658E" stroke-width="1"/>`,
+      L: [[50, 22, '적혈구', 't'], [142, 26, '백혈구', 't'], [222, 34, '혈소판', 't']]}
+  });
+})();
+
+/* ---------- 지구·우주 ---------- */
+(() => {
+  const layers = `<circle cx="120" cy="120" r="110" fill="#8D6E63" stroke="#5D4037" stroke-width="1.4"/><circle cx="120" cy="120" r="103" fill="#D9693F" stroke="none"/><circle cx="120" cy="120" r="92" fill="#DF7647" stroke="none"/><circle cx="120" cy="120" r="80" fill="#E5834F" stroke="none"/><circle cx="120" cy="120" r="70" fill="#EA9058" stroke="none"/><circle cx="120" cy="120" r="60" fill="#F2A93B" stroke="#C98A1E" stroke-width="1.2"/><circle cx="120" cy="120" r="45" fill="#F5B94A" stroke="none"/><circle cx="120" cy="120" r="21" fill="#FBE27A" stroke="#C9A227" stroke-width="1.2"/>`;
+  const cover = `<path d="M120 120 L120 10 A110 110 0 1 0 230 120 Z" fill="#4A90D9" stroke="#2C5F99" stroke-width="1.6"/><path d="M40 70 C56 58 74 66 70 84 C66 98 48 104 40 94 C34 86 32 78 40 70 Z M30 130 C46 122 60 134 56 150 C52 164 36 168 28 156 C22 146 22 136 30 130 Z M90 160 C110 150 140 156 150 172 C156 186 140 200 120 198 C100 196 84 182 90 160 Z M170 140 C186 134 204 144 200 160 C196 172 178 176 170 166 C164 158 164 146 170 140 Z" fill="#5BAA4A" stroke="#3E7D32" stroke-width="1"/><path d="M120 120 L120 10 M120 120 L230 120" stroke="#5D4037" stroke-width="1.2"/>`;
+  const sp = (D, R = 110) => [130 + R * Math.sin(D * Math.PI / 180), 130 - R * Math.cos(D * Math.PI / 180)];
+  let rays = ''; [30, 60, 90, 103].forEach(D => [1, -1].forEach(sg => { const e = sp(D * sg), m = [(130 + e[0]) / 2, (20 + e[1]) / 2], k = .22, c = [m[0] + (m[0] - 130) * k, m[1] + (m[1] - 130) * k]; rays += `<path d="M130 20 Q${f1(c[0])} ${f1(c[1])} ${f1(e[0])} ${f1(e[1])}" fill="none" stroke="#2563EB" stroke-width="1.3"/>`; }));
+  [[20, 160, 150], [10, 175, 170]].forEach(([en, ex, D]) => [1, -1].forEach(sg => { const a = sp(en * sg, 60), b = sp(ex * sg, 60), e = sp(D * sg); rays += `<path d="M130 20 L${f1(a[0])} ${f1(a[1])} L${f1(b[0])} ${f1(b[1])} L${f1(e[0])} ${f1(e[1])}" fill="none" stroke="#2563EB" stroke-width="1.3"/>`; }));
+  rays += `<path d="M130 20 L130 240" fill="none" stroke="#2563EB" stroke-width="1.3"/>`;
+  const shz = `<path d="M${f1(sp(103)[0])} ${f1(sp(103)[1])} A110 110 0 0 1 ${f1(sp(142)[0])} ${f1(sp(142)[1])}" fill="none" stroke="#334155" stroke-width="7" opacity=".55"/><path d="M${f1(sp(-103)[0])} ${f1(sp(-103)[1])} A110 110 0 0 0 ${f1(sp(-142)[0])} ${f1(sp(-142)[1])}" fill="none" stroke="#334155" stroke-width="7" opacity=".55"/>`;
+  def('지구·우주', '지구 내부', {
+    '층 구조': {box: [240, 240], s: layers + cover, L: [[173, 28, '지각', 'r'], [183, 67, '맨틀', 'r'], [158, 102, '외핵', 'r'], [128, 114, '내핵', 'r']]},
+    '깊이 표시': {box: [240, 240], s: layers + cover, L: [[173, 28, '지각 (0~약 35 km)', 'r'], [183, 67, '맨틀 (~약 2900 km)', 'r'], [158, 102, '외핵 (약 2900~5100 km, 액체)', 'r'], [128, 114, '내핵 (약 5100~6400 km, 고체)', 'r']]},
+    '지진파 암영대': {box: [260, 250], s: `<circle cx="130" cy="130" r="110" fill="#F5D0B5" stroke="#8D6E63" stroke-width="1.6"/><circle cx="130" cy="130" r="60" fill="#F7B955" stroke="#C98A1E" stroke-width="1.2"/><circle cx="130" cy="130" r="22" fill="#FBE27A" stroke="#C9A227" stroke-width="1"/>${rays}${shz}<path d="M130 12 l3 6 l7 1 l-5 5 l1 7 l-6 -3 l-6 3 l1 -7 l-5 -5 l7 -1 Z" fill="#DC2626" stroke="none"/>${T(242, 160, '103°', 'font-size="10"')}${T(200, 234, '142°', 'font-size="10"')}${T(18, 160, '103°', 'font-size="10" text-anchor="end"')}${T(60, 234, '142°', 'font-size="10" text-anchor="end"')}`,
+      L: [[130, 20, '진원', 'r'], [222.8, 189.1, 'P파 암영대', 'r'], [135, 132, '내핵', 'r'], [60, 90, '맨틀', 'l'], [96, 150, '외핵 (S파 통과 못함)', 'l']]}
+  });
+
+  const flat = [10, 38, 64, 92, 120, 150].map(b => x => b);
+  const fold = [10, 38, 64, 92, 120, 150].map(b => x => b + 20 - 20 * Math.sin(3 * Math.PI * (x - 10) / 250));
+  const fx = y => 110 + (y - 10) * (40 / 140);
+  const fault = kind => { const d = kind === 'n' ? 22 : -22, cur = [-30, 10, 38, 64, 92, 120, 150, 182].map(b => x => b), b = strata(cur.slice(1), ['사암', '셰일', '석회암', '역암', '셰일', '이암'], 10, 260, 4), Lp = `10,-60 ${fx(-60)},-60 ${fx(200)},200 10,200`, Rp = `${fx(-60)},-60 260,-60 260,200 ${fx(200)},200`;
+    const u = [40 / 145.6, 140 / 145.6], dir = kind === 'n' ? 1 : -1;
+    return `<defs><clipPath id="fa__U__"><rect x="0" y="-40" width="270" height="190"/></clipPath><clipPath id="fl__U__"><polygon points="${Lp}"/></clipPath><clipPath id="fr__U__"><polygon points="${Rp}"/></clipPath></defs><g clip-path="url(#fa__U__)"><g clip-path="url(#fl__U__)">${b}</g><g clip-path="url(#fr__U__)"><g transform="translate(0 ${d})">${b}</g></g></g><path d="M${f1(fx(-20))} -20 L${f1(fx(152))} 152" stroke="#B91C1C" stroke-width="2.4"/>` +
+      arw(146 - u[0] * 15 * dir, 76 - u[1] * 15 * dir, 146 + u[0] * 15 * dir, 76 + u[1] * 15 * dir, '#111827', 2.2) + arw(116 + u[0] * 15 * dir, 96 + u[1] * 15 * dir, 116 - u[0] * 15 * dir, 96 - u[1] * 15 * dir, '#111827', 2.2) +
+      (kind === 'n' ? arw(90, -30, 40, -30, '#475569', 2) + arw(170, -30, 220, -30, '#475569', 2) : arw(40, -30, 90, -30, '#475569', 2) + arw(220, -30, 170, -30, '#475569', 2)); };
+  const ero = x => 70 + 5 * Math.sin((x - 10) / 14) + 3 * Math.sin((x - 10) / 5.3), exs = []; for (let x = 10; x <= 260; x += 5) exs.push([x, ero(x)]);
+  const lower = strata([-90, -60, -30, 0, 30, 60, 90, 120, 150].map(b => x => b + (x - 10) * .38), ['셰일', '사암', '석회암', '셰일', '사암', '석회암', '이암', '사암'], 10, 260, 9);
+  const upper = strata([x => 10, x => 30, x => 52, ero], ['셰일', '사암', '역암'], 10, 260, 2);
+  def('지구·우주', '지층', {
+    '수평 지층': {box: [270, 160], s: strata(flat, ['사암', '셰일', '석회암', '역암', '셰일'], 10, 260) + trilobite(150, 78) + `<path d="M10 9 H260" stroke="#5BAA4A" stroke-width="3"/>`,
+      L: [[260, 24, '사암', 'r'], [260, 51, '셰일', 'r'], [260, 78, '석회암', 'r'], [260, 106, '역암', 'r'], [260, 135, '셰일', 'r'], [150, 78, '화석', 't']]},
+    '습곡': {box: [270, 200], s: strata(fold, ['사암', '셰일', '석회암', '역암', '셰일'], 10, 260, 6) + arw(0, 100, 26, 100, '#475569', 2.4) + arw(270, 100, 244, 100, '#475569', 2.4),
+      L: [[51.7, 10, '배사', 't'], [135, 50, '향사', 't'], [4, 92, '횡압력', 'l']]},
+    '정단층': {box: [270, 180], s: fault('n'), L: [[133, 85, '단층면', 'r'], [230, 90, '상반', 'r'], [40, 80, '하반', 'l']]},
+    '역단층': {box: [270, 180], s: fault('r'), L: [[133, 85, '단층면', 'r'], [230, 60, '상반', 'r'], [40, 80, '하반', 'l']]},
+    '부정합': {box: [270, 160], s: `<defs><clipPath id="ul__U__"><path d="${poly(exs)} L260 150 L10 150 Z"/></clipPath></defs><g clip-path="url(#ul__U__)">${lower}</g>${upper}<path d="${poly(exs)}" fill="none" stroke="#3F2F20" stroke-width="2.2"/>`,
+      L: [[230, ero(230), '부정합면', 'r'], [240, 62, '기저 역암', 'r'], [40, 120, '경사진 지층', 'l'], [40, 20, '수평 지층', 'l']]}
+  });
+
+  def('지구·우주', '화산', {
+    '단면 구조': {box: [280, 200], s: `<rect x="0" y="150" width="280" height="25" fill="#C9A97A" stroke="none"/><rect x="0" y="175" width="280" height="25" fill="#B08D62" stroke="none"/><ellipse cx="140" cy="182" rx="50" ry="15" fill="#E2552B" stroke="#A63A1A" stroke-width="1.3"/><path d="M20 150 L112 44 L168 44 L260 150 Z" fill="#8B6F5A" stroke="#5C4636" stroke-width="1.6"/><path d="M46 150 L120 64 M72 150 L128 84 M234 150 L160 64 M208 150 L152 84" stroke="#A88B70" stroke-width="3"/><path d="M112 44 Q140 64 168 44" fill="#5C4636" stroke="none"/><path d="M134 168 L134 54 Q140 50 146 54 L146 168" fill="#E2552B" stroke="#A63A1A" stroke-width="1.2"/><path d="M162 50 C178 70 186 90 206 102 C216 108 226 120 240 132 L232 138 C218 126 206 116 196 110 C176 98 168 76 156 56 Z" fill="#F26B2A" stroke="#B5401A" stroke-width="1"/>${cloud([[140, 30, 16], [122, 22, 13], [160, 20, 14], [140, 10, 12], [176, 32, 10], [106, 32, 10]], '#9CA3AF', '#6B7280')}${dots([[100, 50], [96, 60], [186, 46], [192, 58], [180, 64]], 1.4, '#4B5563')}`,
+      L: [[124, 24, '화산 가스·화산재', 'l'], [120, 47, '분화구', 'l'], [134, 110, '화도', 'l'], [60, 120, '화산체', 'l'], [214, 110, '용암', 'r'], [186, 182, '마그마굄', 'r']]}
+  });
+
+  def('지구·우주', '판의 경계', {
+    '발산형(해령)': {box: [300, 170], s: `<rect x="0" y="86" width="300" height="84" fill="#F2B48A" stroke="none"/><rect x="0" y="18" width="300" height="40" fill="#BFE0F6" stroke="none"/><path d="M0 18 H300" stroke="#5B9BD5" stroke-width="1.4"/><path d="M128 170 C138 130 144 100 146 48 L154 48 C156 100 162 130 172 170 Z" fill="#E2552B" opacity=".85" stroke="none"/><path d="M0 56 L120 50 Q140 40 146 44 L146 66 Q120 84 0 90 Z" fill="#8D7B6A" stroke="#5C4E42" stroke-width="1.3"/><path d="M300 56 L180 50 Q160 40 154 44 L154 66 Q180 84 300 90 Z" fill="#8D7B6A" stroke="#5C4E42" stroke-width="1.3"/>${carw('M140 150 C100 156 60 146 40 122', 40, 122, -125, '#B45309', 2)}${carw('M160 150 C200 156 240 146 260 122', 260, 122, -55, '#B45309', 2)}${arw(90, 70, 40, 70, '#fff', 3, 9)}${arw(210, 70, 260, 70, '#fff', 3, 9)}`,
+      L: [[146, 44, '해령', 't'], [150, 47, '열곡', 'r'], [60, 66, '해양판', 'l'], [160, 120, '마그마', 'r'], [60, 146, '맨틀 대류', 'l']]},
+    '수렴형(섭입)': {box: [300, 190], s: `<rect x="0" y="70" width="300" height="120" fill="#F2B48A" stroke="none"/><path d="M0 30 H160 V52 L150 56 L146 76 L128 64 L0 62 Z" fill="#BFE0F6" stroke="none"/><path d="M0 62 L130 64 C160 66 190 90 240 170 L212 178 C170 112 150 96 128 94 L0 92 Z" fill="#7F6F62" stroke="#4F443B" stroke-width="1.4"/><path d="M150 52 C170 36 190 30 210 36 L240 26 L270 40 L300 44 L300 110 L230 110 C200 100 180 86 150 66 Z" fill="#B59A7B" stroke="#6E5A44" stroke-width="1.4"/><path d="M196 40 L212 16 L228 40 Z" fill="#8B6F5A" stroke="#5C4636" stroke-width="1"/><path d="M208 22 L212 16 L216 22 Z" fill="#E2552B" stroke="none"/><path d="M214 140 C206 110 216 70 212 30" fill="none" stroke="#E2552B" stroke-width="5" opacity=".85"/><ellipse cx="214" cy="140" rx="10" ry="6" fill="#E2552B" stroke="none"/>${dots([[150, 78], [170, 92], [186, 112], [200, 132], [214, 152]], 2.6, '#DC2626')}${arw(30, 77, 80, 77, '#fff', 3, 9)}${arw(290, 70, 250, 70, '#fff', 3, 9)}`,
+      L: [[146, 74, '해구', 'b'], [40, 80, '해양판', 'l'], [212, 18, '화산', 't'], [270, 80, '대륙판', 'r'], [200, 132, '진원(섭입대)', 'r'], [210, 96, '마그마', 'r']]},
+    '보존형(변환 단층)': {box: [260, 160], s: `<rect x="0" y="0" width="260" height="78" fill="#CFE3F2" stroke="none"/><rect x="0" y="82" width="260" height="78" fill="#BFD8EC" stroke="none"/><path d="M40 0 V80 M220 80 V160" stroke="#E2552B" stroke-width="6"/><path d="M40 0 V80 M220 80 V160" stroke="#FBD3C4" stroke-width="2"/><path d="M40 80 V160 M220 0 V80" stroke="#94A3B8" stroke-width="1.4" stroke-dasharray="5 4"/><path d="M40 80 H220" stroke="#B91C1C" stroke-width="2.6"/>${arw(160, 40, 100, 40, '#1E3A5F', 3, 9)}${arw(100, 120, 160, 120, '#1E3A5F', 3, 9)}`,
+      L: [[150, 80, '변환 단층', 'r'], [40, 30, '해령', 'l'], [220, 30, '단열대', 'r']]}
+  });
+
+  const globe = (cx, cy, r) => `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#4A90D9" stroke="#2C5F99" stroke-width="1.6"/><g transform="translate(${cx - 100} ${cy - 100}) translate(100 100) scale(${r / 92}) translate(-100 -100)"><path d="M88 96 C92 84 104 82 112 88 C122 94 124 104 120 116 C116 130 110 146 102 152 C96 144 94 130 90 120 C86 110 84 102 88 96 Z M86 66 C96 58 112 58 118 66 C112 72 100 76 92 78 C86 76 82 72 86 66 Z M118 56 C136 46 164 50 176 66 C182 80 176 94 164 98 C152 104 140 96 132 88 C124 80 116 70 118 56 Z M150 126 C160 120 174 124 176 134 C172 144 158 146 150 140 C146 136 146 130 150 126 Z" fill="#5BAA4A" stroke="#3E7D32" stroke-width="1"/><path d="M60 176 C80 186 120 188 140 176 C120 182 80 182 60 176 Z" fill="#fff" stroke="#CBD5E1" stroke-width=".8"/></g><ellipse cx="${cx - r * .32}" cy="${cy - r * .42}" rx="${r * .32}" ry="${r * .2}" fill="#fff" opacity=".16" stroke="none"/>`;
+  let grid = ''; [-60, -30, 30, 60].forEach(l => { const y = 110 - 92 * Math.sin(l * Math.PI / 180), w = 92 * Math.cos(l * Math.PI / 180); grid += `<path d="M${f1(110 - w)} ${f1(y)} H${f1(110 + w)}" stroke="#fff" stroke-width="1" opacity=".7"/>`; }); [30, 60].forEach(l => grid += `<ellipse cx="110" cy="110" rx="${f1(92 * Math.sin(l * Math.PI / 180))}" ry="92" fill="none" stroke="#fff" stroke-width="1" opacity=".7"/>`);
+  def('지구·우주', '지구', {
+    '대륙과 바다': {box: [200, 200], s: globe(100, 100, 92), L: [[128, 74, '대륙', 'r'], [60, 130, '바다', 'l']]},
+    '자전축 기울기': {box: [220, 250], s: `<path d="M0 125 H220" stroke="#94A3B8" stroke-width="1.2" stroke-dasharray="6 4"/><path d="M110 15 V235" stroke="#94A3B8" stroke-width="1.2" stroke-dasharray="4 4"/>${globe(110, 125, 70)}<g transform="rotate(23.5 110 125)"><ellipse cx="110" cy="125" rx="70" ry="13" fill="none" stroke="#F2C94C" stroke-width="2.2"/><path d="M110 22 V228" stroke="#334155" stroke-width="2.4"/><path d="M96 34 A16 6 0 1 0 124 34" fill="none" stroke="#334155" stroke-width="1.4"/>${head(124, 34, -1.2, '#334155', 6)}${T(104, 16, 'N', 'font-size="13"')}${T(104, 242, 'S', 'font-size="13"')}</g><path d="M110 60 A65 65 0 0 1 136 65" fill="none" stroke="#DC2626" stroke-width="1.6"/>${T(124, 54, '23.5°', 'font-size="11" fill="#DC2626"')}`,
+      L: [[150, 31, '자전축', 'r'], [176, 148, '적도', 'r'], [16, 125, '공전 궤도면', 'l']]},
+    '위도와 경도': {box: [220, 220], s: globe(110, 110, 92) + grid + `<path d="M18 110 H202" stroke="#F2C94C" stroke-width="2.2"/><path d="M110 18 V202" stroke="#F2C94C" stroke-width="2" stroke-dasharray="5 3"/>`,
+      L: [[200, 110, '적도 (위도 0°)', 'r'], [190, 64, '위도', 'r'], [110, 18, '본초 자오선 (경도 0°)', 't'], [30, 140, '경도', 'l']]}
+  });
+
+  /* 달의 위상 */
+  const phase = (x, y, r, al) => { let s = `<circle cx="${f1(x)}" cy="${f1(y)}" r="${r}" fill="#3F4652" stroke="#1F2937" stroke-width="1"/>`; const rx = f1(Math.abs(Math.cos(al * Math.PI / 180)) * r);
+    if (al === 180) return s + `<circle cx="${f1(x)}" cy="${f1(y)}" r="${r}" fill="#F5E9B8" stroke="#1F2937" stroke-width="1"/>`; if (al === 0) return s;
+    if (al < 180) s += `<path d="M${f1(x)} ${f1(y - r)} A${r} ${r} 0 0 1 ${f1(x)} ${f1(y + r)} A${rx} ${r} 0 0 ${al < 90 ? 0 : 1} ${f1(x)} ${f1(y - r)} Z" fill="#F5E9B8" stroke="none"/>`;
+    else s += `<path d="M${f1(x)} ${f1(y - r)} A${r} ${r} 0 0 0 ${f1(x)} ${f1(y + r)} A${rx} ${r} 0 0 ${al < 270 ? 0 : 1} ${f1(x)} ${f1(y - r)} Z" fill="#F5E9B8" stroke="none"/>`; return s; };
+  const NM = {0: '삭', 45: '초승달', 90: '상현달', 135: '', 180: '망(보름달)', 225: '', 270: '하현달', 315: '그믐달'};
+  let ph = `<circle cx="190" cy="175" r="95" fill="none" stroke="#94A3B8" stroke-width="1.2" stroke-dasharray="5 4"/><circle cx="190" cy="175" r="20" fill="#4A90D9" stroke="#2C5F99" stroke-width="1.4"/><path d="M190 155 A20 20 0 0 0 190 195 Z" fill="#1F2937" opacity=".55" stroke="none"/>`;
+  for (let al = 0; al < 360; al += 45) { const a = al * Math.PI / 180, x = 190 + 95 * Math.cos(a), y = 175 - 95 * Math.sin(a); ph += `<circle cx="${f1(x)}" cy="${f1(y)}" r="12" fill="#3F4652" stroke="#1F2937" stroke-width="1"/><path d="M${f1(x)} ${f1(y - 12)} A12 12 0 0 1 ${f1(x)} ${f1(y + 12)} Z" fill="#F5E9B8" stroke="none"/>`;
+    const X = 190 + 136 * Math.cos(a), Y = 175 - 136 * Math.sin(a); ph += phase(X, Y, 12, al); if (NM[al]) { const tx = 190 + 162 * Math.cos(a), ty = 175 - 162 * Math.sin(a) + 4; ph += T(tx, ty, NM[al], `text-anchor="${Math.cos(a) > .3 ? 'start' : Math.cos(a) < -.3 ? 'end' : 'middle'}"`); } }
+  for (let y = 120; y <= 230; y += 27) ph += arw(412, y, 372, y, '#F2A93B', 2, 8); ph += T(392, 108, '햇빛', 'text-anchor="middle" fill="#B7791F"') + carw('M232 118 A72 72 0 0 0 148 118', 148, 118, 145, '#64748B', 1.4, 6) + T(190, 92, '공전 방향', 'font-size="9" text-anchor="middle" fill="#64748B"');
+  let crat = ''; seed(21); for (let k = 0; k < 14; k++) { const a = rnd() * 6.28, r = rnd() * 52, x = 70 + r * Math.cos(a), y = 70 + r * Math.sin(a), cr = 2 + rnd() * 6; crat += `<circle cx="${f1(x)}" cy="${f1(y)}" r="${f1(cr)}" fill="#C4C4BF" stroke="#9A9A95" stroke-width=".9"/><path d="M${f1(x - cr * .7)} ${f1(y + cr * .5)} A${f1(cr)} ${f1(cr)} 0 0 0 ${f1(x + cr * .7)} ${f1(y + cr * .5)}" fill="none" stroke="#ECECE8" stroke-width=".9"/>`; }
+  def('지구·우주', '달', {
+    '위상 변화': {box: [420, 350], s: ph, L: []},
+    '달 표면': {box: [140, 140], s: `<circle cx="70" cy="70" r="64" fill="#D9D9D6" stroke="#8E8E8A" stroke-width="1.4"/><path d="M30 46 C44 30 66 36 70 52 C72 66 54 74 40 70 C30 66 26 56 30 46 Z M80 80 C94 72 112 80 110 96 C106 108 88 110 80 100 C76 94 76 86 80 80 Z M70 24 C80 20 92 26 90 34 C86 40 74 40 70 34 Z" fill="#A9A9A4" stroke="none"/>${crat}`,
+      L: [[48, 55, '달의 바다', 'l'], [104, 60, '충돌 구덩이', 'r']]}
+  });
+
+  let gran = ''; seed(31); for (let k = 0; k < 150; k++) { const a = rnd() * 6.28, r = Math.sqrt(rnd()) * 80; gran += `<circle cx="${f1(120 + r * Math.cos(a))}" cy="${f1(120 + r * Math.sin(a))}" r="${f1(2.5 + rnd() * 2.5)}" fill="#FBC02D" opacity=".55" stroke="none"/>`; }
+  let conv = ''; for (let a = 200; a < 470; a += 34) { const r = 72, x = 120 + r * Math.cos(a * Math.PI / 180), y = 120 + r * Math.sin(a * Math.PI / 180); conv += `<circle cx="${f1(x)}" cy="${f1(y)}" r="7" fill="none" stroke="#B45309" stroke-width="1.2" stroke-dasharray="8 4"/>`; }
+  def('지구·우주', '태양', {
+    '표면': {box: [240, 240], s: `<circle cx="120" cy="120" r="114" fill="#FFF3C4" opacity=".7" stroke="none"/><circle cx="120" cy="120" r="100" fill="#FFE58F" opacity=".75" stroke="none"/><circle cx="120" cy="120" r="84" fill="#F9A825" stroke="#E07B00" stroke-width="1.4"/>${gran}<circle cx="120" cy="120" r="80" fill="none" stroke="#E07B00" stroke-width="8" opacity=".3"/><ellipse cx="96" cy="100" rx="14" ry="11" fill="#B26A12" stroke="none"/><ellipse cx="96" cy="100" rx="8" ry="6" fill="#5D2E0B" stroke="none"/><ellipse cx="142" cy="142" rx="9" ry="7" fill="#B26A12" stroke="none"/><ellipse cx="142" cy="142" rx="5" ry="4" fill="#5D2E0B" stroke="none"/><path d="M60 58 C36 22 72 4 92 40" fill="none" stroke="#E53935" stroke-width="7" opacity=".9"/>`,
+      L: [[96, 100, '흑점', 'l'], [48, 32, '홍염', 'l'], [150, 86, '쌀알 무늬', 'r'], [200, 150, '광구', 'r'], [228, 110, '코로나', 'r']]},
+    '내부 구조': {box: [240, 240], s: `<circle cx="120" cy="120" r="100" fill="#FFE58F" opacity=".6" stroke="none"/><circle cx="120" cy="120" r="84" fill="#F57C00" stroke="#E07B00" stroke-width="1.4"/><circle cx="120" cy="120" r="62" fill="#FB8C00" stroke="#E07B00" stroke-width="1"/><circle cx="120" cy="120" r="26" fill="#FFE082" stroke="#F2A93B" stroke-width="1"/>${conv}<path d="M120 120 L120 36 A84 84 0 1 0 204 120 Z" fill="#F9A825" stroke="#E07B00" stroke-width="1.4"/>${gran.split('<circle').filter((c, i) => i % 3 === 0 && i).map(c => '<circle' + c).join('')}<path d="M120 120 L120 36 M120 120 L204 120" stroke="#B45309" stroke-width="1.2"/>`,
+      L: [[132, 110, '핵', 'r'], [166, 88, '복사층', 'r'], [186, 66, '대류층', 'r'], [70, 170, '광구', 'l'], [30, 120, '코로나', 'l']]}
+  });
+
+  const PL = [['수성', 62, 3, '#9E9E9E'], ['금성', 84, 5.5, '#E8C07A'], ['지구', 108, 6, '#4A90D9'], ['화성', 130, 4, '#D2553A'], ['목성', 172, 17, '#D9A066'], ['토성', 226, 13, '#E3C27A'], ['천왕성', 278, 9, '#9FE3E8'], ['해왕성', 324, 9, '#4B6FD6']];
+  let ss = `<path d="M0 15.7 A80 80 0 0 1 0 154.3 Z" fill="#FDB813" stroke="#E59400" stroke-width="1.4"/>`;
+  PL.forEach(([n, x, r, c]) => { const R = x + 40, dy = 75, ox = -40 + Math.sqrt(R * R - dy * dy); ss += `<path d="M${f1(ox)} 10 A${R} ${R} 0 0 1 ${f1(ox)} 160" fill="none" stroke="#CBD5E1" stroke-width=".9"/>`; });
+  PL.forEach(([n, x, r, c]) => { ss += (n === '토성' ? `<ellipse cx="${x}" cy="85" rx="25" ry="6" fill="none" stroke="#C9A35C" stroke-width="2.4"/>` : '') + ball(x, 85, r, c, '#475569') + (n === '목성' ? `<path d="M${x - 15} 80 H${x + 15} M${x - 16} 88 H${x + 16}" stroke="#B5763A" stroke-width="1.6"/>` : '') + T(x, 85 + Math.max(r, 6) + 16, n, 'font-size="10" text-anchor="middle"'); });
+  def('지구·우주', '태양계', {'행성 배열': {box: [345, 170], s: ss + T(8, 90, '태양', 'font-size="11"'), L: []}});
+
+  const rain = (x0, x1, y0, y1, gap) => { let s = ''; for (let x = x0; x <= x1; x += gap) s += `<path d="M${x} ${y0} l-4 ${y1 - y0}" stroke="#3B82F6" stroke-width="1.4"/>`; return s; };
+  def('지구·우주', '날씨', {
+    '구름': {box: [200, 110], s: cloud([[60, 70, 30], [96, 50, 38], [140, 64, 30], [170, 80, 22], [30, 86, 18]], '#FFFFFF', '#94A3B8') + `<path d="M14 100 H186" stroke="#CBD5E1" stroke-width="1.4"/>` + cloud([[80, 86, 14], [120, 88, 14]], '#E2E8F0', '#E2E8F0'), L: []},
+    '한랭 전선': {box: [300, 176], s: `<rect x="0" y="0" width="300" height="150" fill="#FED7AA" opacity=".6" stroke="none"/><path d="M0 150 L0 70 C60 72 120 96 170 150 Z" fill="#BFDBFE" stroke="#3B82F6" stroke-width="1.6"/>${cloud([[150, 52, 18], [132, 40, 16], [166, 34, 16], [148, 20, 16], [176, 54, 12], [124, 56, 12]], '#F8FAFC', '#94A3B8')}${rain(128, 172, 72, 112, 7)}${arw(30, 120, 90, 120, '#1D4ED8', 2.4, 9)}${carw('M240 140 C200 120 176 90 170 66', 170, 66, -100, '#C2410C', 2.4, 9)}<path d="M0 150 H300" stroke="#64748B" stroke-width="2"/><path d="M20 164 H280" stroke="#2563EB" stroke-width="2.4"/>${[40, 80, 120, 160, 200, 240].map(x => `<path d="M${x} 164 l6 -9 l6 9 Z" fill="#2563EB" stroke="none"/>`).join('')}`,
+      L: [[40, 100, '찬 공기', 'l'], [250, 100, '따뜻한 공기', 'r'], [150, 128, '전선면', 'r'], [176, 30, '적란운', 'r'], [160, 100, '소나기', 'r']]},
+    '온난 전선': {box: [300, 176], s: `<rect x="0" y="0" width="300" height="150" fill="#FED7AA" opacity=".6" stroke="none"/><path d="M300 150 L300 60 C230 70 120 120 40 150 Z" fill="#BFDBFE" stroke="#3B82F6" stroke-width="1.6"/>${[[240, 44, 34], [190, 64, 30], [140, 86, 26]].map(([x, y, w]) => `<ellipse cx="${x}" cy="${y}" rx="${w}" ry="8" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.6"/>`).join('')}${rain(150, 280, 94, 140, 9)}${carw('M30 140 C100 120 190 90 270 46', 270, 46, -32, '#C2410C', 2.4, 9)}<path d="M0 150 H300" stroke="#64748B" stroke-width="2"/><path d="M20 164 H280" stroke="#DC2626" stroke-width="2.4"/>${[40, 80, 120, 160, 200, 240].map(x => `<path d="M${x} 164 a6 6 0 0 1 12 0 Z" fill="#DC2626" stroke="none"/>`).join('')}`,
+      L: [[40, 100, '따뜻한 공기', 'l'], [270, 110, '찬 공기', 'r'], [110, 124, '전선면', 'r'], [240, 44, '층운형 구름', 'r'], [210, 120, '이슬비(오래 내리는 비)', 'r']]},
+    '고기압과 저기압': {box: [300, 170], s: [75, 225].map((cx, i) => [25, 45, 65].map((r, j) => `<ellipse cx="${cx}" cy="75" rx="${r}" ry="${f1(r * .8)}" fill="none" stroke="#64748B" stroke-width="1.2"/>`).join('') + (i ? T(cx, 84, '저', 'font-size="22" font-weight="800" fill="#DC2626" text-anchor="middle"') : T(cx, 84, '고', 'font-size="22" font-weight="800" fill="#2563EB" text-anchor="middle"'))).join('') +
+      [0, 90, 180, 270].map(a => { const r = a * Math.PI / 180, x = 75 + 34 * Math.cos(r), y = 75 + 28 * Math.sin(r), x2 = 75 + 58 * Math.cos(r + .6), y2 = 75 + 47 * Math.sin(r + .6); return arw(x, y, x2, y2, '#2563EB', 1.8, 7); }).join('') +
+      [0, 90, 180, 270].map(a => { const r = a * Math.PI / 180, x = 225 + 60 * Math.cos(r), y = 75 + 48 * Math.sin(r), x2 = 225 + 34 * Math.cos(r - .6), y2 = 75 + 28 * Math.sin(r - .6); return arw(x, y, x2, y2, '#DC2626', 1.8, 7); }).join('') +
+      T(75, 156, '하강 기류 · 대체로 맑음', 'text-anchor="middle" font-size="10"') + T(225, 156, '상승 기류 · 구름, 비', 'text-anchor="middle" font-size="10"'),
+      L: [[140, 75, '등압선', 't']]}
+  });
+
+  def('지구·우주', '물의 순환', {
+    '순환 과정': {box: [320, 212], s: `<path d="M0 165 H140 L128 212 H0 Z" fill="#4A90D9" stroke="#2C5F99" stroke-width="1.2"/><path d="M10 176 q8 -4 16 0 t16 0 M60 190 q8 -4 16 0 t16 0" fill="none" stroke="#BFE0F6" stroke-width="1.2"/><path d="M120 212 L130 170 C150 150 170 160 190 120 L220 70 L250 120 C270 140 300 150 320 150 L320 212 Z" fill="#9CCB7A" stroke="#5E8F45" stroke-width="1.4"/><path d="M210 86 L220 70 L232 90 L224 86 L218 92 Z" fill="#fff" stroke="none"/><circle cx="34" cy="30" r="16" fill="#FCD34D" stroke="#E59400" stroke-width="1.2"/>${cloud([[86, 46, 14], [104, 40, 16], [120, 48, 12]])}${cloud([[186, 42, 15], [206, 36, 17], [224, 44, 13]], '#CBD5E1', '#64748B')}${rain(190, 226, 62, 92, 8)}<path d="M274 150 v-14 M290 152 v-12" stroke="#5E3B1E" stroke-width="2.4"/><circle cx="274" cy="130" r="9" fill="#3F8F3A" stroke="none"/><circle cx="290" cy="134" r="8" fill="#3F8F3A" stroke="none"/>${carw('M60 155 C55 120 70 95 84 70', 84, 70, -62, '#1D4ED8', 2)}${carw('M128 42 C146 34 160 34 172 38', 172, 38, 18, '#1D4ED8', 2)}${carw('M206 96 L206 118', 206, 118, 90, '#1D4ED8', 2)}${carw('M196 140 C178 150 160 156 142 162', 142, 162, 160, '#1D4ED8', 2)}<path d="M250 196 C210 200 176 202 132 198" fill="none" stroke="#1D4ED8" stroke-width="1.8" stroke-dasharray="5 4"/>${head(132, 198, Math.PI * 1.02, '#1D4ED8')}${carw('M282 118 C280 96 262 78 238 62', 238, 62, -150, '#1D4ED8', 2)}${T(20, 120, '증발', 'fill="#1D4ED8"')}${T(136, 28, '응결·이동', 'fill="#1D4ED8"')}${T(212, 112, '강수', 'fill="#1D4ED8"')}${T(150, 146, '지표 유출', 'fill="#1D4ED8"')}${T(180, 192, '지하수', 'fill="#1D4ED8"')}${T(286, 100, '증산', 'fill="#1D4ED8"')}`, L: []}
+  });
+
+  def('지구·우주', '해수의 층상 구조', {
+    '수온 분포': {box: [240, 214], s: `<rect x="50" y="30" width="170" height="32" fill="#BDE3F7" stroke="none"/><rect x="50" y="62" width="170" height="58" fill="#8FC7EA" stroke="none"/><rect x="50" y="120" width="170" height="80" fill="#5E9FD0" stroke="none"/><path d="M50 30 H220 M50 30 V200" stroke="#334155" stroke-width="1.6"/>${head(224, 30, 0, '#334155', 7)}${head(50, 204, Math.PI / 2, '#334155', 7)}<path d="M190 30 L190 62 C150 80 90 104 70 120 L62 200" fill="none" stroke="#DC2626" stroke-width="2.6"/>${T(220, 20, '수온(℃) →', 'font-size="10" text-anchor="end"')}${T(44, 30, '0', 'font-size="10" text-anchor="end"')}${T(30, 120, '수심', 'font-size="10" text-anchor="middle" transform="rotate(-90 30 120)"')}${T(206, 50, '혼합층', 'text-anchor="end" fill="#0F3B5F"')}${T(206, 96, '수온 약층', 'text-anchor="end" fill="#0F3B5F"')}${T(206, 166, '심해층', 'text-anchor="end" fill="#fff"')}`, L: []}
+  });
+})();
+
+/* ---------- 물질 ---------- */
+(() => {
+  const nuc = (cx, cy) => { let s = ''; [[0, 0, 1], [-7, -5, 0], [7, -4, 1], [-6, 6, 1], [6, 6, 0], [0, -9, 0], [0, 9, 1], [-10, 1, 0], [10, 2, 1], [1, 0, 0], [-3, -2, 1], [4, 3, 0]].forEach(([x, y, p]) => s += ball(cx + x, cy + y, 5.5, p ? '#E53935' : '#9CA3AF', p ? '#B71C1C' : '#6B7280')); return s; };
+  const e = (x, y) => ball(x, y, 6, '#3B82F6', '#1D4ED8', '−');
+  let cloudP = ''; seed(41); for (let k = 0; k < 520; k++) { const u = rnd(), v = rnd(), r = Math.sqrt(-2 * Math.log(u + 1e-6)) * 26, a = v * 6.28; if (r > 92) continue; cloudP += `<circle cx="${f1(100 + r * Math.cos(a))}" cy="${f1(100 + r * Math.sin(a))}" r="1.3" fill="#3B82F6" opacity=".55" stroke="none"/>`; }
+  let plus = ''; seed(42); for (let k = 0; k < 16; k++) { const a = rnd() * 6.28, r = Math.sqrt(rnd()) * 58; plus += T(100 + r * Math.cos(a), 84 + r * Math.sin(a), '+', 'font-size="13" fill="#B91C1C" text-anchor="middle"'); }
+  def('물질', '원자 모형', {
+    '보어 모형': {box: [200, 200], s: `<circle cx="100" cy="100" r="45" fill="none" stroke="#94A3B8" stroke-width="1.4"/><circle cx="100" cy="100" r="82" fill="none" stroke="#94A3B8" stroke-width="1.4"/>${nuc(100, 100)}${e(100, 55)}${e(100, 145)}${e(182, 100)}${e(18, 100)}${e(158, 42)}${e(42, 158)}`,
+      L: [[100, 55, '전자', 'r'], [70, 50, '전자 껍질', 'l'], [92, 92, '원자핵', 'l'], [104, 94, '양성자', 'r'], [93, 106, '중성자', 'l']]},
+    '러더퍼드 모형': {box: [200, 200], s: [0, 60, 120].map(a => `<ellipse cx="100" cy="100" rx="88" ry="30" fill="none" stroke="#94A3B8" stroke-width="1.4" transform="rotate(${a} 100 100)"/>`).join('') + ball(100, 100, 9, '#E53935', '#B71C1C', '+') + e(188, 100) + e(56, 24) + e(56, 176),
+      L: [[100, 100, '원자핵(+)', 'r'], [56, 24, '전자', 'l']]},
+    '톰슨 모형': {box: [200, 170], s: `<circle cx="100" cy="85" r="72" fill="#FBD5D5" stroke="#E57373" stroke-width="1.6"/>${plus}${[[70, 60], [130, 64], [96, 98], [60, 112], [142, 112], [104, 40], [100, 136]].map(([x, y]) => e(x, y)).join('')}`,
+      L: [[40, 60, '양전하를 띤 공', 'l'], [142, 112, '전자', 'r']]},
+    '현대 모형(전자 구름)': {box: [200, 200], s: cloudP + ball(100, 100, 6, '#E53935', '#B71C1C'), L: [[100, 100, '원자핵', 'r'], [40, 120, '전자 구름', 'l']]}
+  });
+  const H = (x, y) => ball(x, y, 13, '#F1F5F9', '#94A3B8', 'H', '#334155'), bond = (a, b, c, d) => `<path d="M${a} ${b} L${c} ${d}" stroke="#94A3B8" stroke-width="7"/>`;
+  def('물질', '분자 모형', {
+    'H₂O': {box: [160, 120], s: bond(80, 50, 40, 86) + bond(80, 50, 120, 86) + ball(80, 50, 24, '#E53935', '#B71C1C', 'O') + H(40, 88) + H(120, 88) + T(80, 116, '104.5°', 'font-size="10" text-anchor="middle" fill="#64748B"'), L: []},
+    'CO₂': {box: [200, 70], s: bond(36, 35, 164, 35) + `<path d="M36 29 H164 M36 41 H164" stroke="#94A3B8" stroke-width="3"/>` + ball(36, 35, 22, '#E53935', '#B71C1C', 'O') + ball(100, 35, 20, '#37474F', '#1F2937', 'C') + ball(164, 35, 22, '#E53935', '#B71C1C', 'O'), L: []},
+    'O₂': {box: [130, 64], s: `<path d="M36 26 H94 M36 38 H94" stroke="#94A3B8" stroke-width="4"/>` + ball(36, 32, 24, '#E53935', '#B71C1C', 'O') + ball(94, 32, 24, '#E53935', '#B71C1C', 'O'), L: []},
+    'NH₃': {box: [160, 130], s: bond(80, 46, 36, 98) + bond(80, 46, 124, 98) + bond(80, 46, 88, 112) + H(36, 98) + H(124, 98) + ball(80, 46, 23, '#3F51B5', '#283593', 'N') + H(88, 112), L: []},
+    'CH₄': {box: [160, 150], s: bond(80, 76, 80, 18) + bond(80, 76, 30, 108) + bond(80, 76, 128, 108) + bond(80, 76, 96, 126) + H(80, 18) + H(30, 108) + H(128, 108) + ball(80, 76, 21, '#37474F', '#1F2937', 'C') + H(96, 126), L: []}
+  });
+  const box = `<path d="M10 20 V160 H150 V20" fill="#F8FAFC" stroke="#64748B" stroke-width="2"/>`;
+  let sol = '', liq = '', gas = ''; for (let j = 0; j < 5; j++) for (let i = 0; i < 6; i++) sol += ball(28 + i * 21, 150 - j * 21, 10, '#60A5FA', '#1D4ED8');
+  seed(51); for (let j = 0; j < 4; j++) for (let i = 0; i < 6; i++) liq += ball(28 + i * 21 + rnd() * 6 - 3, 150 - j * 19 + rnd() * 6 - 3, 10, '#60A5FA', '#1D4ED8');
+  [[40, 40], [110, 52], [70, 90], [128, 120], [36, 130], [96, 146]].forEach(([x, y], k) => { const a = k * 1.1; gas += `<path d="M${x} ${y} l${f1(-20 * Math.cos(a))} ${f1(-20 * Math.sin(a))}" stroke="#93C5FD" stroke-width="2" stroke-dasharray="3 3"/>` + ball(x, y, 10, '#60A5FA', '#1D4ED8'); });
+  def('물질', '입자 배열', {'고체': {box: [160, 170], s: box + sol, L: []}, '액체': {box: [160, 170], s: box + liq, L: []}, '기체': {box: [160, 170], s: box + gas, L: []}});
+  let nacl = ''; const P = (i, j, k) => [40 + i * 46 + k * 22, 140 - j * 46 - k * 18];
+  for (let k = 2; k >= 0; k--) { for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) { const p = P(i, j, k); if (i < 2) { const q = P(i + 1, j, k); nacl += `<path d="M${p} L${q}" stroke="#94A3B8" stroke-width="1.4"/>`; } if (j < 2) { const q = P(i, j + 1, k); nacl += `<path d="M${p} L${q}" stroke="#94A3B8" stroke-width="1.4"/>`; } if (k > 0) { const q = P(i, j, k - 1); nacl += `<path d="M${p} L${q}" stroke="#94A3B8" stroke-width="1.4"/>`; } }
+    for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) { const [x, y] = P(i, j, k), na = (i + j + k) % 2; nacl += na ? ball(x, y, 8, '#9C7CF4', '#5B3FA0') : ball(x, y, 13, '#6CC56A', '#2F7D32'); } }
+  def('물질', '이온 결정(NaCl)', {'결정 구조': {box: [200, 190], s: nacl + ball(150, 176, 6, '#9C7CF4', '#5B3FA0') + T(160, 180, 'Na⁺', 'font-size="10"') + ball(110, 176, 8, '#6CC56A', '#2F7D32') + T(122, 180, 'Cl⁻', 'font-size="10"'), L: []}});
+})();
+
+/* ---------- 실험 기구 · 전기·자기·힘 (선 색·채우기를 바꿀 수 있는 단순 모양) ---------- */
+const LEGACY = {
+  '실험 기구': {
     '비커': '<path d="M10 6 h80 M14 6 v86 q0 8 8 8 h56 q8 0 8-8 v-86"/><path class="f" d="M15 46 h70 v46 q0 7-7 7 h-56 q-7 0-7-7z" stroke="none" opacity=".5"/><path d="M70 22 h12 M74 36 h8 M70 50 h12 M74 64 h8 M70 78 h12" stroke-width="1"/>',
     '삼각 플라스크': '<path d="M38 4 h24 M41 4 v34 l-34 56 q-3 6 4 6 h78 q7 0 4-6 l-34-56 v-34"/><path class="f" d="M27 64 h46 l19 30 q2 4-3 4 h-78 q-5 0-3-4z" stroke="none" opacity=".5"/>',
     '둥근 플라스크': '<path d="M40 4 h20 M43 4 v36 a32 32 0 1 0 14 0 v-36"/><path class="f" d="M20 72 a30 30 0 0 0 60 0z" stroke="none" opacity=".5"/>',
@@ -115,7 +560,7 @@ const LIB = {
     '집기병': '<path d="M30 4 h24 M33 4 v14 q-26 6-26 30 v52 q0 6 6 6 h58 q6 0 6-6 v-52 q0-24-26-30 v-14"/>',
     '저울': '<path d="M6 60 h88 v20 h-88z M20 60 v-8 h60 v8"/><rect x="58" y="66" width="28" height="9" class="f"/>'
   },
-  phy: {
+  '전기·자기·힘': {
     '전지': '<path d="M4 30 h30 M34 12 v36 M46 20 v20 M46 30 h30"/><text x="26" y="10" font-size="12" fill="currentColor" stroke="none">+</text><text x="50" y="16" font-size="12" fill="currentColor" stroke="none">−</text>',
     '전구': '<circle cx="40" cy="30" r="16"/><path d="M28 18 l24 24 M52 18 l-24 24 M4 30 h20 M56 30 h20"/>',
     '스위치': '<path d="M4 30 h24 M52 30 h24 M28 30 l22-14"/><circle cx="28" cy="30" r="3" class="f"/><circle cx="52" cy="30" r="3" class="f"/>',
@@ -132,27 +577,282 @@ const LIB = {
     '빗면': '<path d="M4 70 h100 v-60z" class="f"/>',
     '좌표축': '<path d="M14 100 h100 M14 100 v-94 M110 96 l6 4 l-6 4 M10 10 l4-6 l4 6"/><text x="118" y="114" font-size="12" fill="currentColor" stroke="none">x</text><text x="0" y="12" font-size="12" fill="currentColor" stroke="none">y</text>',
     '빛·광선': '<path d="M4 50 L60 20" /><path d="M54 18 l8 1 l-4 7" />'
-  },
-  bio: {
-    '동물 세포': '<ellipse cx="50" cy="38" rx="46" ry="34" class="f"/><circle cx="46" cy="36" r="12" fill="#C4B5FD"/><circle cx="46" cy="36" r="3" fill="currentColor" stroke="none"/><ellipse cx="76" cy="50" rx="8" ry="4" fill="#FCA5A5"/><ellipse cx="22" cy="24" rx="7" ry="4" fill="#FCA5A5"/>',
-    '식물 세포': '<rect x="4" y="4" width="92" height="68" rx="4"/><rect x="9" y="9" width="82" height="58" rx="3" class="f"/><circle cx="30" cy="28" r="10" fill="#C4B5FD"/><ellipse cx="62" cy="44" rx="20" ry="14" fill="#DBEAFE" stroke-width="1"/><ellipse cx="22" cy="54" rx="6" ry="3.5" fill="#4ADE80"/><ellipse cx="78" cy="18" rx="6" ry="3.5" fill="#4ADE80"/>',
-    '잎': '<path d="M6 60 Q10 10 70 6 Q66 60 6 60z" fill="#86EFAC"/><path d="M6 60 L60 14 M24 44 l-2-14 M38 32 l14 2"/>',
-    '뉴런': '<circle cx="18" cy="30" r="12" class="f"/><path d="M8 20 l-6-8 M8 40 l-6 8 M18 18 v-12 M30 30 h56 M86 30 l8-8 M86 30 l8 8 M86 30 h10"/><path d="M40 26 h10 v8 h-10z M58 26 h10 v8 h-10z" fill="#FDE68A"/>',
-    '원자 모형': '<circle cx="50" cy="50" r="7" fill="#EF4444"/><circle cx="50" cy="50" r="24"/><circle cx="50" cy="50" r="42"/><circle cx="74" cy="50" r="4" fill="#3B82F6"/><circle cx="26" cy="50" r="4" fill="#3B82F6"/><circle cx="50" cy="8" r="4" fill="#3B82F6"/>',
-    '분자(H₂O)': '<circle cx="50" cy="30" r="18" fill="#EF4444"/><circle cx="22" cy="54" r="11" fill="#E5E7EB"/><circle cx="78" cy="54" r="11" fill="#E5E7EB"/><text x="50" y="35" font-size="13" font-weight="700" text-anchor="middle" fill="#fff" stroke="none">O</text><text x="22" y="58" font-size="11" text-anchor="middle" fill="currentColor" stroke="none">H</text><text x="78" y="58" font-size="11" text-anchor="middle" fill="currentColor" stroke="none">H</text>',
-    '지구 내부': '<circle cx="50" cy="50" r="46" fill="#A3E635"/><circle cx="50" cy="50" r="40" fill="#FDBA74"/><circle cx="50" cy="50" r="24" fill="#FB923C"/><circle cx="50" cy="50" r="12" fill="#EF4444"/>',
-    '태양': '<circle cx="40" cy="40" r="18" fill="#FCD34D"/><path d="M40 6 v10 M40 64 v10 M6 40 h10 M64 40 h10 M16 16 l7 7 M57 57 l7 7 M64 16 l-7 7 M23 57 l-7 7"/>',
-    '달': '<path d="M40 6 a30 30 0 1 0 22 52 a24 24 0 1 1 -22-52z" fill="#FDE68A"/>',
-    '지구': '<circle cx="34" cy="34" r="30" fill="#93C5FD"/><path d="M14 22 q10-6 14 4 q6 8-4 14 q-8 2-10-6z M38 12 q14 2 16 14 q-8 4-12-4z M40 44 q10-2 14 6 q-6 8-14 4z" fill="#4ADE80" stroke-width="1"/>',
-    '구름': '<path d="M20 50 a14 14 0 0 1 2-28 a20 20 0 0 1 38-6 a16 16 0 0 1 22 18 a12 12 0 0 1-4 16z" class="f"/>',
-    '지층': '<path d="M4 10 h100 v20 h-100z" fill="#FDE68A"/><path d="M4 30 h100 v20 h-100z" fill="#FDBA74"/><path d="M4 50 h100 v20 h-100z" fill="#D6D3D1"/><path d="M4 70 h100 v20 h-100z" fill="#A8A29E"/>'
   }
 };
-function libIcon(svg) { return `<svg viewBox="-4 -4 130 130" fill="none" stroke="#16202E" stroke-width="3" style="color:#16202E">${svg.replace(/class="f"/g, 'fill="#E5E7EB"')}</svg>`; }
-for (const [k, set] of Object.entries(LIB)) $('lib-' + k).innerHTML = Object.entries(set).map(([n, s]) => `<button type="button" data-k="${k}" data-n="${esc(n)}" title="${esc(n)}">${libIcon(s)}${esc(n)}</button>`).join('');
-document.querySelectorAll('.lib button').forEach(b => b.onclick = () => stamp(LIB[b.dataset.k][b.dataset.n], b.dataset.n));
+for (const [cat, set] of Object.entries(LEGACY)) for (const [n, s] of Object.entries(set)) def(cat, n, {'기본': {legacy: s}});
+const CATS = ['생명', '지구·우주', '물질', '실험 기구', '전기·자기·힘'];
 
-/* ===== 색·굵기 ===== */
+/* ================= 이름표 배치 ================= */
+function labelsSVG(L, ox, oy, W, H) {
+  const g = {l: [], r: [], t: [], b: []};
+  L.forEach(([ax, ay, t, sd]) => g[sd || (ax - ox < W / 2 ? 'l' : 'r')].push({ax, ay, t}));
+  let out = ''; const wOf = t => t.length * 10.5 + 4;
+  for (const sd of ['l', 'r']) { let prev = -1e9; g[sd].sort((p, q) => p.ay - q.ay).forEach(p => { p.ty = Math.max(p.ay, prev + 15); prev = p.ty;
+    const x = sd === 'l' ? ox - 14 : ox + W + 14, lx = sd === 'l' ? x + 3 : x - 3;
+    out += `<path d="M${f1(p.ax)} ${f1(p.ay)} L${f1(lx)} ${f1(p.ty)}" stroke="#5B6573" stroke-width=".6" fill="none"/><circle cx="${f1(p.ax)}" cy="${f1(p.ay)}" r="1.2" fill="#5B6573" stroke="none"/>` + T(x, p.ty + 4, p.t, `text-anchor="${sd === 'l' ? 'end' : 'start'}"`); }); }
+  for (const sd of ['t', 'b']) { let pr = -1e9; g[sd].sort((p, q) => p.ax - q.ax).forEach(p => { const w = wOf(p.t); p.tx = Math.max(p.ax, pr + w / 2 + 6); pr = p.tx + w / 2;
+    const y = sd === 't' ? oy - 14 : oy + H + 22, ly = sd === 't' ? y + 3 : y - 12;
+    out += `<path d="M${f1(p.ax)} ${f1(p.ay)} L${f1(p.tx)} ${f1(ly)}" stroke="#5B6573" stroke-width=".6" fill="none"/><circle cx="${f1(p.ax)}" cy="${f1(p.ay)}" r="1.2" fill="#5B6573" stroke="none"/>` + T(p.tx, y, p.t, 'text-anchor="middle"'); }); }
+  return out;
+}
+const WRAP = s => `<g stroke="#334155" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none" font-family="Pretendard Variable, Malgun Gothic, sans-serif">${s}</g>`;
+const uniq = s => { const u = 'u' + Math.random().toString(36).slice(2, 8); return s.replaceAll('__U__', u); };
+function renderVar(v, withLabels) {
+  if (v.legacy) return v.legacy;
+  return uniq(polish(WRAP(v.s + (withLabels && v.L.length ? labelsSVG(v.L, v.ox || 0, v.oy || 0, v.box[0], v.box[1]) : ''))));
+}
+/* 교재 인쇄풍: 채도를 낮추고 면에 은은한 입체 그라데이션 */
+const hex2hsl = h => { const r = parseInt(h.slice(1, 3), 16) / 255, g = parseInt(h.slice(3, 5), 16) / 255, b = parseInt(h.slice(5, 7), 16) / 255, mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2; let H = 0, S = 0; if (mx !== mn) { const d = mx - mn; S = l > .5 ? d / (2 - mx - mn) : d / (mx + mn); H = (mx === r ? (g - b) / d + (g < b ? 6 : 0) : mx === g ? (b - r) / d + 2 : (r - g) / d + 4) / 6; } return [H, S, l]; };
+const hsl2hex = (h, s, l) => { const f = n => { const k = (n + h * 12) % 12, a = s * Math.min(l, 1 - l), c = l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1)); return Math.round(Math.max(0, Math.min(1, c)) * 255).toString(16).padStart(2, '0'); }; return '#' + f(0) + f(8) + f(4); };
+const mute = h => { let [H, S, L] = hex2hsl(h); if (S < .06) return h; S *= .74; L = L > .55 ? L + (1 - L) * .1 : L * .96; return hsl2hex(H, S, L); };
+function polish(svg) {
+  const cache = {}, gid = {}; let defs = '';
+  svg = svg.replace(/#[0-9A-Fa-f]{6}\b/g, h => cache[h] || (cache[h] = mute(h)));
+  svg = svg.replace(/<(circle|ellipse|path|rect|polygon)\b([^>]*?)\sfill="(#[0-9a-f]{6})"([^>]*)>/gi, (m, tag, pre, h, post) => {
+    if (/opacity=/.test(pre + post)) return m;
+    const [H, S, L] = hex2hsl(h); if (L < .3 || (L > .95 && S < .3)) return m;
+    if (!gid[h]) { gid[h] = '__U__g' + h.slice(1); defs += `<radialGradient id="${gid[h]}" cx=".36" cy=".3" r=".85"><stop offset="0" stop-color="${hsl2hex(H, S * .85, Math.min(.97, L + (1 - L) * .55))}"/><stop offset=".62" stop-color="${h}"/><stop offset="1" stop-color="${hsl2hex(H, Math.min(1, S * 1.05), L * .86)}"/></radialGradient>`; }
+    return `<${tag}${pre} fill="url(#${gid[h]})"${post}>`;
+  });
+  return defs ? svg.replace('>', `><defs>${defs}</defs>`) : svg;
+}
+
+/* ================= 화학식 → 원자·분자·이온 모형 ================= */
+// [원자 번호, 이름, 공유 반지름(Å), 반데르발스 반지름(Å), 색, 질량수, 전자 껍질(원자 번호 21 이상)]
+const EL = {H: [1, '수소', .31, 1.2, '#EEF2F6', 1], He: [2, '헬륨', .28, 1.4, '#D9F99D', 4], Li: [3, '리튬', 1.28, 1.82, '#B39DDB', 7], Be: [4, '베릴륨', .96, 1.53, '#A5D6A7', 9], B: [5, '붕소', .84, 1.92, '#FFAB91', 11], C: [6, '탄소', .76, 1.7, '#4B5563', 12], N: [7, '질소', .71, 1.55, '#3F5BC4', 14], O: [8, '산소', .66, 1.52, '#E04848', 16], F: [9, '플루오린', .57, 1.47, '#B5D98A', 19], Ne: [10, '네온', .58, 1.54, '#F48FB1', 20], Na: [11, '나트륨', 1.66, 2.27, '#9575CD', 23], Mg: [12, '마그네슘', 1.41, 1.73, '#4DB6AC', 24], Al: [13, '알루미늄', 1.21, 1.84, '#B0BEC5', 27], Si: [14, '규소', 1.11, 2.1, '#BCAAA4', 28], P: [15, '인', 1.07, 1.8, '#FF9800', 31], S: [16, '황', 1.05, 1.8, '#F2D03B', 32], Cl: [17, '염소', 1.02, 1.75, '#6DBB5A', 35], Ar: [18, '아르곤', 1.06, 1.88, '#80DEEA', 40], K: [19, '칼륨', 2.03, 2.75, '#7E57C2', 39], Ca: [20, '칼슘', 1.76, 2.31, '#9CCC65', 40], Fe: [26, '철', 1.32, 2.0, '#E07B39', 56, [2, 8, 14, 2]], Cu: [29, '구리', 1.32, 1.4, '#C77D3A', 64, [2, 8, 18, 1]], Zn: [30, '아연', 1.22, 1.39, '#90A4AE', 65, [2, 8, 18, 2]], Br: [35, '브로민', 1.2, 1.85, '#A1452E', 80, [2, 8, 18, 7]], Ag: [47, '은', 1.45, 1.72, '#CFD8DC', 108, [2, 8, 18, 18, 1]], I: [53, '아이오딘', 1.39, 1.98, '#7B1FA2', 127, [2, 8, 18, 18, 7]]};
+const ION_Q = {Li: 1, Na: 1, K: 1, Ag: 1, Be: 2, Mg: 2, Ca: 2, Zn: 2, Cu: 2, Fe: 2, Al: 3, F: -1, Cl: -1, Br: -1, I: -1, O: -2, S: -2};
+const ION_R = {Li: .76, Na: 1.02, K: 1.38, Ag: 1.15, Be: .45, Mg: .72, Ca: 1, Zn: .74, Cu: .73, Fe: .78, Al: .54, F: 1.33, Cl: 1.81, Br: 1.96, I: 2.2, O: 1.4, S: 1.84};
+const SUBD = '₀₁₂₃₄₅₆₇₈₉', SUPD = '⁰¹²³⁴⁵⁶⁷⁸⁹';
+const qStr = q => q ? (Math.abs(q) > 1 ? [...String(Math.abs(q))].map(d => SUPD[d]).join('') : '') + (q > 0 ? '⁺' : '⁻') : '';
+const pretty = f => f.replace(/([A-Za-z)])(\d+)/g, (m, a, d) => a + [...d].map(x => SUBD[x]).join(''));
+const shellsOf = (Z, e) => { if (Z > 20 && EL_BY_Z[Z]) return EL_BY_Z[Z][6].slice(); const caps = [2, 8, 8, 2], out = []; let n = e; for (const c of caps) { if (n <= 0) break; out.push(Math.min(c, n)); n -= c; } return out; };
+const EL_BY_Z = {}; for (const [k, v] of Object.entries(EL)) EL_BY_Z[v[0]] = v;
+const lightCol = c => hex2hsl(c)[2] > .62;
+/* 분자 좌표(Å): 원자 [기호, x, y, z], 결합 [i, j, 결합 차수] */
+const MOL = {
+  'H2': ['수소', [['H', -.37, 0, 0], ['H', .37, 0, 0]], [[0, 1, 1]]],
+  'O2': ['산소', [['O', -.6, 0, 0], ['O', .6, 0, 0]], [[0, 1, 2]]],
+  'N2': ['질소', [['N', -.55, 0, 0], ['N', .55, 0, 0]], [[0, 1, 3]]],
+  'F2': ['플루오린', [['F', -.71, 0, 0], ['F', .71, 0, 0]], [[0, 1, 1]]],
+  'Cl2': ['염소', [['Cl', -1, 0, 0], ['Cl', 1, 0, 0]], [[0, 1, 1]]],
+  'HCl': ['염화 수소', [['H', -.64, 0, 0], ['Cl', .64, 0, 0]], [[0, 1, 1]]],
+  'HF': ['플루오린화 수소', [['H', -.46, 0, 0], ['F', .46, 0, 0]], [[0, 1, 1]]],
+  'H2O': ['물', [['O', 0, -.2, 0], ['H', -.76, .39, 0], ['H', .76, .39, 0]], [[0, 1, 1], [0, 2, 1]]],
+  'H2S': ['황화 수소', [['S', 0, -.3, 0], ['H', -.96, .6, 0], ['H', .96, .6, 0]], [[0, 1, 1], [0, 2, 1]]],
+  'CO2': ['이산화 탄소', [['O', -1.16, 0, 0], ['C', 0, 0, 0], ['O', 1.16, 0, 0]], [[0, 1, 2], [1, 2, 2]]],
+  'CO': ['일산화 탄소', [['C', -.56, 0, 0], ['O', .56, 0, 0]], [[0, 1, 3]]],
+  'SO2': ['이산화 황', [['S', 0, -.3, 0], ['O', -1.24, .45, 0], ['O', 1.24, .45, 0]], [[0, 1, 2], [0, 2, 2]]],
+  'SO3': ['삼산화 황', [['S', 0, 0, 0], ['O', 0, -1.42, 0], ['O', 1.23, .71, 0], ['O', -1.23, .71, 0]], [[0, 1, 2], [0, 2, 2], [0, 3, 2]]],
+  'O3': ['오존', [['O', 0, -.3, 0], ['O', -1.09, .36, 0], ['O', 1.09, .36, 0]], [[0, 1, 2], [0, 2, 1]]],
+  'NH3': ['암모니아', [['N', 0, -.25, 0], ['H', -.94, .2, .3], ['H', .94, .2, .3], ['H', 0, .35, -.85]], [[0, 1, 1], [0, 2, 1], [0, 3, 1]]],
+  'CH4': ['메테인', [['C', 0, 0, 0], ['H', 0, -1.09, 0], ['H', 1.03, .36, 0], ['H', -.51, .36, .89], ['H', -.51, .36, -.89]], [[0, 1, 1], [0, 2, 1], [0, 3, 1], [0, 4, 1]]],
+  'CCl4': ['사염화 탄소', [['C', 0, 0, 0], ['Cl', 0, -1.77, 0], ['Cl', 1.67, .59, 0], ['Cl', -.83, .59, 1.44], ['Cl', -.83, .59, -1.44]], [[0, 1, 1], [0, 2, 1], [0, 3, 1], [0, 4, 1]]],
+  'H2O2': ['과산화 수소', [['O', -.73, 0, 0], ['O', .73, 0, 0], ['H', -1.0, .9, .3], ['H', 1.0, -.9, .3]], [[0, 1, 1], [0, 2, 1], [1, 3, 1]]],
+  'C2H6': ['에테인', [['C', -.77, 0, 0], ['C', .77, 0, 0], ['H', -1.16, -1, 0], ['H', -1.16, .5, .87], ['H', -1.16, .5, -.87], ['H', 1.16, 1, 0], ['H', 1.16, -.5, .87], ['H', 1.16, -.5, -.87]], [[0, 1, 1], [0, 2, 1], [0, 3, 1], [0, 4, 1], [1, 5, 1], [1, 6, 1], [1, 7, 1]]],
+  'C2H4': ['에텐', [['C', -.67, 0, 0], ['C', .67, 0, 0], ['H', -1.23, -.92, 0], ['H', -1.23, .92, 0], ['H', 1.23, -.92, 0], ['H', 1.23, .92, 0]], [[0, 1, 2], [0, 2, 1], [0, 3, 1], [1, 4, 1], [1, 5, 1]]],
+  'C2H2': ['에타인', [['H', -1.66, 0, 0], ['C', -.6, 0, 0], ['C', .6, 0, 0], ['H', 1.66, 0, 0]], [[0, 1, 1], [1, 2, 3], [2, 3, 1]]],
+  'C3H8': ['프로페인', [['C', -1.27, .4, 0], ['C', 0, -.4, 0], ['C', 1.27, .4, 0], ['H', -2.16, -.2, 0], ['H', -1.27, 1.05, .88], ['H', -1.27, 1.05, -.88], ['H', 0, -1.05, .88], ['H', 0, -1.05, -.88], ['H', 2.16, -.2, 0], ['H', 1.27, 1.05, .88], ['H', 1.27, 1.05, -.88]], [[0, 1, 1], [1, 2, 1], [0, 3, 1], [0, 4, 1], [0, 5, 1], [1, 6, 1], [1, 7, 1], [2, 8, 1], [2, 9, 1], [2, 10, 1]]],
+  'CH3OH': ['메탄올', [['C', -.7, 0, 0], ['O', .7, 0, 0], ['H', 1.0, .9, 0], ['H', -1.1, -1, 0], ['H', -1.1, .5, .87], ['H', -1.1, .5, -.87]], [[0, 1, 1], [1, 2, 1], [0, 3, 1], [0, 4, 1], [0, 5, 1]]],
+  'C2H5OH': ['에탄올', [['C', -1.9, .3, 0], ['C', -.6, -.4, 0], ['O', .6, .3, 0], ['H', 1.4, -.25, 0], ['H', -2.8, -.3, 0], ['H', -1.9, .95, .88], ['H', -1.9, .95, -.88], ['H', -.6, -1.05, .88], ['H', -.6, -1.05, -.88]], [[0, 1, 1], [1, 2, 1], [2, 3, 1], [0, 4, 1], [0, 5, 1], [0, 6, 1], [1, 7, 1], [1, 8, 1]]],
+  'HCHO': ['폼알데하이드', [['C', 0, 0, 0], ['O', 0, -1.2, 0], ['H', -.94, .59, 0], ['H', .94, .59, 0]], [[0, 1, 2], [0, 2, 1], [0, 3, 1]]],
+  'HCOOH': ['폼산', [['C', 0, 0, 0], ['O', -1.0, -.75, 0], ['O', 1.15, -.6, 0], ['H', 0, 1.1, 0], ['H', 1.95, -.05, 0]], [[0, 1, 2], [0, 2, 1], [0, 3, 1], [2, 4, 1]]],
+  'CH3COOH': ['아세트산', [['C', -1.5, .3, 0], ['C', 0, 0, 0], ['O', .55, -1.1, 0], ['O', .8, 1.0, 0], ['H', 1.7, .75, 0], ['H', -1.95, -.7, 0], ['H', -1.85, .85, .88], ['H', -1.85, .85, -.88]], [[0, 1, 1], [1, 2, 2], [1, 3, 1], [3, 4, 1], [0, 5, 1], [0, 6, 1], [0, 7, 1]]],
+  'HCN': ['사이안화 수소', [['H', -1.66, 0, 0], ['C', -.6, 0, 0], ['N', .55, 0, 0]], [[0, 1, 1], [1, 2, 3]]],
+  'BF3': ['삼플루오린화 붕소', [['B', 0, 0, 0], ['F', 0, -1.31, 0], ['F', 1.13, .65, 0], ['F', -1.13, .65, 0]], [[0, 1, 1], [0, 2, 1], [0, 3, 1]]],
+  'NH4+': ['암모늄 이온', [['N', 0, 0, 0], ['H', 0, -1.03, 0], ['H', .97, .34, 0], ['H', -.49, .34, .84], ['H', -.49, .34, -.84]], [[0, 1, 1], [0, 2, 1], [0, 3, 1], [0, 4, 1]]],
+  'H3O+': ['하이드로늄 이온', [['O', 0, -.2, 0], ['H', -.92, .2, .3], ['H', .92, .2, .3], ['H', 0, .3, -.9]], [[0, 1, 1], [0, 2, 1], [0, 3, 1]]],
+  'OH-': ['수산화 이온', [['O', -.48, 0, 0], ['H', .48, 0, 0]], [[0, 1, 1]]]
+};
+(() => { const ring = [], b = []; for (let i = 0; i < 6; i++) { const a = -Math.PI / 2 + i * Math.PI / 3; ring.push(['C', 1.4 * Math.cos(a), 1.4 * Math.sin(a), 0]); } for (let i = 0; i < 6; i++) { const a = -Math.PI / 2 + i * Math.PI / 3; ring.push(['H', 2.48 * Math.cos(a), 2.48 * Math.sin(a), 0]); b.push([i, (i + 1) % 6, i % 2 ? 1 : 2], [i, i + 6, 1]); } MOL['C6H6'] = ['벤젠', ring, b]; })();
+MOL['CH2O'] = MOL['HCHO'];
+function parseF(s) {
+  const st = [{}]; const re = /([A-Z][a-z]?)(\d*)|(\()|(\))(\d*)/g; let m, used = 0;
+  while ((m = re.exec(s))) { used += m[0].length;
+    if (m[1]) { if (!EL[m[1]]) return null; const t = st[st.length - 1]; t[m[1]] = (t[m[1]] || 0) + (+m[2] || 1); }
+    else if (m[3]) st.push({}); else if (m[4]) { if (st.length < 2) return null; const t = st.pop(), k = +m[5] || 1, u = st[st.length - 1]; for (const [e, n] of Object.entries(t)) u[e] = (u[e] || 0) + n * k; } }
+  return used === s.length && st.length === 1 ? st[0] : null;
+}
+const hill = c => { const k = Object.keys(c).sort(), o = c.C ? ['C', 'H', ...k.filter(e => e !== 'C' && e !== 'H')].filter(e => c[e]) : k; return o.map(e => e + (c[e] > 1 ? c[e] : '')).join(''); };
+const MOL_HILL = {}; for (const [k, v] of Object.entries(MOL)) if (!/[+-]$/.test(k)) { const h = hill(parseF(k)); if (!MOL_HILL[h]) MOL_HILL[h] = k; }
+function vsepr(c) {
+  const els = Object.keys(c), lig1 = ['H', 'F', 'Cl', 'Br', 'I'], cand = els.filter(e => c[e] === 1 && !lig1.includes(e));
+  const cen = cand.find(e => e !== 'O') || cand[0] || (els.length === 2 && els.find(e => c[e] === 1)); if (!cen) return null;
+  if (els.some(e => ION_Q[e] > 0 && e !== 'Be')) return null; // 금속이 든 물질은 분자 모형으로 그리지 않음
+  if (cen !== 'O' && (c.O || c.S) && c.H) return null;        // H가 O에 붙는 산(H2SO4 등)은 중심 원자 모형으로 틀리게 그려지므로 제외
+  const ligs = []; for (const e of els) for (let i = 0; i < (e === cen ? c[e] - 1 : c[e]); i++) { if (!lig1.includes(e) && e !== 'O' && e !== 'S') return null; ligs.push(e); }
+  const V = shellsOf(EL[cen][0], EL[cen][0]).pop(); let used = 0; const ord = ligs.map(e => { const o = (e === 'O' || e === 'S') && V - used >= 2 + (ligs.length - 1) ? 2 : 1; used += o; return o; });
+  const lp = Math.max(0, Math.floor((V - used) / 2)), SN = ligs.length + lp;
+  const D = {1: [[1, 0, 0]], 2: [[-1, 0, 0], [1, 0, 0]], 3: [[0, -1, 0], [.866, .5, 0], [-.866, .5, 0]], 4: [[0, -1, 0], [.943, .333, 0], [-.471, .333, .816], [-.471, .333, -.816]], 5: [[1, 0, 0], [-.5, 0, .866], [-.5, 0, -.866], [0, -1, 0], [0, 1, 0]], 6: [[0, -1, 0], [0, 1, 0], [1, 0, 0], [-1, 0, 0], [0, 0, 1], [0, 0, -1]]}[SN];
+  if (!D || !ligs.length) return null;
+  const dirs = D.slice(lp), atoms = [[cen, 0, 0, 0]], bonds = [];
+  ligs.forEach((e, i) => { const d = dirs[i], L = EL[cen][2] + EL[e][2] - (ord[i] > 1 ? .12 : 0); atoms.push([e, d[0] * L, d[1] * L, d[2] * L]); bonds.push([0, i + 1, ord[i]]); });
+  return ['', atoms, bonds];
+}
+/* 구조식: 원소 기호와 결합선만. 끝 원자(H 등)는 중심 원자 둘레 빈 방향에 고르게 배치 */
+function structSVG(atoms, bonds, title) {
+  const n = atoms.length, degN = atoms.map((a, i) => bonds.filter(b => b[0] === i || b[1] === i).length), nb = i => bonds.filter(b => b[0] === i || b[1] === i).map(b => b[0] === i ? b[1] : b[0]);
+  const term = atoms.map((a, i) => degN[i] === 1 && n > 2 && degN[nb(i)[0]] > 1), K = 44, LH = 40, pos = atoms.map(a => [a[1] * K, a[2] * K]);
+  // 고리가 없는 사슬은 교과서처럼 가장 긴 사슬을 가로 일직선으로 펴고, 곁가지는 위아래로
+  const heavy = atoms.map((a, i) => i).filter(i => !term[i]), hb = bonds.filter(b => !term[b[0]] && !term[b[1]]);
+  if (heavy.length >= 2 && hb.length === heavy.length - 1) {
+    const hn = i => nb(i).filter(j => !term[j]), far = st => { const dd = {[st]: 0}, pr = {}, q = [st]; while (q.length) { const u = q.shift(); hn(u).forEach(v => { if (dd[v] === undefined) { dd[v] = dd[u] + 1; pr[v] = u; q.push(v); } }); } const e = +Object.keys(dd).reduce((a, b) => dd[b] > dd[a] ? b : a); const path = [e]; while (path[path.length - 1] !== st) path.push(pr[path[path.length - 1]]); return path; };
+    const chain = far(far(heavy[0])[0]), done = new Set(chain), D = 62; chain.forEach((i, k) => pos[i] = [k * D, 0]);
+    const q = chain.slice(); while (q.length) { const u = q.shift(); hn(u).filter(v => !done.has(v)).forEach(v => { const used = hn(u).filter(w => done.has(w)).map(w => Math.atan2(pos[w][1] - pos[u][1], pos[w][0] - pos[u][0])); const c = [270, 90, 0, 180].map(d => d * Math.PI / 180).find(c => used.every(t => Math.abs(Math.atan2(Math.sin(c - t), Math.cos(c - t))) > .5)) ?? Math.PI / 4; pos[v] = [pos[u][0] + D * Math.cos(c), pos[u][1] + D * Math.sin(c)]; done.add(v); q.push(v); }); }
+  }
+  atoms.forEach((a, i) => { if (term[i]) return; const subs = nb(i).filter(j => term[j]); if (!subs.length) return;
+    const used = nb(i).filter(j => !term[j]).map(j => Math.atan2(pos[j][1] - pos[i][1], pos[j][0] - pos[i][0]));
+    const cand = (used.length + subs.length <= 4 ? [0, 90, 180, 270] : [0, 90, 180, 270, 45, 135, 225, 315]).map(d => d * Math.PI / 180), dist = (a, b) => { const d = Math.abs(a - b) % (2 * Math.PI); return Math.min(d, 2 * Math.PI - d); };
+    subs.forEach(j => { let best = cand[0], bv = -1; cand.forEach((c, ci) => { const v = used.length ? Math.min(...used.map(u => dist(u, c))) : 4 - ci * .01; if (v > bv + 1e-6) { bv = v; best = c; } }); used.push(best); pos[j] = [pos[i][0] + LH * Math.cos(best), pos[i][1] + LH * Math.sin(best)]; }); });
+  let s = '';
+  bonds.forEach(([i, j, o]) => { const [x1, y1] = pos[i], [x2, y2] = pos[j], L = Math.hypot(x2 - x1, y2 - y1) || 1, ux = (x2 - x1) / L, uy = (y2 - y1) / L, sh = 11, nx = -uy, ny = ux;
+    (o === 1 ? [0] : o === 2 ? [-3, 3] : [-4.5, 0, 4.5]).forEach(t => s += `<path d="M${f1(x1 + ux * sh + nx * t)} ${f1(y1 + uy * sh + ny * t)} L${f1(x2 - ux * sh + nx * t)} ${f1(y2 - uy * sh + ny * t)}" stroke="#1F2937" stroke-width="1.6"/>`); });
+  atoms.forEach((a, i) => s += T(pos[i][0], pos[i][1] + 6, a[0], 'font-size="17" font-weight="600" text-anchor="middle"'));
+  const xs = pos.map(p => p[0]), ys = pos.map(p => p[1]);
+  return s + T((Math.min(...xs) + Math.max(...xs)) / 2, Math.max(...ys) + 36, esc(title), 'font-size="13" text-anchor="middle"');
+}
+function molSVG(atoms, bonds, mode, title) {
+  const planar = atoms.every(a => Math.abs(a[3]) < 1e-6), ay = 28 * Math.PI / 180, ax = -14 * Math.PI / 180;
+  const P = atoms.map(([e, x, y, z]) => { if (!planar) { const x1 = x * Math.cos(ay) + z * Math.sin(ay), z1 = -x * Math.sin(ay) + z * Math.cos(ay); const y2 = y * Math.cos(ax) - z1 * Math.sin(ax), z2 = y * Math.sin(ax) + z1 * Math.cos(ax); x = x1; y = y2; z = z2; } return {e, x, y, z}; });
+  const sf = mode === 'sf', k = sf ? 40 : 52, items = [];
+  const deg = P.map((p, i) => bonds.filter(b => b[0] === i || b[1] === i).length);
+  P.forEach((p, i) => { p.X = p.x * k; p.Y = p.y * k; const per = 1 + p.z * .05; p.r = (sf ? EL[p.e][3] * k * .46 : 8 + EL[p.e][2] * 15) * per; items.push({z: p.z, r: p.r, d: deg[i], s: () => ball(p.X, p.Y, f1(p.r), EL[p.e][4], hsl2hex(...(([H, S, L]) => [H, S, L * .62])(hex2hsl(EL[p.e][4]))), p.e, lightCol(EL[p.e][4]) ? '#1F2937' : '#fff').replace(/font-size="[\d.]+"/, `font-size="${f1(Math.min(p.r * .8, 15))}"`)}); });
+  if (!sf) bonds.forEach(([i, j, o]) => { const a = P[i], b = P[j], dx = b.X - a.X, dy = b.Y - a.Y, L = Math.hypot(dx, dy) || 1, nx = -dy / L, ny = dx / L, w = o === 1 ? 6.5 : o === 2 ? 4.6 : 3.8, gap = o === 1 ? 0 : o === 2 ? 3.4 : 5.2;
+    items.push({z: Math.min(a.z, b.z) - .01, s: () => { let s = ''; const offs = o === 1 ? [0] : o === 2 ? [-gap, gap] : [-gap, 0, gap]; offs.forEach(t => s += tube(`M${f1(a.X + nx * t)} ${f1(a.Y + ny * t)} L${f1(b.X + nx * t)} ${f1(b.Y + ny * t)}`, '#7B8794', '#D5DAE0', w)); return s; }}); });
+  // 공간 채움: 결합이 많은 중심 원자를 맨 위에 그려 가려지지 않게 함
+  items.sort(sf ? (p, q) => (p.d - q.d) || (p.z - q.z) : (p, q) => (Math.abs(p.z - q.z) > .05 ? p.z - q.z : 0) || (q.r || 0) - (p.r || 0));
+  const maxY = Math.max(...P.map(p => p.Y + p.r)), minX = Math.min(...P.map(p => p.X - p.r)), maxX = Math.max(...P.map(p => p.X + p.r));
+  return items.map(i => i.s()).join('') + T((minX + maxX) / 2, maxY + 24, esc(title), 'font-size="13" text-anchor="middle"');
+}
+function bohrSVG(sym, q) {
+  const [Z, nm, , , , A] = EL[sym], e = Z - q, sh = Z > 20 ? EL[sym][6] : shellsOf(Z, e), cx = 0, cy = 0;
+  let s = `<circle cx="0" cy="0" r="17" fill="#E8776F" stroke="#B4473F" stroke-width="1.2"/>` + T(0, 4, `${Z}+`, 'font-size="12" font-weight="700" fill="#fff" text-anchor="middle"'); const L = [[0, 10, '원자핵', 'l']];
+  sh.forEach((n, i) => { const R = 34 + i * 22; s += `<circle cx="0" cy="0" r="${R}" fill="none" stroke="#9AA5B1" stroke-width="1.1"/>`;
+    const pos = []; if (n <= 8) { const base = [-90, 0, 90, 180]; for (let j = 0; j < n; j++) { const c = base[j % 4], pair = n > 4 && j < n - 4 ? 1 : n > 4 && j >= 4 ? 1 : 0; pos.push(pair ? c + (j < 4 ? -11 : 11) * (22 / R) * 1.6 : c); } } else for (let j = 0; j < n; j++) pos.push(-90 + 360 * j / n);
+    pos.forEach(a => { const r = a * Math.PI / 180; s += ball(Math.cos(r) * R, Math.sin(r) * R, 5, '#4C7FD9', '#2B5BB0'); });
+    if (i === sh.length - 1 && pos.length) { const r = pos[0] * Math.PI / 180; L.push([Math.cos(r) * R, Math.sin(r) * R, '전자', 'r']); L.push([-R * .707, -R * .707, '전자 껍질', 'l']); } });
+  const Rm = 34 + (sh.length - 1) * 22, N = A - Z;
+  s += T(0, Rm + 30, `${nm}(${sym}${qStr(q)})`, 'font-size="13" font-weight="700" text-anchor="middle"') + T(0, Rm + 48, `양성자 ${Z}개 · 중성자 ${N}개 · 전자 ${e}개`, 'font-size="11" text-anchor="middle" fill="#4B5563"');
+  return {s, L, R: Rm};
+}
+function lewisSVG(sym, q) {
+  const [Z, nm] = EL[sym], e = Z - q, sh = Z > 20 ? EL[sym][6] : shellsOf(Z, e); let v = q > 0 ? 0 : sh[sh.length - 1]; if (Z > 20 && q === 0) v = sh[sh.length - 1];
+  let s = T(0, 12, sym, 'font-size="34" font-weight="700" text-anchor="middle"');
+  const hw = sym.length > 1 ? 25 : 18, site = [[0, -27], [hw + 4, 0], [0, 23], [-hw - 4, 0]], cnt = [0, 0, 0, 0]; if (Z === 2) cnt[0] = 2; else for (let j = 0; j < v; j++) cnt[j % 4]++;
+  site.forEach(([x, y], i) => { const tx = y ? 1 : 0, ty = x ? 1 : 0; if (cnt[i] === 1) s += `<circle cx="${x}" cy="${y}" r="3.4" fill="#1F2937" stroke="none"/>`; if (cnt[i] === 2) s += `<circle cx="${x - tx * 6}" cy="${y - ty * 6}" r="3.4" fill="#1F2937" stroke="none"/><circle cx="${x + tx * 6}" cy="${y + ty * 6}" r="3.4" fill="#1F2937" stroke="none"/>`; });
+  const bx = hw + 14;
+  if (q < 0) s += `<path d="M${-bx} -36 h-6 v68 h6 M${bx} -36 h6 v68 h-6" fill="none" stroke="#1F2937" stroke-width="1.6"/>` + T(bx + 10, -30, qStr(q), 'font-size="16"');
+  else if (q > 0) s += T(hw + 2, -10, qStr(q), 'font-size="16"');
+  return s + T(0, 66, `${nm}(${sym}${qStr(q)})`, 'font-size="13" text-anchor="middle"');
+}
+function ionicSVG(c, mode) {
+  const [m, x] = Object.keys(c).sort((a, b) => ION_Q[b] - ION_Q[a]), qm = ION_Q[m], qx = ION_Q[x], rm = ION_R[m] * 9, rx = ION_R[x] * 9, nm = c[m], nx = c[x];
+  const disp = pretty(m + (nm > 1 ? nm : '') + x + (nx > 1 ? nx : '')), ratio = `${m}${qStr(qm)} : ${x}${qStr(qx)} = ${nm} : ${nx}`;
+  const ionBall = (X, Y, e, q, r) => ball(X, Y, f1(r), EL[e][4], hsl2hex(...(([H, S, L]) => [H, S, L * .62])(hex2hsl(EL[e][4]))), e + qStr(q), lightCol(EL[e][4]) ? '#1F2937' : '#fff').replace(/font-size="[\d.]+"/, `font-size="${f1(Math.min(r * .62, 13))}"`);
+  const cap = (pts, txt) => { const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]), R = Math.max(rm, rx); return T((Math.min(...xs) + Math.max(...xs)) / 2, Math.max(...ys) + R + 24, txt, 'font-size="13" text-anchor="middle"') + T((Math.min(...xs) + Math.max(...xs)) / 2, Math.max(...ys) + R + 42, ratio, 'font-size="11" text-anchor="middle" fill="#4B5563"'); };
+  const paint = list => list.sort((p, q) => q[4] - p[4]).map(([, X, Y, e, r, q]) => ionBall(X, Y, e, q, r)).join('');
+  if (mode === 'lat') { let s = ''; const d = (rm + rx) * 1.15, Pp = (i, j, k) => [i * d + k * d * .48, -j * d - k * d * .38], pts = [];
+    for (let k = 2; k >= 0; k--) { for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) { const p = Pp(i, j, k); [[i + 1, j, k], [i, j + 1, k], [i, j, k - 1]].forEach(([a, b, cc]) => { if (a < 3 && b < 3 && cc >= 0) { const q = Pp(a, b, cc); s += `<path d="M${f1(p[0])} ${f1(p[1])} L${f1(q[0])} ${f1(q[1])}" stroke="#A7B0BA" stroke-width="1.2"/>`; } }); }
+      for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) { const [X, Y] = Pp(i, j, k), isM = (i + j + k) % 2; pts.push([X, Y]); s += isM ? ionBall(X, Y, m, qm, rm) : ionBall(X, Y, x, qx, rx); } }
+    return s + cap(pts, `${disp} 결정 구조`); }
+  if (mode === 'plane') { // 한 이온 1개당 다른 이온 n개가 되도록 평면에 규칙적으로 배열
+    const one = nm === 1 ? [m, qm, rm] : [x, qx, rx], many = nm === 1 ? [x, qx, rx] : [m, qm, rm], n = Math.max(nm, nx), d = (rm + rx) * 1.02, list = [];
+    for (let u = 0; u <= 6; u++) for (let v = 0; v <= 4; v++) { const ev = u % 2 === 0 && v % 2 === 0, B = (u % 2) + (v % 2) === 1 || (n === 3 && u % 2 === 1 && v % 2 === 1); const it = ev ? one : B ? many : null; if (it) list.push([0, u * d, v * d, it[0], it[2], it[1]]); }
+    return paint(list) + cap(list.map(p => [p[1], p[2]]), `${disp} 결정 구조(평면 모식도)`); }
+  // 이온 결합 모형: 이온이 맞닿아 결합한 한 단위
+  const list = [];
+  if (nm === 1 || nx === 1) { const [ce, cq, cr] = nm === 1 ? [m, qm, rm] : [x, qx, rx], [oe, oq, or] = nm === 1 ? [x, qx, rx] : [m, qm, rm], k = nm === 1 ? nx : nm, D = (cr + or) * .96;
+    list.push([0, 0, 0, ce, cr, cq]); for (let i = 0; i < k; i++) { const a = (k === 1 ? 0 : Math.PI + 2 * Math.PI * i / k) + (k <= 2 ? 0 : -Math.PI / 2); list.push([.5, D * Math.cos(a), D * Math.sin(a), oe, or, oq]); } }
+  else { const big = nm >= nx ? [m, qm, rm, nm] : [x, qx, rx, nx], sm = nm >= nx ? [x, qx, rx, nx] : [m, qm, rm, nm], seq = []; let a = big[3], b = sm[3]; while (a || b) { if (a) { seq.push(big); a--; } if (b) { seq.push(sm); b--; } }
+    let X = 0; seq.forEach((it, i) => { if (i) X += (seq[i - 1][2] + it[2]) * .9; list.push([i % 2 ? 1 : 0, X, i % 2 ? (it[2] + seq[i - 1][2]) * .42 : 0, it[0], it[2], it[1]]); }); }
+  return paint(list) + cap(list.map(p => [p[1], p[2]]), `${disp} 이온 결합 모형`);
+}
+const FCACHE = {};
+function formulaVars(raw) {
+  if (FCACHE[raw]) return FCACHE[raw];
+  let s = raw.replace(/\s/g, '').replace(/[₀-₉]/g, d => SUBD.indexOf(d)).replace(/[⁰-⁹¹²³]/g, d => SUPD.indexOf(d)).replace(/⁺/g, '+').replace(/[⁻−–]/g, '-').replace(/\^/g, '');
+  let q = 0; const cm = /^(.*?)(\d*)([+-])$/.exec(s);
+  const W = (s, L = [], box = null) => ({s, L, box: box || [0, 0]});
+  let res = null;
+  if (cm && /^[A-Z][a-z]?$/.test(cm[1]) && EL[cm[1]]) { q = (+cm[2] || 1) * (cm[3] === '+' ? 1 : -1); s = cm[1]; }
+  if (/^[A-Z][a-z]?$/.test(s) && EL[s]) {
+    const e = EL[s][0] - q; if (e < 0) return {err: '전자 수가 0보다 작아집니다.'};
+    if (EL[s][0] > 20 && q) return {err: '원자 번호 21 이상의 이온은 아직 그릴 수 없습니다.'};
+    const b = bohrSVG(s, q); res = {title: `${EL[s][1]} ${q ? '이온' : '원자'} ${s}${qStr(q)}`, vars: {'보어 모형': {s: b.s, L: b.L, box: [b.R * 2, b.R * 2], ox: -b.R, oy: -b.R}, '전자점식': W(lewisSVG(s, q))}};
+  } else if (MOL[s]) { const [nm, at, bd] = MOL[s]; res = {title: `${nm} ${pretty(s.replace(/[+-]$/, ''))}${qStr(/\+$/.test(s) ? 1 : /-$/.test(s) ? -1 : 0)}`, vars: {'공 막대 모형': W(molSVG(at, bd, 'bs', `${nm} (${pretty(s)})`)), '공간 채움 모형': W(molSVG(at, bd, 'sf', `${nm} (${pretty(s)})`)), '구조식(결합선)': W(structSVG(at, bd, `${nm} (${pretty(s)})`))}}; }
+  else {
+    const c = cm ? null : parseF(s); if (!c) return {err: `'${raw}'을(를) 화학식으로 읽지 못했습니다. 예: H2O, CO2, CH4, NaCl, Na, Cl-`};
+    const h = hill(c), els = Object.keys(c);
+    if (MOL_HILL[h]) return (FCACHE[raw] = formulaVars(MOL_HILL[h]));
+    if (els.length === 2 && !c.Be && els.every(e => ION_Q[e] !== undefined) && Math.sign(ION_Q[els[0]]) !== Math.sign(ION_Q[els[1]])) {
+      const [m, x] = els.sort((a, b) => ION_Q[b] - ION_Q[a]);
+      if (c[m] * ION_Q[m] + c[x] * ION_Q[x] !== 0) return {err: `${pretty(s)}은(는) 전하의 합이 0이 아닙니다. 이온의 개수를 확인해 주세요.`};
+      const v = {}, disp = pretty(m + (c[m] > 1 ? c[m] : '') + x + (c[x] > 1 ? c[x] : ''));
+      if (c[m] === c[x]) v['결정 구조'] = W(ionicSVG(c, 'lat')); else if ((c[m] === 1 || c[x] === 1) && Math.max(c[m], c[x]) <= 3) v['결정 구조(평면)'] = W(ionicSVG(c, 'plane'));
+      v['이온 결합 모형'] = W(ionicSVG(c, 'unit'));
+      res = {title: `이온 결합 물질 ${disp}`, vars: v};
+    } else { const g = vsepr(c); if (!g) return {err: `${pretty(s)}의 모형은 아직 준비되지 않았습니다. 중심 원자 하나에 수소·할로젠·산소가 붙은 분자, 교과서에 나오는 분자(H2O, NH3, CH4, C2H5OH, C6H6 등), 이온 결합 물질(NaCl, CaCl2 등)을 그릴 수 있습니다.`};
+      res = {title: `${pretty(s)} 분자`, vars: {'공 막대 모형': W(molSVG(g[1], g[2], 'bs', pretty(s))), '공간 채움 모형': W(molSVG(g[1], g[2], 'sf', pretty(s))), '구조식(결합선)': W(structSVG(g[1], g[2], pretty(s)))}}; }
+  }
+  for (const v of Object.values(res.vars)) if (!v.box[0]) { const b = measure(WRAP(v.s)); v.box = [b.width, b.height]; v.ox = b.x; v.oy = b.y; }
+  return (FCACHE[raw] = res);
+}
+const legacyView = s => `<g fill="none" stroke="#16202E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="color:#16202E">${s.replace(/class="f"/g, 'class="f" fill="#DBEAFE"')}</g>`;
+function measure(svg) { const m = $('meas'); m.innerHTML = `<g>${svg}</g>`; const b = m.firstChild.getBBox(); m.innerHTML = ''; return b; }
+function fitView(el, svg) { el.innerHTML = svg; const b = el.firstChild ? el.getBBox() : {x: 0, y: 0, width: 100, height: 100}; const p = 8; el.setAttribute('viewBox', `${f1(b.x - p)} ${f1(b.y - p)} ${f1(b.width + p * 2)} ${f1(b.height + p * 2)}`); }
+
+/* ================= 모형 선택창 ================= */
+$('cats').innerHTML = CATS.map(c => `<button type="button" data-c="${c}">${c}</button>`).join('');
+$('cats').onclick = e => { const b = e.target.closest('button'); if (!b) return; ST.cat = b.dataset.c; $('q').value = ''; drawGrid(); };
+$('q').oninput = drawGrid;
+function drawGrid() {
+  document.querySelectorAll('#cats button').forEach(b => b.classList.toggle('on', b.dataset.c === ST.cat && !$('q').value.trim()));
+  const q = $('q').value.trim(); const items = [];
+  for (const cat of CATS) for (const [n, vs] of Object.entries(C[cat])) { const keys = Object.keys(vs); if (q ? (n + keys.join(' ')).includes(q) : cat === ST.cat) items.push([cat, n, vs, keys]); }
+  $('grid').innerHTML = items.length ? items.map(([cat, n, vs, keys]) => `<button type="button" class="card${ST.pick && ST.pick[0] === cat && ST.pick[1] === n ? ' on' : ''}" data-cat="${cat}" data-n="${esc(n)}" title="${esc(n)} — 눌러서 미리보기, 두 번 눌러 바로 넣기"><svg xmlns="${NS}"></svg>${esc(n)}${keys.length > 1 ? `<span class="n">${keys.length}가지</span>` : ''}</button>`).join('') : `<p class="empty">'${esc(q)}'에 맞는 모형이 없습니다. 다른 낱말로 찾아보세요.</p>`;
+  $('grid').querySelectorAll('.card').forEach(b => { const v = C[b.dataset.cat][b.dataset.n], first = v[Object.keys(v)[0]]; const s = b.querySelector('svg'); fitView(s, first.legacy ? legacyView(first.legacy) : renderVar(first, false));
+    b.onclick = () => choose(b.dataset.cat, b.dataset.n, 0); b.ondblclick = () => { choose(b.dataset.cat, b.dataset.n, 0); insertPick(); }; });
+}
+function choose(cat, n, vi) { ST.pick = [cat, n]; ST.vi = vi; document.querySelectorAll('.card').forEach(b => b.classList.toggle('on', b.dataset.cat === cat && b.dataset.n === n)); pvShow('model'); drawPreview(); }
+
+/* ================= 미리보기창 ================= */
+document.querySelectorAll('.pv-tabs [data-m]').forEach(b => b.onclick = () => pvShow(b.dataset.m));
+function pvShow(m) { ST.pvMode = m; $('pv').classList.add('open'); document.querySelectorAll('.pv-tabs [data-m]').forEach(b => b.classList.toggle('on', b.dataset.m === m)); $('pv-model').hidden = m !== 'model'; $('pv-conv').hidden = m !== 'conv'; if (m === 'conv') convPreview(); }
+function pvClose() { $('pv').classList.remove('open'); }
+function curVars() { if (!ST.pick) return null; if (ST.pick[0] === '__f') { const r = formulaVars(ST.pick[1]); return r.vars || null; } return C[ST.pick[0]][ST.pick[1]]; }
+$('ff').onsubmit = e => { e.preventDefault(); const v = $('fq').value.trim(); if (!v) return; const r = formulaVars(v); $('fmsg').hidden = !r.err; $('fmsg').textContent = r.err || ''; if (r.err) return; ST.pick = ['__f', v]; ST.vi = 0; document.querySelectorAll('.card').forEach(b => b.classList.remove('on')); pvShow('model'); drawPreview(); };
+function drawPreview() {
+  const vs = curVars(); $('pvEmpty').hidden = !!vs; $('pvMain').hidden = !vs; $('pvMain').style.display = vs ? 'flex' : 'none'; if (!vs) return;
+  const keys = Object.keys(vs), v = vs[keys[ST.vi]];
+  $('pvTitle').textContent = ST.pick[0] === '__f' ? formulaVars(ST.pick[1]).title : ST.pick[1];
+  $('vars').innerHTML = keys.map((k, i) => `<button type="button" class="${i === ST.vi ? 'on' : ''}" data-i="${i}">${esc(k)}</button>`).join('');
+  $('vars').querySelectorAll('button').forEach(b => b.onclick = () => { ST.vi = +b.dataset.i; drawPreview(); const g = ST.sel; if (g && g.dataset.cat === ST.pick[0] && g.dataset.model === ST.pick[1]) replaceSel(); });
+  $('lab').parentElement.style.display = v.legacy || !v.L.length ? 'none' : 'flex';
+  fitView($('pvsvg'), v.legacy ? legacyView(v.legacy) : renderVar(v, $('lab').checked));
+  const g = ST.sel, same = g && g.dataset.kind === 'stamp' && g.dataset.model; $('rep').disabled = !same;
+}
+$('lab').onchange = () => { drawPreview(); const g = ST.sel; if (g && g.dataset.model === (ST.pick || [])[1]) replaceSel(); };
+$('ins').onclick = () => insertPick();
+$('rep').onclick = () => replaceSel();
+function insertPick() {
+  const vs = curVars(); if (!vs) return; const key = Object.keys(vs)[ST.vi], v = vs[key];
+  if (v.legacy) { stamp(v.legacy, ST.pick[1]); return; }
+  const W = +cv.getAttribute('width'), H = +cv.getAttribute('height');
+  const g = makeObj(renderVar(v, $('lab').checked), 'stamp', 0, 0, {});
+  const k = Math.min(1.6, (W * .62) / g.dataset.w, (H * .78) / g.dataset.h); g.dataset.s = f1(Math.max(.4, k) * 100) / 100;
+  g.dataset.tx = (W - g.dataset.w * g.dataset.s) / 2; g.dataset.ty = (H - g.dataset.h * g.dataset.s) / 2;
+  Object.assign(g.dataset, {cat: ST.pick[0], model: ST.pick[1], vi: ST.vi, lab: $('lab').checked ? 1 : 0, name: ST.pick[1]}); place(g);
+  setTool('sel'); select(g); commit(); pvCloseNarrow();
+}
+function replaceSel() {
+  const g = ST.sel; if (!g || !g.dataset.model) return; const vs = curVars(); if (!vs) return; const v = vs[Object.keys(vs)[ST.vi]]; if (v.legacy) return;
+  const s = +g.dataset.s, cx = +g.dataset.tx + g.dataset.w * s / 2, cy = +g.dataset.ty + g.dataset.h * s / 2;
+  const c = g.firstElementChild; c.removeAttribute('transform'); c.innerHTML = renderVar(v, $('lab').checked);
+  Object.assign(g.dataset, {cat: ST.pick[0], model: ST.pick[1], vi: ST.vi, lab: $('lab').checked ? 1 : 0}); g.dataset.tx = 0; g.dataset.ty = 0;
+  normalize(g); g.dataset.tx = cx - g.dataset.w * s / 2; g.dataset.ty = cy - g.dataset.h * s / 2; place(g); select(g); commit();
+}
+function pvCloseNarrow() { if (window.innerWidth <= 1180) pvClose(); }
+
+/* ================= 색·굵기 ================= */
 function swatches(id, list, key) {
   $(id).innerHTML = list.map(c => `<button type="button" class="sw${ST[key] === c ? ' on' : ''}" data-c="${c}" title="${c === 'none' ? '채우기 없음' : c}" style="background:${c === 'none' ? 'linear-gradient(135deg,#fff 45%,#DC2626 45%,#DC2626 55%,#fff 55%)' : c}"></button>`).join('');
   $(id).querySelectorAll('.sw').forEach(b => b.onclick = () => { ST[key] = b.dataset.c; swatches(id, list, key); applyStyle(key); });
@@ -161,7 +861,6 @@ swatches('strokes', STROKES, 'stroke'); swatches('fills', FILLS, 'fill');
 $('sw').oninput = () => { $('swv').textContent = $('sw').value; applyStyle('sw'); };
 $('dash').onchange = () => applyStyle('dash');
 $('fs').onchange = () => applyStyle('fs');
-/* 선택한 것에 바로 적용 */
 function applyStyle(key) {
   const g = ST.sel; if (!g) return;
   const c = g.firstElementChild;
@@ -173,12 +872,11 @@ function applyStyle(key) {
   normalize(g); select(g); commit();
 }
 
-/* ===== 도구 ===== */
+/* ================= 도구 ================= */
 document.querySelectorAll('.tool').forEach(b => b.onclick = () => setTool(b.dataset.t));
 function setTool(t) { ST.tool = t; document.querySelectorAll('.tool').forEach(b => b.classList.toggle('on', b.dataset.t === t)); if (t !== 'sel') select(null); cv.style.cursor = t === 'sel' ? 'default' : t === 'text' ? 'text' : 'crosshair'; }
 function setSize(v) { const [w, h] = v.split('x').map(Number); cv.setAttribute('width', w); cv.setAttribute('height', h); cv.setAttribute('viewBox', `0 0 ${w} ${h}`); commit(); }
 
-/* 개체 = <g class="obj" data-tx data-ty data-s data-r data-fx><g(내용, 0,0 기준)/></g> */
 let uidN = 0;
 function makeObj(inner, kind, x, y, attrs = {}) {
   const g = document.createElementNS(NS, 'g'); g.setAttribute('class', 'obj'); g.dataset.kind = kind; g.dataset.id = 'o' + (++uidN) + Date.now().toString(36);
@@ -187,10 +885,9 @@ function makeObj(inner, kind, x, y, attrs = {}) {
   g.appendChild(c); Object.assign(g.dataset, {tx: x, ty: y, s: 1, r: 0, fx: 1}); layer.appendChild(g); normalize(g); return g;
 }
 const baseAttrs = () => ({stroke: ST.stroke, 'stroke-width': $('sw').value, 'stroke-dasharray': $('dash').checked ? '6 4' : '', fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', style: `color:${ST.stroke}`});
-/* 내용의 bbox를 0,0으로 옮겨 이동·크기 기준을 맞춤 */
 function normalize(g) {
   const c = g.firstElementChild, b = c.getBBox(), m = /translate\(([-\d.]+)[ ,]([-\d.]+)\)/.exec(c.getAttribute('transform') || '') || [0, 0, 0];
-  const dx = b.x + +m[1], dy = b.y + +m[2]; /* 지금 내용의 왼쪽 위(0이어야 함) */
+  const dx = b.x + +m[1], dy = b.y + +m[2];
   if (Math.abs(dx) > .01 || Math.abs(dy) > .01) { c.setAttribute('transform', `translate(${-b.x} ${-b.y})`); const s = +g.dataset.s; g.dataset.tx = +g.dataset.tx + dx * s; g.dataset.ty = +g.dataset.ty + dy * s; }
   g.dataset.w = b.width; g.dataset.h = b.height; place(g);
 }
@@ -203,10 +900,10 @@ function stamp(svg, name) {
   const a = baseAttrs(); a['stroke-width'] = Math.max(2, +$('sw').value);
   const g = makeObj(svg.replace(/class="f"/g, `class="f" fill="${ST.fill === 'none' ? '#DBEAFE' : ST.fill}"`), 'stamp', 0, 0, a);
   g.dataset.tx = (W - g.dataset.w) / 2; g.dataset.ty = (H - g.dataset.h) / 2; g.dataset.name = name; place(g);
-  setTool('sel'); select(g); commit();
+  setTool('sel'); select(g); commit(); pvCloseNarrow();
 }
 
-/* ===== 글자: _x, _{..} 아래첨자 / ^x, ^{..} 위첨자 / 화학식 숫자 자동 ===== */
+/* ================= 글자 ================= */
 function richText(s) {
   const out = []; let i = 0, buf = '';
   const flush = () => { if (buf) out.push({t: buf, k: 0}); buf = ''; };
@@ -220,7 +917,6 @@ function richText(s) {
     } else { buf += ch; i++; }
   }
   flush();
-  /* H2O처럼 원소 기호 뒤 숫자 → 아래첨자 */
   const R = /((?:He|Li|Na|Mg|Al|Si|Cl|Ca|Fe|Cu|Zn|Ag|H|C|N|O|F|P|S|K|I)|\))(\d+)/g;
   return out.flatMap(p => { if (p.k) return [p]; const r = []; let last = 0, m; R.lastIndex = 0;
     while ((m = R.exec(p.t))) { const before = p.t[m.index - 1]; if (before && /[a-z]/.test(before) && m[1].length === 1) continue; r.push({t: p.t.slice(last, m.index + m[1].length), k: 0}, {t: m[2], k: 1}); last = m.index + m[0].length; }
@@ -248,7 +944,7 @@ function closeText(ok) {
 txt.onkeydown = e => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); closeText(true); } if (e.key === 'Escape') closeText(false); };
 txt.onblur = () => closeText(true);
 
-/* ===== 그리기·선택 (포인터) ===== */
+/* ================= 그리기·선택 ================= */
 const pt = e => { const p = cv.createSVGPoint(); p.x = e.clientX; p.y = e.clientY; return p.matrixTransform(cv.getScreenCTM().inverse()); };
 let drag = null;
 cv.addEventListener('pointerdown', e => {
@@ -262,7 +958,7 @@ cv.addEventListener('pointerdown', e => {
   }
   if (t === 'text') { openText(p.x, p.y); return; }
   const a = baseAttrs(); let el;
-  if (t === 'pen') { el = makeObj(`<path d="M${p.x} ${p.y}"/>`, 'pen', 0, 0, {...a, fill: 'none'}); }
+  if (t === 'pen') { el = makeObj(`<path d="M${f1(p.x)} ${f1(p.y)}"/>`, 'pen', 0, 0, {...a, fill: 'none'}); }
   else if (t === 'line' || t === 'arrow') el = makeObj(`<line x1="${p.x}" y1="${p.y}" x2="${p.x}" y2="${p.y}"/>${t === 'arrow' ? '<path class="ah"/>' : ''}`, t, 0, 0, a);
   else if (t === 'rect') el = makeObj(`<rect x="${p.x}" y="${p.y}" width="0" height="0"/>`, 'rect', 0, 0, {...a, fill: ST.fill});
   else if (t === 'ellipse') el = makeObj(`<ellipse cx="${p.x}" cy="${p.y}" rx="0" ry="0"/>`, 'ellipse', 0, 0, {...a, fill: ST.fill});
@@ -274,7 +970,7 @@ cv.addEventListener('pointermove', e => {
   if (drag.mode === 'move') { drag.moved = true; g.dataset.tx = drag.tx + p.x - drag.p.x; g.dataset.ty = drag.ty + p.y - drag.p.y; place(g); select(g); return; }
   if (drag.mode === 'resize') { const k = Math.max(.1, (drag.w + (p.x - drag.p.x)) / drag.w); g.dataset.s = drag.s * k; place(g); select(g); return; }
   const t = g.dataset.kind, x0 = drag.p.x, y0 = drag.p.y; let x = p.x, y = p.y;
-  if (t === 'pen') { drag.pts.push([x, y]); c.firstElementChild.setAttribute('d', 'M' + drag.pts.map(q => q.join(' ')).join(' L')); return; }
+  if (t === 'pen') { drag.pts.push([x, y]); c.firstElementChild.setAttribute('d', 'M' + drag.pts.map(q => f1(q[0]) + ' ' + f1(q[1])).join(' L')); return; }
   if ((t === 'line' || t === 'arrow') && e.shiftKey) { const a = Math.round(Math.atan2(y - y0, x - x0) / (Math.PI / 4)) * Math.PI / 4, d = Math.hypot(x - x0, y - y0); x = x0 + d * Math.cos(a); y = y0 + d * Math.sin(a); }
   if (t === 'line' || t === 'arrow') { const l = c.querySelector('line'); l.setAttribute('x2', x); l.setAttribute('y2', y);
     if (t === 'arrow') { const a = Math.atan2(y - y0, x - x0), L = 8 + 2 * $('sw').value; c.querySelector('.ah').setAttribute('d', `M${x - L * Math.cos(a - .45)} ${y - L * Math.sin(a - .45)} L${x} ${y} L${x - L * Math.cos(a + .45)} ${y - L * Math.sin(a + .45)}`); } return; }
@@ -283,14 +979,16 @@ cv.addEventListener('pointermove', e => {
 });
 cv.addEventListener('pointerup', () => {
   if (!drag) return; const d = drag; drag = null;
-  if (d.mode === 'draw') { const b = d.g.firstElementChild.getBBox(); if (b.width < 2 && b.height < 2) { d.g.remove(); return; } normalize(d.g); select(d.g); commit(); }
+  if (d.mode === 'draw') { const b = d.g.firstElementChild.getBBox(); if (b.width < 2 && b.height < 2 && d.g.dataset.kind !== 'pen') { d.g.remove(); return; } if (d.g.dataset.kind === 'pen' && d.pts.length < 2) { const q = d.pts[0]; d.g.firstElementChild.firstElementChild.setAttribute('d', `M${f1(q[0])} ${f1(q[1])} L${f1(q[0] + .1)} ${f1(q[1] + .1)}`); } normalize(d.g); select(d.g); commit(); }
   else if (d.mode === 'resize' || (d.mode === 'move' && d.moved)) commit();
 });
 cv.addEventListener('dblclick', e => { const g = e.target.closest('.obj'); if (g && g.dataset.kind === 'text') { const s = +g.dataset.s; openText(+g.dataset.tx, +g.dataset.ty + g.dataset.h * s * .8, g); } });
 
-/* 선택 표시: 점선 상자 + 크기 손잡이 */
 function select(g) {
-  ST.sel = g || null; ui.innerHTML = ''; if (!g) return;
+  ST.sel = g || null; ui.innerHTML = '';
+  if (g && g.dataset.model && (g.dataset.cat === '__f' ? !formulaVars(g.dataset.model).err : C[g.dataset.cat] && C[g.dataset.cat][g.dataset.model])) { ST.pick = [g.dataset.cat, g.dataset.model]; ST.vi = +g.dataset.vi || 0; $('lab').checked = g.dataset.lab !== '0'; if (window.innerWidth > 1180 || $('pv').classList.contains('open')) { if (ST.pvMode === 'model') drawPreview(); } }
+  else if (ST.pvMode === 'model') $('rep').disabled = true;
+  if (!g) return;
   const b = g.getBBox();
   const P = [[b.x, b.y], [b.x + b.width, b.y + b.height], [b.x + b.width, b.y], [b.x, b.y + b.height]].map(([x, y]) => { const p = cv.createSVGPoint(); p.x = x; p.y = y; return p.matrixTransform(g.transform.baseVal.consolidate().matrix); });
   const xs = P.map(p => p.x), ys = P.map(p => p.y), x1 = Math.min(...xs) - 4, y1 = Math.min(...ys) - 4, x2 = Math.max(...xs) + 4, y2 = Math.max(...ys) + 4;
@@ -300,12 +998,202 @@ function select(g) {
   if (c.getAttribute('stroke-width')) { $('sw').value = c.getAttribute('stroke-width'); $('swv').textContent = $('sw').value; }
 }
 function delSel() { if (ST.sel) { ST.sel.remove(); select(null); commit(); } }
-function dupSel() { const g = ST.sel; if (!g) return; const n = g.cloneNode(true); n.dataset.id = 'o' + (++uidN) + Date.now().toString(36); n.dataset.tx = +g.dataset.tx + 16; n.dataset.ty = +g.dataset.ty + 16; layer.appendChild(n); place(n); select(n); commit(); }
+function dupSel() { const g = ST.sel; if (!g) return; const n = g.cloneNode(true); n.dataset.id = 'o' + (++uidN) + Date.now().toString(36); n.dataset.tx = +g.dataset.tx + 16; n.dataset.ty = +g.dataset.ty + 16; n.innerHTML = uniqClone(n.innerHTML); layer.appendChild(n); place(n); select(n); commit(); }
+function uniqClone(h) { const ids = [...new Set([...h.matchAll(/id="(u[a-z0-9]{6})/g)].map(m => m[1]))]; ids.forEach(id => { const u = 'u' + Math.random().toString(36).slice(2, 8); h = h.replaceAll(id, u); }); return h; }
 function order(d) { const g = ST.sel; if (!g) return; d > 0 ? layer.appendChild(g) : layer.insertBefore(g, layer.firstChild); commit(); }
 function rot(a) { const g = ST.sel; if (!g) return; g.dataset.r = ((+g.dataset.r + a) % 360 + 360) % 360; place(g); select(g); commit(); }
 function flip() { const g = ST.sel; if (!g) return; g.dataset.fx = -g.dataset.fx; place(g); select(g); commit(); }
 
-/* ===== 바탕 그림 (따라 그리기용, 흐리게) ===== */
+/* ================= 펜 그림 → 교재 그림 ================= */
+const SUBJ = ['자동', '동물 세포', '식물 세포', '지구 내부', '원자', '일반 다듬기'];
+const SUBJ_MODEL = {'동물 세포': ['생명', '동물 세포'], '식물 세포': ['생명', '식물 세포'], '지구 내부': ['지구·우주', '지구 내부'], '원자': ['물질', '원자 모형']};
+function penStrokes() {
+  return [...layer.querySelectorAll('.obj[data-kind="pen"]')].map(g => {
+    const path = g.querySelector('path'), d = path.getAttribute('d') || '', nums = d.match(/-?\d+\.?\d*/g) || [];
+    const m = g.transform.baseVal.consolidate(), M = m ? m.matrix : cv.createSVGMatrix(), ct = g.firstElementChild.transform.baseVal.consolidate(), MM = ct ? M.multiply(ct.matrix) : M;
+    const pts = []; for (let i = 0; i + 1 < nums.length; i += 2) { const p = cv.createSVGPoint(); p.x = +nums[i]; p.y = +nums[i + 1]; const q = p.matrixTransform(MM); pts.push([q.x, q.y]); }
+    return {g, pts, color: g.firstElementChild.getAttribute('stroke') || '#16202E'};
+  }).filter(s => s.pts.length);
+}
+function resample(pts, step) { if (pts.length < 2) return pts.slice(); const out = [pts[0]]; let acc = 0; for (let i = 1; i < pts.length; i++) { let [x0, y0] = pts[i - 1]; const [x1, y1] = pts[i]; let d = Math.hypot(x1 - x0, y1 - y0); while (acc + d >= step) { const t = (step - acc) / d; x0 = x0 + (x1 - x0) * t; y0 = y0 + (y1 - y0) * t; out.push([x0, y0]); d = Math.hypot(x1 - x0, y1 - y0); acc = 0; } acc += d; } out.push(pts[pts.length - 1]); return out; }
+function smooth(pts, closed, k = 2) { const n = pts.length; if (n < 5) return pts; return pts.map((p, i) => { let sx = 0, sy = 0, c = 0; for (let j = -k; j <= k; j++) { let q = i + j; if (closed) q = (q + n) % n; else if (q < 0 || q >= n) continue; sx += pts[q][0]; sy += pts[q][1]; c++; } return (!closed && (i === 0 || i === n - 1)) ? p : [sx / c, sy / c]; }); }
+function rdp(pts, eps) { if (pts.length < 3) return pts; let dm = 0, idx = 0; const [a, b] = [pts[0], pts[pts.length - 1]], L = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1; for (let i = 1; i < pts.length - 1; i++) { const d = Math.abs((b[1] - a[1]) * pts[i][0] - (b[0] - a[0]) * pts[i][1] + b[0] * a[1] - b[1] * a[0]) / L; if (d > dm) { dm = d; idx = i; } } if (dm > eps) { const l = rdp(pts.slice(0, idx + 1), eps), r = rdp(pts.slice(idx), eps); return l.slice(0, -1).concat(r); } return [a, b]; }
+function bez(pts, closed) { const n = pts.length; if (n < 2) return ''; if (n === 2) return `M${f1(pts[0][0])} ${f1(pts[0][1])} L${f1(pts[1][0])} ${f1(pts[1][1])}`; const P = i => closed ? pts[(i + n) % n] : pts[Math.max(0, Math.min(n - 1, i))]; let d = `M${f1(pts[0][0])} ${f1(pts[0][1])}`; const last = closed ? n : n - 1; for (let i = 0; i < last; i++) { const p0 = P(i - 1), p1 = P(i), p2 = P(i + 1), p3 = P(i + 2); d += ` C${f1(p1[0] + (p2[0] - p0[0]) / 6)} ${f1(p1[1] + (p2[1] - p0[1]) / 6)} ${f1(p2[0] - (p3[0] - p1[0]) / 6)} ${f1(p2[1] - (p3[1] - p1[1]) / 6)} ${f1(p2[0])} ${f1(p2[1])}`; } return d + (closed ? ' Z' : ''); }
+function analyze(s) {
+  const raw = s.pts; let len = 0; for (let i = 1; i < raw.length; i++) len += Math.hypot(raw[i][0] - raw[i - 1][0], raw[i][1] - raw[i - 1][1]);
+  const xs = raw.map(p => p[0]), ys = raw.map(p => p[1]), bb = {x: Math.min(...xs), y: Math.min(...ys)}; bb.w = Math.max(...xs) - bb.x; bb.h = Math.max(...ys) - bb.y;
+  const o = {s, len, bb, dot: Math.max(bb.w, bb.h) < 8};
+  if (o.dot) { o.c = [bb.x + bb.w / 2, bb.y + bb.h / 2]; return o; }
+  const gap = Math.hypot(raw[0][0] - raw[raw.length - 1][0], raw[0][1] - raw[raw.length - 1][1]);
+  o.closed = len > 40 && gap < Math.max(18, len * .18);
+  let pts = resample(raw, Math.max(2.5, len / 160)); if (o.closed && pts.length > 3) pts = pts.slice(0, -1);
+  pts = smooth(pts, o.closed, 3); o.pts = rdp(pts, .9);
+  let mx = 0, my = 0; pts.forEach(p => { mx += p[0]; my += p[1]; }); mx /= pts.length; my /= pts.length;
+  let sxx = 0, syy = 0, sxy = 0; pts.forEach(([x, y]) => { sxx += (x - mx) ** 2; syy += (y - my) ** 2; sxy += (x - mx) * (y - my); }); sxx /= pts.length; syy /= pts.length; sxy /= pts.length;
+  const tr = sxx + syy, det = sxx * syy - sxy * sxy, dd = Math.sqrt(Math.max(0, tr * tr / 4 - det)), l1 = tr / 2 + dd, l2 = Math.max(1e-3, tr / 2 - dd);
+  o.c = [mx, my]; o.ang = .5 * Math.atan2(2 * sxy, sxx - syy); o.a = Math.sqrt(2 * l1); o.b = Math.sqrt(2 * l2); o.elong = Math.sqrt(l1 / l2);
+  if (o.closed) { let A = 0; for (let i = 0; i < pts.length; i++) { const p = pts[i], q = pts[(i + 1) % pts.length]; A += p[0] * q[1] - q[0] * p[1]; } o.area = Math.abs(A / 2); o.circ = 4 * Math.PI * o.area / (len * len); o.rect = o.area / (bb.w * bb.h); o.poly = pts; }
+  o.straight = !o.closed && gap / len > .96;
+  return o;
+}
+const inside = (p, poly) => { let c = false; for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) { const [xi, yi] = poly[i], [xj, yj] = poly[j]; if ((yi > p[1]) !== (yj > p[1]) && p[0] < (xj - xi) * (p[1] - yi) / (yj - yi) + xi) c = !c; } return c; };
+function guess(A) {
+  const loops = A.filter(o => o.closed).sort((p, q) => q.area - p.area), ds = A.filter(o => o.dot).length;
+  if (!loops.length) return '일반 다듬기';
+  const out = loops[0], R = Math.sqrt(out.area / Math.PI);
+  const isConc = o => Math.hypot(o.c[0] - out.c[0], o.c[1] - out.c[1]) < R * .15 && o.circ > .6;
+  const conc = loops.filter(isConc), other = loops.filter(o => !isConc(o) && inside(o.c, out.poly)), tiny = conc[conc.length - 1].area < out.area * .03;
+  if (!other.length && conc.length >= 3) return tiny || ds >= 2 ? '원자' : '지구 내부';
+  if (!other.length && conc.length === 2 && tiny && ds >= 1) return '원자';
+  const inn = A.filter(o => o !== out && inside(o.c, out.poly));
+  if (inn.length) return out.rect > .82 ? '식물 세포' : '동물 세포';
+  return '일반 다듬기';
+}
+function resampleClosed(pts, N) {
+  const P = pts.concat([pts[0]]), cum = [0];
+  for (let i = 1; i < P.length; i++) cum.push(cum[i - 1] + Math.hypot(P[i][0] - P[i - 1][0], P[i][1] - P[i - 1][1]));
+  const L = cum[cum.length - 1] || 1, out = []; let j = 1;
+  for (let k = 0; k < N; k++) { const t = k * L / N; while (j < cum.length - 1 && cum[j] < t) j++; const seg = cum[j] - cum[j - 1] || 1, u = (t - cum[j - 1]) / seg; out.push([P[j - 1][0] + (P[j][0] - P[j - 1][0]) * u, P[j - 1][1] + (P[j][1] - P[j - 1][1]) * u]); }
+  return out;
+}
+/* 닫힌 선을 낮은 차수 푸리에 성분만 남겨 매끈한 모양으로 */
+function fourier(pts, K, N = 96) {
+  const z = resampleClosed(pts, N), c = [];
+  for (let k = -K; k <= K; k++) { let re = 0, im = 0; z.forEach(([x, y], n) => { const a = -2 * Math.PI * k * n / N; re += x * Math.cos(a) - y * Math.sin(a); im += x * Math.sin(a) + y * Math.cos(a); }); c.push([k, re / N, im / N]); }
+  const M = 48, out = [];
+  for (let n = 0; n < M; n++) { let x = 0, y = 0; c.forEach(([k, re, im]) => { const a = 2 * Math.PI * k * n / M; x += re * Math.cos(a) - im * Math.sin(a); y += re * Math.sin(a) + im * Math.cos(a); }); out.push([x, y]); }
+  return out;
+}
+function openPath(o) { let p = resample(o.s.pts, Math.max(3, o.len / 50)); p = smooth(smooth(p, false, 3), false, 3); return bez(rdp(p, 1.2), false); }
+const loopPath = (o, K) => bez(fourier(o.poly, K), true);
+function shapeOf(o, snap, K = 6) {
+  if (o.closed && snap && o.circ > .8) return `<ellipse cx="${f1(o.c[0])}" cy="${f1(o.c[1])}" rx="${f1(o.a)}" ry="${f1(o.b)}" transform="rotate(${f1(o.ang * 180 / Math.PI)} ${f1(o.c[0])} ${f1(o.c[1])})"`;
+  if (o.straight && snap) { const p = o.s.pts[0], q = o.s.pts[o.s.pts.length - 1]; return `<path d="M${f1(p[0])} ${f1(p[1])} L${f1(q[0])} ${f1(q[1])}"`; }
+  return `<path d="${o.closed ? loopPath(o, K) : openPath(o)}"`;
+}
+const draw = (o, snap, attrs, K) => shapeOf(o, snap, K) + ` ${attrs}/>`;
+const DEG = o => o.ang * 180 / Math.PI;
+const edgePt = o => o.closed ? o.poly.reduce((m, p) => p[0] < m[0] ? p : m, o.poly[0]) : o.pts[0];
+const topPt = o => o.closed ? o.poly.reduce((m, p) => p[1] < m[1] ? p : m, o.poly[0]) : o.pts[0];
+const bdist = (p, poly) => { let m = 1e9; for (const q of poly) { const d = Math.hypot(q[0] - p[0], q[1] - p[1]); if (d < m) m = d; } return m; };
+const nearPt = (p, poly) => { let m = poly[0], md = 1e9; for (const q of poly) { const d = Math.hypot(q[0] - p[0], q[1] - p[1]); if (d < md) { md = d; m = q; } } return m; };
+/* 교과서 소기관 그림 (위치·방향·크기를 맞춰 그림) */
+function mitoAt(cx, cy, deg, a, b) {
+  const ia = a * .9, ib = b * .74, w = Math.max(2.4, b * .32), n = Math.max(3, Math.round(1.6 * a / Math.max(4, b)));
+  let s = `<g transform="translate(${f1(cx)} ${f1(cy)}) rotate(${f1(deg)})"><ellipse rx="${f1(a)}" ry="${f1(b)}" fill="#F6A25E" stroke="#B4541A" stroke-width="1.4"/><ellipse rx="${f1(ia)}" ry="${f1(ib)}" fill="#FCDDB8" stroke="#B4541A" stroke-width=".8"/>`;
+  for (let i = 0; i < n; i++) { const x = -ia * .72 + ia * 1.44 * (i / (n - 1)), e = ib * Math.sqrt(Math.max(0, 1 - (x / ia) ** 2)); s += tube(i % 2 ? `M${f1(x)} ${f1(e)} V${f1(-e * .25)}` : `M${f1(x)} ${f1(-e)} V${f1(e * .25)}`, '#B4541A', '#F6A25E', w); }
+  return s + '</g>';
+}
+function chloroAt(cx, cy, deg, a, b) {
+  const n = Math.max(2, Math.min(5, Math.round(a / Math.max(5, b * .9)))), gw = Math.min(a * 1.1 / n, b * 1.1), gh = Math.max(1.6, b * .16);
+  let s = `<g transform="translate(${f1(cx)} ${f1(cy)}) rotate(${f1(deg)})"><ellipse rx="${f1(a)}" ry="${f1(b)}" fill="#8ED081" stroke="#2E7D32" stroke-width="1.3"/><ellipse rx="${f1(a * .92)}" ry="${f1(b * .82)}" fill="#D2EEC4" stroke="#2E7D32" stroke-width=".7"/><path d="M${f1(-a * .7)} 0 H${f1(a * .7)}" stroke="#3E9B45" stroke-width="${f1(Math.max(.8, gh * .6))}"/>`;
+  for (let i = 0; i < n; i++) { const x = -a * .6 + a * 1.2 * (i / (n - 1)); for (let k = -2; k <= 1; k++) s += `<rect x="${f1(x - gw / 2)}" y="${f1(k * gh * 1.25 + gh * .1)}" width="${f1(gw)}" height="${f1(gh)}" rx="${f1(gh / 2)}" fill="#3E9B45" stroke="#1F6A27" stroke-width=".4"/>`; }
+  return s + '</g>';
+}
+const lysoAt = (x, y, r) => `<circle cx="${f1(x)}" cy="${f1(y)}" r="${f1(r)}" fill="#F3A6C8" stroke="#C2477E" stroke-width="1.1"/>` + dots([[x - r * .3, y - r * .2], [x + r * .3, y + r * .25], [x + r * .1, y - r * .45]], f1(Math.max(.8, r * .14)), '#C2477E');
+const golgiAt = (cx, cy, deg, w) => `<g transform="translate(${f1(cx)} ${f1(cy)}) rotate(${f1(deg)})">` + [0, 1, 2, 3].map(i => tube(`M${f1(-w)} ${f1(i * w * .26 - w * .3)} q${f1(w)} ${f1(-w * .5)} ${f1(2 * w)} 0`, '#D99A2B', '#FBE0A2', Math.max(3.5, w * .2))).join('') + [[w * 1.2, -w * .2], [w * 1.25, w * .5], [-w * 1.2, w * .45]].map(([x, y]) => `<circle cx="${f1(x)}" cy="${f1(y)}" r="${f1(Math.max(2, w * .13))}" fill="#FBE0A2" stroke="#D99A2B" stroke-width=".9"/>`).join('') + '</g>';
+const centAt = (cx, cy, k) => `<g transform="translate(${f1(cx)} ${f1(cy)}) scale(${f1(k * 100) / 100})"><rect x="-8" y="-2.6" width="16" height="5.2" rx="1.6" fill="#A7B4C6" stroke="#475569" stroke-width=".8"/><rect x="6" y="-8" width="5.2" height="16" rx="1.6" fill="#A7B4C6" stroke="#475569" stroke-width=".8"/></g>`;
+/* 세포 안 빈자리 찾기 */
+function spotFinder(out, taken) {
+  const R = Math.sqrt(out.area / Math.PI), step = R / 10, cand = [];
+  for (let x = out.bb.x; x <= out.bb.x + out.bb.w; x += step) for (let y = out.bb.y; y <= out.bb.y + out.bb.h; y += step) if (inside([x, y], out.poly)) cand.push([x, y, bdist([x, y], out.poly), 0]);
+  seed(97); cand.forEach(c => c[3] = rnd()); cand.sort((p, q) => p[3] - q[3]);
+  return (r, pref) => {
+    const list = pref === 'wall' ? cand.slice().sort((p, q) => p[2] - q[2]) : pref === 'center' ? cand.slice().sort((p, q) => Math.hypot(p[0] - out.c[0], p[1] - out.c[1]) - Math.hypot(q[0] - out.c[0], q[1] - out.c[1])) : cand;
+    for (const c of list) { if (c[2] < r + R * .05) continue; if (taken.some(t => Math.hypot(t.c[0] - c[0], t.c[1] - c[1]) < t.r + r + R * .03)) continue; const it = {c: [c[0], c[1]], r}; taken.push(it); return it; }
+    return null;
+  };
+}
+function convert(subj, snap, labels, asModel) {
+  const strokes = penStrokes(); if (!strokes.length) return null;
+  const A = strokes.map(analyze), auto = guess(A), S = subj === '자동' ? auto : subj, fillIn = $('cFill').checked;
+  const all = A.flatMap(o => o.dot ? [o.c] : o.s.pts), X = all.map(p => p[0]), Y = all.map(p => p[1]), bb = {x: Math.min(...X), y: Math.min(...Y)}; bb.w = Math.max(...X) - bb.x || 1; bb.h = Math.max(...Y) - bb.y || 1;
+  let s = '', L = [], seen = {};
+  const lab = (p, t) => { if (p && !seen[t]) { seen[t] = 1; L.push([p[0], p[1], t]); } };
+  if (asModel && SUBJ_MODEL[S]) {
+    const [cat, n] = SUBJ_MODEL[S], v = C[cat][n][Object.keys(C[cat][n])[0]], k = Math.min(bb.w / v.box[0], bb.h / v.box[1]);
+    const ox = bb.x + (bb.w - v.box[0] * k) / 2, oy = bb.y + (bb.h - v.box[1] * k) / 2;
+    return {S, auto, n: strokes.length, svg: uniq(polish(`<g transform="translate(${f1(ox)} ${f1(oy)}) scale(${f1(k * 1000) / 1000})">${WRAP(v.s + (labels ? labelsSVG(v.L, 0, 0, v.box[0], v.box[1]) : ''))}</g>`))};
+  }
+  const loops = A.filter(o => o.closed).sort((p, q) => q.area - p.area), dotsA = A.filter(o => o.dot), opens = A.filter(o => !o.closed && !o.dot);
+  const generic = list => list.forEach((o, i) => { if (o.dot) { s += `<circle cx="${f1(o.c[0])}" cy="${f1(o.c[1])}" r="2.6" fill="#334155" stroke="none"/>`; return; } const pal = [['#DBEAFE', '#2563EB'], ['#DCFCE7', '#16A34A'], ['#FEF3C7', '#D97706'], ['#FCE7F3', '#DB2777'], ['#EDE9FE', '#7C3AED']][i % 5]; s += o.closed ? draw(o, snap, `fill="${pal[0]}" stroke="${pal[1]}" stroke-width="1.8"`) : draw(o, snap, `fill="none" stroke="${o.s.color === '#FFFFFF' ? '#16202E' : o.s.color}" stroke-width="2.2"`); });
+  if ((S === '동물 세포' || S === '식물 세포') && loops.length) {
+    const out = loops[0], plant = S === '식물 세포', R = Math.sqrt(out.area / Math.PI), inn = o => o !== out && inside(o.c, out.poly), taken = [], C0 = out.c;
+    let ER = '', ORG = '', DOT = '';
+    const put = (p, r) => taken.push({c: p, r});
+    const rib = p => `<circle cx="${f1(p[0])}" cy="${f1(p[1])}" r="${f1(Math.max(1.5, R * .012))}" fill="#334155" stroke="none"/>`;
+    if (plant) {
+      const t = Math.max(5, R * .06);
+      if (out.rect > .72) { const {x, y, w, h} = out.bb, rr = Math.min(w, h) * .07; s += `<rect x="${f1(x)}" y="${f1(y)}" width="${f1(w)}" height="${f1(h)}" rx="${f1(rr + t)}" fill="#B9DC8E" stroke="#4D7C0F" stroke-width="1.8"/><rect x="${f1(x + t)}" y="${f1(y + t)}" width="${f1(w - 2 * t)}" height="${f1(h - 2 * t)}" rx="${f1(rr)}" fill="#F1F8E3" stroke="#6B9A2E" stroke-width="1.2"/>`; lab([x + t, C0[1] + h * .3], '세포막'); }
+      else { const d = loopPath(out, 8), k = 1 - t / R; s += `<path d="${d}" fill="#B9DC8E" stroke="#4D7C0F" stroke-width="1.8"/><g transform="translate(${f1(C0[0])} ${f1(C0[1])}) scale(${f1(k * 1000) / 1000}) translate(${f1(-C0[0])} ${f1(-C0[1])})"><path d="${d}" fill="#F1F8E3" stroke="#6B9A2E" stroke-width="1.2"/></g>`; const e = edgePt(out); lab([e[0] + t, e[1] + R * .25], '세포막'); }
+      lab(topPt(out), '세포벽');
+    } else { s += `<path d="${loopPath(out, 7)}" fill="#FDE7D3" stroke="#D9774A" stroke-width="2.4"/>`; lab(edgePt(out), '세포막'); }
+    let hasNuc = null, hasVac = !plant, nMito = 0, nChl = 0, nLyso = 0;
+    const nucDraw = (cx, cy, a, b, deg) => { ORG += `<g transform="rotate(${f1(deg)} ${f1(cx)} ${f1(cy)})">${nucleus(f1(cx), f1(cy), f1(a), f1(b))}</g>`; lab([cx, cy - b * .85], '핵'); lab([cx + a * .15, cy], '인'); };
+    loops.filter(inn).forEach(o => {
+      const deg = DEG(o);
+      if (!hasVac && o.area > out.area * .12) { hasVac = true; ORG += `<path d="${loopPath(o, 5)}" fill="#D6ECFA" stroke="#5B9BD5" stroke-width="1.6"/>`; lab(o.c, '액포'); put(o.c, Math.max(o.a, o.b)); return; }
+      if (!hasNuc && o.area > out.area * .025 && o.elong < 2.2) { hasNuc = {c: o.c, a: Math.max(o.a, o.b)}; nucDraw(o.c[0], o.c[1], o.a, o.b, deg); put(o.c, Math.max(o.a, o.b)); return; }
+      if (plant && (o.elong >= 1.4 || o.area < out.area * .02)) { ORG += chloroAt(o.c[0], o.c[1], deg, Math.max(o.a, o.b * 1.8), o.b); nChl++; lab(o.c, '엽록체'); put(o.c, o.a); return; }
+      if (o.elong >= 1.6) { ORG += mitoAt(o.c[0], o.c[1], deg, o.a, Math.max(o.b, o.a * .36)); nMito++; lab(o.c, '마이토콘드리아'); put(o.c, o.a); return; }
+      const r = (o.a + o.b) / 2; ORG += plant ? `<circle cx="${f1(o.c[0])}" cy="${f1(o.c[1])}" r="${f1(r)}" fill="#FBE0A2" stroke="#D99A2B" stroke-width="1.2"/>` : lysoAt(o.c[0], o.c[1], r); nLyso++; lab(o.c, plant ? '소포' : '라이소좀'); put(o.c, r);
+    });
+    const erW = Math.max(5, R * .045), userER = opens.filter(inn);
+    userER.forEach(o => { ER += tube(openPath(o), '#5B8FD0', '#D6E6F8', erW); lab(o.pts[Math.floor(o.pts.length / 2)], '소포체'); o.s.pts.forEach(p => put(p, erW)); });
+    dotsA.filter(o => inside(o.c, out.poly)).forEach(o => { DOT += rib(o.c); lab(o.c, '라이보솜'); put(o.c, 3); });
+    if (fillIn) {
+      const find = spotFinder(out, taken);
+      if (!hasVac) { let c = C0.slice(); if (hasNuc) { const dx = C0[0] - hasNuc.c[0], dy = C0[1] - hasNuc.c[1], d = Math.hypot(dx, dy) || 1; c = [C0[0] + dx / d * R * .15, C0[1] + dy / d * R * .15]; }
+        let a = Math.min(R * .55, bdist(c, out.poly) * .8); if (hasNuc) a = Math.min(a, (Math.hypot(c[0] - hasNuc.c[0], c[1] - hasNuc.c[1]) - hasNuc.a) * .92);
+        if (a > R * .15) { ORG = `<ellipse cx="${f1(c[0])}" cy="${f1(c[1])}" rx="${f1(a)}" ry="${f1(a * .74)}" transform="rotate(${f1(DEG(out))} ${f1(c[0])} ${f1(c[1])})" fill="#D6ECFA" stroke="#5B9BD5" stroke-width="1.6"/>` + ORG; lab(c, '액포'); put(c, a); hasVac = true; } }
+      if (!hasNuc) { const it = plant ? find(R * .19, 'wall') : find(R * .27, 'center'); if (it) { nucDraw(it.c[0], it.c[1], it.r, it.r * .9, 0); hasNuc = {c: it.c, a: it.r}; } }
+      if (!plant && !userER.length && hasNuc) { const [nx, ny] = hasNuc.c, na = hasNuc.a;
+        [[na + R * .11, -2.5, -.8], [na + R * .11, .4, 2.0], [na + R * .2, -2.3, -1.1], [na + R * .2, .6, 1.7]].forEach(([rr, t0, t1]) => { const pts = []; for (let i = 0; i <= 12; i++) { const t = t0 + (t1 - t0) * i / 12; pts.push([nx + rr * Math.cos(t), ny + rr * .92 * Math.sin(t)]); }
+          if (pts.every(p => inside(p, out.poly) && bdist(p, out.poly) > erW * 1.6 && !taken.some(q => q.r > 3 && Math.hypot(q.c[0] - p[0], q.c[1] - p[1]) < q.r + erW * .8))) { ER += tube(bez(pts, false), '#5B8FD0', '#D6E6F8', erW); pts.forEach(p => put(p, erW)); lab(pts[6], '소포체'); } }); }
+      if (!plant) { const g = find(R * .15); if (g) { const th = hasNuc ? Math.atan2(hasNuc.c[1] - g.c[1], hasNuc.c[0] - g.c[0]) * 180 / Math.PI + 90 : 0; ORG += golgiAt(g.c[0], g.c[1], th, R * .11); lab(g.c, '골지체'); } }
+      if (plant) for (let tries = 0; nChl < 6 && tries < 6; tries++) { const it = find(R * .12, 'wall'); if (!it) break; const q = nearPt(it.c, out.poly); ORG += chloroAt(it.c[0], it.c[1], Math.atan2(q[1] - it.c[1], q[0] - it.c[0]) * 180 / Math.PI + 90, R * .11, R * .055); nChl++; lab(it.c, '엽록체'); }
+      seed(13); for (let tries = 0; nMito < (plant ? 2 : 3) && tries < 4; tries++) { const it = find(plant ? R * .1 : R * .17); if (!it) break; ORG += mitoAt(it.c[0], it.c[1], rnd() * 180, it.r * .95, it.r * .42); nMito++; lab(it.c, '마이토콘드리아'); }
+      if (!plant) { for (let tries = 0; nLyso < 2 && tries < 3; tries++) { const it = find(R * .055); if (!it) break; ORG += lysoAt(it.c[0], it.c[1], R * .045); nLyso++; lab(it.c, '라이소좀'); } const ce = find(R * .07); if (ce) { ORG += centAt(ce.c[0], ce.c[1], R / 110); lab(ce.c, '중심체'); } }
+      let nr = dotsA.length; for (let tries = 0; nr < 18 && tries < 30; tries++) { const it = find(R * .012); if (!it) break; DOT += rib(it.c); nr++; lab(it.c, '라이보솜'); }
+    }
+    const cyt = spotFinder(out, taken)(R * .03); if (cyt) lab(cyt.c, '세포질');
+    s += ER + ORG + DOT;
+    generic(A.filter(o => o !== out && !inn(o) && !(o.dot && inside(o.c, out.poly))));
+  } else if (S === '지구 내부' && loops.length) {
+    const ring = loops.slice(0, 4), cx = ring.reduce((a, o) => a + o.c[0], 0) / ring.length, cy = ring.reduce((a, o) => a + o.c[1], 0) / ring.length, rs = ring.map(o => Math.sqrt(o.area / Math.PI));
+    const nm = ring.length >= 4 ? ['지각', '맨틀', '외핵', '내핵'] : ring.length === 3 ? ['맨틀', '외핵', '내핵'] : ['맨틀', '핵'], col = {지각: '#8D6E63', 맨틀: '#E07A4F', 외핵: '#F2A93B', 내핵: '#FBE27A', 핵: '#F2A93B'};
+    if (ring.length < 4) { s += `<circle cx="${f1(cx)}" cy="${f1(cy)}" r="${f1(rs[0] + 4)}" fill="#8D6E63" stroke="#5D4037" stroke-width="1.2"/>`; lab([cx - (rs[0] + 2) * .707, cy - (rs[0] + 2) * .707], '지각'); }
+    ring.forEach((o, i) => { s += `<circle cx="${f1(cx)}" cy="${f1(cy)}" r="${f1(rs[i])}" fill="${col[nm[i]]}" stroke="#7A4A2A" stroke-width="1"/>`; const r2 = i + 1 < rs.length ? (rs[i] + rs[i + 1]) / 2 : rs[i] * .45; lab([cx + r2 * .707, cy - r2 * .707], nm[i]); });
+    generic(A.filter(o => !ring.includes(o)));
+  } else if (S === '원자' && loops.length) {
+    const core = loops[loops.length - 1], orbits = loops.slice(0, -1), [cx, cy] = core.c, cr = Math.max(9, Math.sqrt(core.area / Math.PI)), ors = orbits.map(o => Math.sqrt(o.area / Math.PI));
+    ors.forEach(r => s += `<circle cx="${f1(cx)}" cy="${f1(cy)}" r="${f1(r)}" fill="none" stroke="#9AA5B1" stroke-width="1.3"/>`); if (ors.length) lab([cx - ors[0] * .707, cy - ors[0] * .707], '전자 껍질');
+    const ne = Math.max(1, dotsA.length), m = Math.min(30, ne * 2), rb = Math.max(2.5, cr * .95 / Math.sqrt(m) * .95);
+    for (let i = m - 1; i >= 0; i--) { const rr = Math.max(0, cr - rb) * Math.sqrt((i + .5) / m), th = i * 2.39996; s += ball(cx + rr * Math.cos(th), cy + rr * Math.sin(th), f1(rb), i % 2 ? '#9CA3AF' : '#E04848', i % 2 ? '#6B7280' : '#A33A3A'); }
+    lab([cx, cy], '원자핵');
+    dotsA.forEach(o => { const d = Math.hypot(o.c[0] - cx, o.c[1] - cy), th = Math.atan2(o.c[1] - cy, o.c[0] - cx), r = ors.length ? ors.reduce((b, r) => Math.abs(r - d) < Math.abs(b - d) ? r : b, ors[0]) : d, x = cx + r * Math.cos(th), y = cy + r * Math.sin(th); s += ball(x, y, f1(Math.max(5, cr * .3)), '#4C7FD9', '#2B5BB0', '−'); lab([x, y], '전자'); });
+    generic(opens);
+  } else generic(A);
+  if (labels && L.length) s += labelsSVG(L, bb.x, bb.y, bb.w, bb.h);
+  return {S, auto, n: strokes.length, svg: uniq(polish(WRAP(s)))};
+}
+$('subs').onclick = e => { const b = e.target.closest('button'); if (!b) return; ST.subj = b.dataset.s; convPreview(); };
+['cLab', 'cSnap', 'cModel', 'cFill'].forEach(id => $(id).onchange = convPreview);
+function convPreview() {
+  const r = convert(ST.subj, $('cSnap').checked, $('cLab').checked, $('cModel').checked);
+  $('subs').innerHTML = SUBJ.map(x => `<button type="button" data-s="${x}" class="${x === ST.subj ? 'on' : ''}">${x === '자동' && r ? `자동 (${r.auto})` : x}</button>`).join('');
+  $('cModel').parentElement.style.opacity = r && SUBJ_MODEL[r.S] ? 1 : .45; $('cModel').disabled = !(r && SUBJ_MODEL[r.S]);
+  if (!r) { $('cvsvg').innerHTML = ''; $('cvsvg').setAttribute('viewBox', '0 0 10 10'); $('cInfo').textContent = '캔버스에 펜으로 먼저 그려 주세요. 예: 큰 테두리 안에 핵(둥근 선), 마이토콘드리아(길쭉한 선), 소포체(열린 선), 라이보솜(점)을 그리면 동물 세포로 알아봅니다.'; $('cGo').disabled = true; return; }
+  $('cGo').disabled = false; fitView($('cvsvg'), r.svg);
+  $('cInfo').textContent = `펜 선 ${r.n}개를 '${r.S}'(으)로 바꿉니다.` + (ST.subj === '자동' ? ' 다르게 알아봤다면 위에서 직접 고르세요.' : '') + ' 바꾼 뒤에도 되돌리기(Ctrl+Z)로 원래 선을 살릴 수 있습니다.';
+}
+$('cGo').onclick = () => {
+  const r = convert(ST.subj, $('cSnap').checked, $('cLab').checked, $('cModel').checked); if (!r) return;
+  penStrokes().forEach(s => s.g.remove());
+  const g = makeObj(r.svg, 'stamp', 0, 0, {}); g.dataset.name = r.S; place(g); setTool('sel'); select(g); commit(); convPreview(); pvCloseNarrow();
+};
+
+/* ================= 바탕 그림 ================= */
 function bgLoad(inp) {
   const f = inp.files[0]; inp.value = ''; if (!f) return;
   const r = new FileReader(); r.onload = () => { const im = new Image(); im.onload = () => {
@@ -315,16 +1203,16 @@ function bgLoad(inp) {
   }; im.src = r.result; }; r.readAsDataURL(f);
 }
 
-/* ===== 되돌리기·자동 저장 ===== */
+/* ================= 되돌리기·자동 저장 ================= */
 const HK = 'sciDrawV1'; let hist = [], hi = -1;
 const snap = () => JSON.stringify({w: cv.getAttribute('width'), h: cv.getAttribute('height'), layer: layer.innerHTML, bg: bg.innerHTML, keep: bg.dataset.keep || ''});
 function restore(s) { const d = JSON.parse(s); cv.setAttribute('width', d.w); cv.setAttribute('height', d.h); cv.setAttribute('viewBox', `0 0 ${d.w} ${d.h}`); layer.innerHTML = d.layer; bg.innerHTML = d.bg || ''; if (d.keep) bg.dataset.keep = '1'; else delete bg.dataset.keep; $('size').value = d.w + 'x' + d.h; select(null); }
-function commit() { const s = snap(); if (hist[hi] === s) return; hist = hist.slice(0, hi + 1); hist.push(s); if (hist.length > 80) hist.shift(); hi = hist.length - 1; try { localStorage.setItem(HK, s); } catch(e) {} }
-function undo() { if (hi > 0) { hi--; restore(hist[hi]); try { localStorage.setItem(HK, hist[hi]); } catch(e) {} } }
-function redo() { if (hi < hist.length - 1) { hi++; restore(hist[hi]); try { localStorage.setItem(HK, hist[hi]); } catch(e) {} } }
+function commit() { const s = snap(); if (hist[hi] === s) return; hist = hist.slice(0, hi + 1); hist.push(s); if (hist.length > 80) hist.shift(); hi = hist.length - 1; try { localStorage.setItem(HK, s); } catch (e) {} if (ST.pvMode === 'conv' && !$('pv-conv').hidden) convPreview(); }
+function undo() { if (hi > 0) { hi--; restore(hist[hi]); try { localStorage.setItem(HK, hist[hi]); } catch (e) {} } }
+function redo() { if (hi < hist.length - 1) { hi++; restore(hist[hi]); try { localStorage.setItem(HK, hist[hi]); } catch (e) {} } }
 function clearAll() { if (layer.children.length && !confirm('지금 그림을 지우고 새로 시작할까요? (되돌리기로 살릴 수 있습니다)')) return; layer.innerHTML = ''; bg.innerHTML = ''; select(null); commit(); }
 
-/* ===== 저장: 선택 표시 빼고, 바탕 그림은 고른 경우만 ===== */
+/* ================= 저장 ================= */
 function exportSVG() {
   const c = cv.cloneNode(true); c.querySelector('#ui').remove();
   if (!bg.dataset.keep) c.querySelector('#bg').remove(); else c.querySelectorAll('#bg image').forEach(i => i.setAttribute('opacity', '1'));
@@ -342,7 +1230,7 @@ function savePNG() {
   im.src = url;
 }
 
-/* ===== 단축키 ===== */
+/* ================= 단축키 ================= */
 document.addEventListener('keydown', e => {
   if (txtAt || /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return;
   const k = e.key.toLowerCase();
@@ -350,13 +1238,15 @@ document.addEventListener('keydown', e => {
   if ((e.ctrlKey || e.metaKey) && k === 'y') { e.preventDefault(); redo(); return; }
   if ((e.ctrlKey || e.metaKey) && k === 'd') { e.preventDefault(); dupSel(); return; }
   if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); delSel(); return; }
+  if (e.key === 'Escape') { pvClose(); return; }
   if (ST.sel && e.key.startsWith('Arrow')) { e.preventDefault(); const s = e.shiftKey ? 10 : 1, g = ST.sel; g.dataset.tx = +g.dataset.tx + (k === 'arrowleft' ? -s : k === 'arrowright' ? s : 0); g.dataset.ty = +g.dataset.ty + (k === 'arrowup' ? -s : k === 'arrowdown' ? s : 0); place(g); select(g); commit(); return; }
   const m = {v: 'sel', p: 'pen', l: 'line', a: 'arrow', r: 'rect', o: 'ellipse', t: 'text'}[k];
   if (m && !e.ctrlKey && !e.metaKey) setTool(m);
 });
 
-/* 시작: 저장된 그림 불러오기 */
-try { const s = localStorage.getItem(HK); if (s) restore(s); } catch(e) {}
+/* 시작 */
+drawGrid();
+try { const s = localStorage.getItem(HK); if (s) restore(s); } catch (e) {}
 commit();
 if (window.lucide) lucide.createIcons();
 </script>
