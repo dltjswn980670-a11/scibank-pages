@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>과학 그림판</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<style>
+:root{--bg:#F2F4F7;--surface:#fff;--ink:#16202E;--muted:#5E6878;--line:#DDE2E9;--accent:#3E8E2F;--accent-s:#EAF5E6}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Pretendard Variable',Pretendard,-apple-system,'Malgun Gothic',sans-serif;background:var(--bg);color:var(--ink);letter-spacing:-.01em}
+header{display:flex;align-items:center;gap:10px;padding:10px 16px;background:#fff;border-bottom:1px solid var(--line);flex-wrap:wrap}
+header h1{font-size:1.05rem;margin:0 8px 0 0;font-weight:800}
+button,select,input{font:inherit}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 11px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:.82rem;font-weight:600;color:var(--ink);cursor:pointer}
+.btn:hover{background:#f6f7f9}.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn svg,.tool svg{width:16px;height:16px}
+.wrap{display:grid;grid-template-columns:56px 220px minmax(0,1fr);gap:12px;padding:12px;height:calc(100vh - 58px)}
+.tools{display:flex;flex-direction:column;gap:6px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:6px}
+.tool{width:42px;height:42px;display:flex;align-items:center;justify-content:center;border-radius:9px;border:1px solid transparent;background:none;cursor:pointer;color:var(--muted)}
+.tool:hover{background:#f6f7f9}.tool.on{background:var(--accent-s);border-color:var(--accent);color:var(--ink)}
+.side{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;overflow:auto;display:flex;flex-direction:column;gap:12px}
+.side h3{font-size:.78rem;margin:0 0 6px;color:var(--muted);font-weight:700}
+.lib{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.lib button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:.68rem;font-weight:600;color:var(--muted);cursor:pointer}
+.lib button:hover{border-color:var(--accent);color:var(--ink)}
+.lib svg{width:40px;height:34px}
+.row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:.8rem}
+.row label{color:var(--muted);font-weight:600}
+.sw{width:22px;height:22px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--line);cursor:pointer}
+.sw.on{box-shadow:0 0 0 2px var(--ink)}
+.stage{position:relative;overflow:auto;background:#e9ecf1;border-radius:12px;border:1px solid var(--line);display:flex;align-items:flex-start;justify-content:center;padding:20px}
+#cv{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12);touch-action:none;user-select:none;flex:none}
+#cv .obj{cursor:move}
+.hint{font-size:.72rem;color:var(--muted);line-height:1.5}
+#txt{position:absolute;display:none;border:2px solid var(--accent);border-radius:6px;padding:4px 6px;font-size:16px;min-width:160px;background:#fff;z-index:5}
+@media (max-width:860px){.wrap{grid-template-columns:1fr;height:auto}.tools{flex-direction:row;flex-wrap:wrap}.side{max-height:none}.stage{min-height:70vh;padding:8px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>과학 그림판</h1>
+  <button class="btn" onclick="undo()" title="되돌리기 (Ctrl+Z)"><i data-lucide="undo-2"></i>되돌리기</button>
+  <button class="btn" onclick="redo()" title="다시 하기 (Ctrl+Y)"><i data-lucide="redo-2"></i></button>
+  <button class="btn" onclick="delSel()" title="선택 지우기 (Delete)"><i data-lucide="trash-2"></i>지우기</button>
+  <button class="btn" onclick="dupSel()" title="복제 (Ctrl+D)"><i data-lucide="copy"></i>복제</button>
+  <button class="btn" onclick="order(1)" title="맨 앞으로"><i data-lucide="bring-to-front"></i></button>
+  <button class="btn" onclick="order(-1)" title="맨 뒤로"><i data-lucide="send-to-back"></i></button>
+  <button class="btn" onclick="rot(-15)" title="왼쪽으로 15° 돌리기"><i data-lucide="rotate-ccw"></i></button>
+  <button class="btn" onclick="rot(15)" title="오른쪽으로 15° 돌리기"><i data-lucide="rotate-cw"></i></button>
+  <button class="btn" onclick="flip()" title="좌우 뒤집기"><i data-lucide="flip-horizontal-2"></i></button>
+  <span style="flex:1"></span>
+  <label class="btn" title="따라 그릴 그림(오투 그림 등)을 바탕에 깔기"><i data-lucide="image"></i>바탕 그림<input type="file" accept="image/*" hidden onchange="bgLoad(this)"></label>
+  <button class="btn" onclick="clearAll()"><i data-lucide="file-plus"></i>새 그림</button>
+  <button class="btn" onclick="saveSVG()"><i data-lucide="file-code"></i>SVG</button>
+  <button class="btn pri" onclick="savePNG()"><i data-lucide="download"></i>PNG 저장</button>
+</header>
+<div class="wrap">
+  <div class="tools" id="tools">
+    <button class="tool on" data-t="sel" title="선택·이동 (V)"><i data-lucide="mouse-pointer-2"></i></button>
+    <button class="tool" data-t="pen" title="펜 (P)"><i data-lucide="pencil"></i></button>
+    <button class="tool" data-t="line" title="직선 (L) — Shift: 수평·수직·45°"><i data-lucide="minus"></i></button>
+    <button class="tool" data-t="arrow" title="화살표 (A)"><i data-lucide="move-right"></i></button>
+    <button class="tool" data-t="rect" title="사각형 (R)"><i data-lucide="square"></i></button>
+    <button class="tool" data-t="ellipse" title="원·타원 (O) — Shift: 정원"><i data-lucide="circle"></i></button>
+    <button class="tool" data-t="text" title="글자 (T) — H_2O, x^2, 10^{-3}"><i data-lucide="type"></i></button>
+  </div>
+  <div class="side">
+    <div>
+      <h3>선 색</h3>
+      <div class="row" id="strokes"></div>
+    </div>
+    <div>
+      <h3>채우기</h3>
+      <div class="row" id="fills"></div>
+    </div>
+    <div class="row"><label>굵기</label><input type="range" id="sw" min="1" max="10" value="2" style="flex:1"><span id="swv">2</span></div>
+    <div class="row"><label>점선</label><input type="checkbox" id="dash"><label style="margin-left:8px">글자 크기</label><input type="number" id="fs" value="18" min="8" max="72" style="width:58px"></div>
+    <div class="row"><label>캔버스</label><select id="size" onchange="setSize(this.value)"><option value="800x500">가로 800×500</option><option value="600x600">정사각 600×600</option><option value="500x700">세로 500×700</option><option value="1000x400">넓게 1000×400</option></select></div>
+    <div><h3>실험 기구</h3><div class="lib" id="lib-lab"></div></div>
+    <div><h3>전기·자기·힘</h3><div class="lib" id="lib-phy"></div></div>
+    <div><h3>생명·지구·우주</h3><div class="lib" id="lib-bio"></div></div>
+    <p class="hint">기구를 누르면 가운데에 놓입니다. 끌어서 옮기고, 선택한 뒤 오른쪽 아래 점을 끌면 크기가 바뀝니다. 글자는 H_2O → H₂O, x^2 → x², 10^{-3}처럼 쓰면 첨자로 그려집니다. 그림은 이 브라우저에 자동 저장됩니다.</p>
+  </div>
+  <div class="stage" id="stage">
+    <svg id="cv" xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500">
+      <g id="bg"></g><g id="layer"></g><g id="ui"></g>
+    </svg>
+    <input id="txt" type="text" placeholder="글자 입력 후 Enter">
+  </div>
+</div>
+<script>
+const NS = 'http://www.w3.org/2000/svg';
+const $ = id => document.getElementById(id);
+const cv = $('cv'), layer = $('layer'), ui = $('ui'), bg = $('bg');
+const ST = {tool: 'sel', stroke: '#16202E', fill: 'none', sel: null};
+const STROKES = ['#16202E', '#6B7280', '#DC2626', '#2563EB', '#16A34A', '#D97706', '#7C3AED', '#FFFFFF'];
+const FILLS = ['none', '#FFFFFF', '#E5E7EB', '#9CA3AF', '#DBEAFE', '#FEE2E2', '#DCFCE7', '#FEF3C7', '#16202E'];
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+/* ===== 기구 모양 (0,0 기준, 선 색은 currentColor, 채우기 칸은 class="f") ===== */
+const LIB = {
+  lab: {
+    '비커': '<path d="M10 6 h80 M14 6 v86 q0 8 8 8 h56 q8 0 8-8 v-86"/><path class="f" d="M15 46 h70 v46 q0 7-7 7 h-56 q-7 0-7-7z" stroke="none" opacity=".5"/><path d="M70 22 h12 M74 36 h8 M70 50 h12 M74 64 h8 M70 78 h12" stroke-width="1"/>',
+    '삼각 플라스크': '<path d="M38 4 h24 M41 4 v34 l-34 56 q-3 6 4 6 h78 q7 0 4-6 l-34-56 v-34"/><path class="f" d="M27 64 h46 l19 30 q2 4-3 4 h-78 q-5 0-3-4z" stroke="none" opacity=".5"/>',
+    '둥근 플라스크': '<path d="M40 4 h20 M43 4 v36 a32 32 0 1 0 14 0 v-36"/><path class="f" d="M20 72 a30 30 0 0 0 60 0z" stroke="none" opacity=".5"/>',
+    '시험관': '<path d="M14 4 h22 M17 4 v84 a8 8 0 0 0 16 0 v-84"/><path class="f" d="M18 56 h14 v32 a7 7 0 0 1-14 0z" stroke="none" opacity=".5"/>',
+    '눈금실린더': '<path d="M14 6 h32 M18 6 v100 h24 v-100 M10 106 h40 v6 h-40z"/><path d="M34 20 h8 M37 30 h5 M34 40 h8 M37 50 h5 M34 60 h8 M37 70 h5 M34 80 h8 M37 90 h5" stroke-width="1"/><path class="f" d="M19 50 h22 v55 h-22z" stroke="none" opacity=".5"/>',
+    '알코올램프': '<path d="M20 40 q-12 0-12 14 v26 q0 8 8 8 h48 q8 0 8-8 v-26 q0-14-12-14z M32 40 v-10 h16 v10 M40 30 v-8"/><path d="M40 22 q-9-10 0-22 q9 12 0 22z" fill="#F59E0B" stroke="#D97706"/>',
+    '온도계': '<path d="M14 4 a6 6 0 0 1 12 0 v84 a10 10 0 1 1-12 0z"/><path d="M20 30 v62" stroke="#DC2626" stroke-width="4"/><circle cx="20" cy="96" r="7" fill="#DC2626" stroke="none"/><path d="M26 16 h6 M26 28 h4 M26 40 h6 M26 52 h4 M26 64 h6 M26 76 h4" stroke-width="1"/>',
+    '깔때기': '<path d="M4 4 h72 l-30 40 v40 h-12 v-40z"/>',
+    '스포이트': '<path d="M14 4 h12 q6 0 6 8 v16 h-24 v-16 q0-8 6-8z M10 28 h20 M16 28 v52 l4 10 l4-10 v-52"/>',
+    '스탠드': '<path d="M6 110 h70 v8 h-70z M18 110 v-104" stroke-width="3"/><path d="M18 40 h40 M50 34 v12 M58 34 v12"/>',
+    '집기병': '<path d="M30 4 h24 M33 4 v14 q-26 6-26 30 v52 q0 6 6 6 h58 q6 0 6-6 v-52 q0-24-26-30 v-14"/>',
+    '저울': '<path d="M6 60 h88 v20 h-88z M20 60 v-8 h60 v8"/><rect x="58" y="66" width="28" height="9" class="f"/>'
+  },
+  phy: {
+    '전지': '<path d="M4 30 h30 M34 12 v36 M46 20 v20 M46 30 h30"/><text x="26" y="10" font-size="12" fill="currentColor" stroke="none">+</text><text x="50" y="16" font-size="12" fill="currentColor" stroke="none">−</text>',
+    '전구': '<circle cx="40" cy="30" r="16"/><path d="M28 18 l24 24 M52 18 l-24 24 M4 30 h20 M56 30 h20"/>',
+    '스위치': '<path d="M4 30 h24 M52 30 h24 M28 30 l22-14"/><circle cx="28" cy="30" r="3" class="f"/><circle cx="52" cy="30" r="3" class="f"/>',
+    '저항': '<path d="M4 30 h16 l4-10 l8 20 l8-20 l8 20 l8-20 l8 20 l4-10 h16"/>',
+    '전류계': '<circle cx="40" cy="30" r="16"/><path d="M4 30 h20 M56 30 h20"/><text x="40" y="36" font-size="17" font-weight="700" text-anchor="middle" fill="currentColor" stroke="none">A</text>',
+    '전압계': '<circle cx="40" cy="30" r="16"/><path d="M4 30 h20 M56 30 h20"/><text x="40" y="36" font-size="17" font-weight="700" text-anchor="middle" fill="currentColor" stroke="none">V</text>',
+    '막대자석': '<rect x="4" y="14" width="46" height="26" fill="#EF4444"/><rect x="50" y="14" width="46" height="26" fill="#3B82F6"/><text x="27" y="33" font-size="15" font-weight="700" text-anchor="middle" fill="#fff" stroke="none">N</text><text x="73" y="33" font-size="15" font-weight="700" text-anchor="middle" fill="#fff" stroke="none">S</text>',
+    '나침반': '<circle cx="30" cy="30" r="26"/><path d="M30 8 l6 22 h-12z" fill="#EF4444"/><path d="M30 52 l6-22 h-12z" class="f"/>',
+    '코일': '<path d="M4 30 h10 c0-22 14-22 14 0 c0-22 14-22 14 0 c0-22 14-22 14 0 c0-22 14-22 14 0 h12"/>',
+    '용수철': '<path d="M30 4 v10 l-14 6 l28 8 l-28 8 l28 8 l-28 8 l28 8 l-14 6 v10"/>',
+    '추': '<path d="M20 4 v8 M6 12 h28 l4 30 h-36z" class="f"/>',
+    '수레': '<rect x="6" y="10" width="76" height="26" class="f"/><circle cx="22" cy="42" r="7"/><circle cx="66" cy="42" r="7"/>',
+    '도르래': '<circle cx="30" cy="30" r="22"/><circle cx="30" cy="30" r="4" class="f"/><path d="M30 0 v8 M8 30 v50 M52 30 v50"/>',
+    '빗면': '<path d="M4 70 h100 v-60z" class="f"/>',
+    '좌표축': '<path d="M14 100 h100 M14 100 v-94 M110 96 l6 4 l-6 4 M10 10 l4-6 l4 6"/><text x="118" y="114" font-size="12" fill="currentColor" stroke="none">x</text><text x="0" y="12" font-size="12" fill="currentColor" stroke="none">y</text>',
+    '빛·광선': '<path d="M4 50 L60 20" /><path d="M54 18 l8 1 l-4 7" />'
+  },
+  bio: {
+    '동물 세포': '<ellipse cx="50" cy="38" rx="46" ry="34" class="f"/><circle cx="46" cy="36" r="12" fill="#C4B5FD"/><circle cx="46" cy="36" r="3" fill="currentColor" stroke="none"/><ellipse cx="76" cy="50" rx="8" ry="4" fill="#FCA5A5"/><ellipse cx="22" cy="24" rx="7" ry="4" fill="#FCA5A5"/>',
+    '식물 세포': '<rect x="4" y="4" width="92" height="68" rx="4"/><rect x="9" y="9" width="82" height="58" rx="3" class="f"/><circle cx="30" cy="28" r="10" fill="#C4B5FD"/><ellipse cx="62" cy="44" rx="20" ry="14" fill="#DBEAFE" stroke-width="1"/><ellipse cx="22" cy="54" rx="6" ry="3.5" fill="#4ADE80"/><ellipse cx="78" cy="18" rx="6" ry="3.5" fill="#4ADE80"/>',
+    '잎': '<path d="M6 60 Q10 10 70 6 Q66 60 6 60z" fill="#86EFAC"/><path d="M6 60 L60 14 M24 44 l-2-14 M38 32 l14 2"/>',
+    '뉴런': '<circle cx="18" cy="30" r="12" class="f"/><path d="M8 20 l-6-8 M8 40 l-6 8 M18 18 v-12 M30 30 h56 M86 30 l8-8 M86 30 l8 8 M86 30 h10"/><path d="M40 26 h10 v8 h-10z M58 26 h10 v8 h-10z" fill="#FDE68A"/>',
+    '원자 모형': '<circle cx="50" cy="50" r="7" fill="#EF4444"/><circle cx="50" cy="50" r="24"/><circle cx="50" cy="50" r="42"/><circle cx="74" cy="50" r="4" fill="#3B82F6"/><circle cx="26" cy="50" r="4" fill="#3B82F6"/><circle cx="50" cy="8" r="4" fill="#3B82F6"/>',
+    '분자(H₂O)': '<circle cx="50" cy="30" r="18" fill="#EF4444"/><circle cx="22" cy="54" r="11" fill="#E5E7EB"/><circle cx="78" cy="54" r="11" fill="#E5E7EB"/><text x="50" y="35" font-size="13" font-weight="700" text-anchor="middle" fill="#fff" stroke="none">O</text><text x="22" y="58" font-size="11" text-anchor="middle" fill="currentColor" stroke="none">H</text><text x="78" y="58" font-size="11" text-anchor="middle" fill="currentColor" stroke="none">H</text>',
+    '지구 내부': '<circle cx="50" cy="50" r="46" fill="#A3E635"/><circle cx="50" cy="50" r="40" fill="#FDBA74"/><circle cx="50" cy="50" r="24" fill="#FB923C"/><circle cx="50" cy="50" r="12" fill="#EF4444"/>',
+    '태양': '<circle cx="40" cy="40" r="18" fill="#FCD34D"/><path d="M40 6 v10 M40 64 v10 M6 40 h10 M64 40 h10 M16 16 l7 7 M57 57 l7 7 M64 16 l-7 7 M23 57 l-7 7"/>',
+    '달': '<path d="M40 6 a30 30 0 1 0 22 52 a24 24 0 1 1 -22-52z" fill="#FDE68A"/>',
+    '지구': '<circle cx="34" cy="34" r="30" fill="#93C5FD"/><path d="M14 22 q10-6 14 4 q6 8-4 14 q-8 2-10-6z M38 12 q14 2 16 14 q-8 4-12-4z M40 44 q10-2 14 6 q-6 8-14 4z" fill="#4ADE80" stroke-width="1"/>',
+    '구름': '<path d="M20 50 a14 14 0 0 1 2-28 a20 20 0 0 1 38-6 a16 16 0 0 1 22 18 a12 12 0 0 1-4 16z" class="f"/>',
+    '지층': '<path d="M4 10 h100 v20 h-100z" fill="#FDE68A"/><path d="M4 30 h100 v20 h-100z" fill="#FDBA74"/><path d="M4 50 h100 v20 h-100z" fill="#D6D3D1"/><path d="M4 70 h100 v20 h-100z" fill="#A8A29E"/>'
+  }
+};
+function libIcon(svg) { return `<svg viewBox="-4 -4 130 130" fill="none" stroke="#16202E" stroke-width="3" style="color:#16202E">${svg.replace(/class="f"/g, 'fill="#E5E7EB"')}</svg>`; }
+for (const [k, set] of Object.entries(LIB)) $('lib-' + k).innerHTML = Object.entries(set).map(([n, s]) => `<button type="button" data-k="${k}" data-n="${esc(n)}" title="${esc(n)}">${libIcon(s)}${esc(n)}</button>`).join('');
+document.querySelectorAll('.lib button').forEach(b => b.onclick = () => stamp(LIB[b.dataset.k][b.dataset.n], b.dataset.n));
+
+/* ===== 색·굵기 ===== */
+function swatches(id, list, key) {
+  $(id).innerHTML = list.map(c => `<button type="button" class="sw${ST[key] === c ? ' on' : ''}" data-c="${c}" title="${c === 'none' ? '채우기 없음' : c}" style="background:${c === 'none' ? 'linear-gradient(135deg,#fff 45%,#DC2626 45%,#DC2626 55%,#fff 55%)' : c}"></button>`).join('');
+  $(id).querySelectorAll('.sw').forEach(b => b.onclick = () => { ST[key] = b.dataset.c; swatches(id, list, key); applyStyle(key); });
+}
+swatches('strokes', STROKES, 'stroke'); swatches('fills', FILLS, 'fill');
+$('sw').oninput = () => { $('swv').textContent = $('sw').value; applyStyle('sw'); };
+$('dash').onchange = () => applyStyle('dash');
+$('fs').onchange = () => applyStyle('fs');
+/* 선택한 것에 바로 적용 */
+function applyStyle(key) {
+  const g = ST.sel; if (!g) return;
+  const c = g.firstElementChild;
+  if (key === 'stroke') { c.setAttribute('stroke', ST.stroke); c.style.color = ST.stroke; if (g.dataset.kind === 'text') c.setAttribute('fill', ST.stroke); }
+  if (key === 'fill' && g.dataset.kind !== 'text') { c.querySelectorAll('.f').forEach(x => x.setAttribute('fill', ST.fill === 'none' ? '#fff' : ST.fill)); if (['rect', 'ellipse', 'pen'].includes(g.dataset.kind)) c.setAttribute('fill', ST.fill); }
+  if (key === 'sw') c.setAttribute('stroke-width', $('sw').value);
+  if (key === 'dash') c.setAttribute('stroke-dasharray', $('dash').checked ? '6 4' : '');
+  if (key === 'fs' && g.dataset.kind === 'text') { c.setAttribute('font-size', $('fs').value); }
+  normalize(g); select(g); commit();
+}
+
+/* ===== 도구 ===== */
+document.querySelectorAll('.tool').forEach(b => b.onclick = () => setTool(b.dataset.t));
+function setTool(t) { ST.tool = t; document.querySelectorAll('.tool').forEach(b => b.classList.toggle('on', b.dataset.t === t)); if (t !== 'sel') select(null); cv.style.cursor = t === 'sel' ? 'default' : t === 'text' ? 'text' : 'crosshair'; }
+function setSize(v) { const [w, h] = v.split('x').map(Number); cv.setAttribute('width', w); cv.setAttribute('height', h); cv.setAttribute('viewBox', `0 0 ${w} ${h}`); commit(); }
+
+/* 개체 = <g class="obj" data-tx data-ty data-s data-r data-fx><g(내용, 0,0 기준)/></g> */
+let uidN = 0;
+function makeObj(inner, kind, x, y, attrs = {}) {
+  const g = document.createElementNS(NS, 'g'); g.setAttribute('class', 'obj'); g.dataset.kind = kind; g.dataset.id = 'o' + (++uidN) + Date.now().toString(36);
+  const c = document.createElementNS(NS, 'g'); c.innerHTML = inner;
+  for (const [k, v] of Object.entries(attrs)) if (v !== '' && v != null) c.setAttribute(k, v);
+  g.appendChild(c); Object.assign(g.dataset, {tx: x, ty: y, s: 1, r: 0, fx: 1}); layer.appendChild(g); normalize(g); return g;
+}
+const baseAttrs = () => ({stroke: ST.stroke, 'stroke-width': $('sw').value, 'stroke-dasharray': $('dash').checked ? '6 4' : '', fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', style: `color:${ST.stroke}`});
+/* 내용의 bbox를 0,0으로 옮겨 이동·크기 기준을 맞춤 */
+function normalize(g) {
+  const c = g.firstElementChild, b = c.getBBox(), m = /translate\(([-\d.]+)[ ,]([-\d.]+)\)/.exec(c.getAttribute('transform') || '') || [0, 0, 0];
+  const dx = b.x + +m[1], dy = b.y + +m[2]; /* 지금 내용의 왼쪽 위(0이어야 함) */
+  if (Math.abs(dx) > .01 || Math.abs(dy) > .01) { c.setAttribute('transform', `translate(${-b.x} ${-b.y})`); const s = +g.dataset.s; g.dataset.tx = +g.dataset.tx + dx * s; g.dataset.ty = +g.dataset.ty + dy * s; }
+  g.dataset.w = b.width; g.dataset.h = b.height; place(g);
+}
+function place(g) {
+  const s = +g.dataset.s, w = g.dataset.w * s, h = g.dataset.h * s, fx = +g.dataset.fx;
+  g.setAttribute('transform', `translate(${g.dataset.tx} ${g.dataset.ty}) rotate(${g.dataset.r} ${w / 2} ${h / 2})${fx < 0 ? ` translate(${w} 0) scale(-1 1)` : ''} scale(${s})`);
+}
+function stamp(svg, name) {
+  const W = +cv.getAttribute('width'), H = +cv.getAttribute('height');
+  const a = baseAttrs(); a['stroke-width'] = Math.max(2, +$('sw').value);
+  const g = makeObj(svg.replace(/class="f"/g, `class="f" fill="${ST.fill === 'none' ? '#DBEAFE' : ST.fill}"`), 'stamp', 0, 0, a);
+  g.dataset.tx = (W - g.dataset.w) / 2; g.dataset.ty = (H - g.dataset.h) / 2; g.dataset.name = name; place(g);
+  setTool('sel'); select(g); commit();
+}
+
+/* ===== 글자: _x, _{..} 아래첨자 / ^x, ^{..} 위첨자 / 화학식 숫자 자동 ===== */
+function richText(s) {
+  const out = []; let i = 0, buf = '';
+  const flush = () => { if (buf) out.push({t: buf, k: 0}); buf = ''; };
+  while (i < s.length) {
+    const ch = s[i];
+    if ((ch === '_' || ch === '^') && i + 1 < s.length) {
+      flush(); let j = i + 1, t;
+      if (s[j] === '{') { const e = s.indexOf('}', j); t = s.slice(j + 1, e < 0 ? s.length : e); i = e < 0 ? s.length : e + 1; }
+      else { const m = /^[-+−]?[0-9A-Za-z]{1}|^[-+−]?\d+/.exec(s.slice(j)); t = m ? (/^\d/.test(s.slice(j)) ? /^\d+/.exec(s.slice(j))[0] : m[0]) : s[j]; i = j + t.length; }
+      out.push({t, k: ch === '_' ? 1 : 2});
+    } else { buf += ch; i++; }
+  }
+  flush();
+  /* H2O처럼 원소 기호 뒤 숫자 → 아래첨자 */
+  const R = /((?:He|Li|Na|Mg|Al|Si|Cl|Ca|Fe|Cu|Zn|Ag|H|C|N|O|F|P|S|K|I)|\))(\d+)/g;
+  return out.flatMap(p => { if (p.k) return [p]; const r = []; let last = 0, m; R.lastIndex = 0;
+    while ((m = R.exec(p.t))) { const before = p.t[m.index - 1]; if (before && /[a-z]/.test(before) && m[1].length === 1) continue; r.push({t: p.t.slice(last, m.index + m[1].length), k: 0}, {t: m[2], k: 1}); last = m.index + m[0].length; }
+    r.push({t: p.t.slice(last), k: 0}); return r.filter(x => x.t); });
+}
+function textSVG(s) {
+  let dy = 0;
+  return richText(s).map(p => { const want = p.k === 1 ? .32 : p.k === 2 ? -.45 : 0, d = want - dy; dy = want;
+    return `<tspan dy="${d.toFixed(2)}em"${p.k ? ' font-size="68%"' : ''}>${esc(p.t)}</tspan>`; }).join('') + (dy ? `<tspan dy="${(-dy).toFixed(2)}em"></tspan>` : '');
+}
+const txt = $('txt'); let txtAt = null;
+function openText(x, y, g) {
+  const r = cv.getBoundingClientRect(), st = $('stage').getBoundingClientRect(), k = r.width / +cv.getAttribute('width');
+  txt.style.left = (r.left - st.left + $('stage').scrollLeft + x * k) + 'px'; txt.style.top = (r.top - st.top + $('stage').scrollTop + y * k - 14) + 'px';
+  txt.style.display = 'block'; txt.value = g ? g.dataset.src : ''; txtAt = {x, y, g}; setTimeout(() => txt.focus(), 0);
+}
+function closeText(ok) {
+  if (!txtAt) return; const {x, y, g} = txtAt, v = txt.value.trim(); txtAt = null; txt.style.display = 'none';
+  if (!ok) return;
+  if (g) { if (!v) { g.remove(); select(null); commit(); return; } g.dataset.src = v; g.firstElementChild.querySelector('text').innerHTML = textSVG(v); normalize(g); select(g); commit(); return; }
+  if (!v) return;
+  const n = makeObj(`<text x="0" y="0" font-family="Pretendard Variable, Malgun Gothic, sans-serif">${textSVG(v)}</text>`, 'text', x, y, {fill: ST.stroke, 'font-size': $('fs').value, style: `color:${ST.stroke}`});
+  n.dataset.src = v; select(n); commit(); setTool('sel');
+}
+txt.onkeydown = e => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); closeText(true); } if (e.key === 'Escape') closeText(false); };
+txt.onblur = () => closeText(true);
+
+/* ===== 그리기·선택 (포인터) ===== */
+const pt = e => { const p = cv.createSVGPoint(); p.x = e.clientX; p.y = e.clientY; return p.matrixTransform(cv.getScreenCTM().inverse()); };
+let drag = null;
+cv.addEventListener('pointerdown', e => {
+  if (txtAt) return;
+  const p = pt(e), t = ST.tool; cv.setPointerCapture(e.pointerId);
+  if (t === 'sel') {
+    if (e.target.dataset && e.target.dataset.h) { const g = ST.sel; drag = {mode: 'resize', g, p, s: +g.dataset.s, w: g.dataset.w * g.dataset.s}; return; }
+    const g = e.target.closest('.obj'); select(g);
+    if (g) drag = {mode: 'move', g, p, tx: +g.dataset.tx, ty: +g.dataset.ty, moved: false};
+    return;
+  }
+  if (t === 'text') { openText(p.x, p.y); return; }
+  const a = baseAttrs(); let el;
+  if (t === 'pen') { el = makeObj(`<path d="M${p.x} ${p.y}"/>`, 'pen', 0, 0, {...a, fill: 'none'}); }
+  else if (t === 'line' || t === 'arrow') el = makeObj(`<line x1="${p.x}" y1="${p.y}" x2="${p.x}" y2="${p.y}"/>${t === 'arrow' ? '<path class="ah"/>' : ''}`, t, 0, 0, a);
+  else if (t === 'rect') el = makeObj(`<rect x="${p.x}" y="${p.y}" width="0" height="0"/>`, 'rect', 0, 0, {...a, fill: ST.fill});
+  else if (t === 'ellipse') el = makeObj(`<ellipse cx="${p.x}" cy="${p.y}" rx="0" ry="0"/>`, 'ellipse', 0, 0, {...a, fill: ST.fill});
+  el.firstElementChild.removeAttribute('transform'); el.dataset.tx = 0; el.dataset.ty = 0; place(el);
+  drag = {mode: 'draw', g: el, p, pts: [[p.x, p.y]]};
+});
+cv.addEventListener('pointermove', e => {
+  if (!drag) return; const p = pt(e), g = drag.g, c = g.firstElementChild;
+  if (drag.mode === 'move') { drag.moved = true; g.dataset.tx = drag.tx + p.x - drag.p.x; g.dataset.ty = drag.ty + p.y - drag.p.y; place(g); select(g); return; }
+  if (drag.mode === 'resize') { const k = Math.max(.1, (drag.w + (p.x - drag.p.x)) / drag.w); g.dataset.s = drag.s * k; place(g); select(g); return; }
+  const t = g.dataset.kind, x0 = drag.p.x, y0 = drag.p.y; let x = p.x, y = p.y;
+  if (t === 'pen') { drag.pts.push([x, y]); c.firstElementChild.setAttribute('d', 'M' + drag.pts.map(q => q.join(' ')).join(' L')); return; }
+  if ((t === 'line' || t === 'arrow') && e.shiftKey) { const a = Math.round(Math.atan2(y - y0, x - x0) / (Math.PI / 4)) * Math.PI / 4, d = Math.hypot(x - x0, y - y0); x = x0 + d * Math.cos(a); y = y0 + d * Math.sin(a); }
+  if (t === 'line' || t === 'arrow') { const l = c.querySelector('line'); l.setAttribute('x2', x); l.setAttribute('y2', y);
+    if (t === 'arrow') { const a = Math.atan2(y - y0, x - x0), L = 8 + 2 * $('sw').value; c.querySelector('.ah').setAttribute('d', `M${x - L * Math.cos(a - .45)} ${y - L * Math.sin(a - .45)} L${x} ${y} L${x - L * Math.cos(a + .45)} ${y - L * Math.sin(a + .45)}`); } return; }
+  if (t === 'rect') { const r = c.querySelector('rect'); let w = x - x0, h = y - y0; if (e.shiftKey) w = h = Math.max(Math.abs(w), Math.abs(h)) * Math.sign(w || 1); r.setAttribute('x', Math.min(x0, x0 + w)); r.setAttribute('y', Math.min(y0, y0 + h)); r.setAttribute('width', Math.abs(w)); r.setAttribute('height', Math.abs(h)); return; }
+  if (t === 'ellipse') { const el = c.querySelector('ellipse'); let rx = Math.abs(x - x0) / 2, ry = Math.abs(y - y0) / 2; if (e.shiftKey) rx = ry = Math.max(rx, ry); el.setAttribute('cx', (x0 + x) / 2); el.setAttribute('cy', (y0 + y) / 2); el.setAttribute('rx', rx); el.setAttribute('ry', ry); }
+});
+cv.addEventListener('pointerup', () => {
+  if (!drag) return; const d = drag; drag = null;
+  if (d.mode === 'draw') { const b = d.g.firstElementChild.getBBox(); if (b.width < 2 && b.height < 2) { d.g.remove(); return; } normalize(d.g); select(d.g); commit(); }
+  else if (d.mode === 'resize' || (d.mode === 'move' && d.moved)) commit();
+});
+cv.addEventListener('dblclick', e => { const g = e.target.closest('.obj'); if (g && g.dataset.kind === 'text') { const s = +g.dataset.s; openText(+g.dataset.tx, +g.dataset.ty + g.dataset.h * s * .8, g); } });
+
+/* 선택 표시: 점선 상자 + 크기 손잡이 */
+function select(g) {
+  ST.sel = g || null; ui.innerHTML = ''; if (!g) return;
+  const b = g.getBBox();
+  const P = [[b.x, b.y], [b.x + b.width, b.y + b.height], [b.x + b.width, b.y], [b.x, b.y + b.height]].map(([x, y]) => { const p = cv.createSVGPoint(); p.x = x; p.y = y; return p.matrixTransform(g.transform.baseVal.consolidate().matrix); });
+  const xs = P.map(p => p.x), ys = P.map(p => p.y), x1 = Math.min(...xs) - 4, y1 = Math.min(...ys) - 4, x2 = Math.max(...xs) + 4, y2 = Math.max(...ys) + 4;
+  ui.innerHTML = `<rect x="${x1}" y="${y1}" width="${x2 - x1}" height="${y2 - y1}" fill="none" stroke="#3E8E2F" stroke-dasharray="4 3" pointer-events="none"/><rect data-h="1" x="${x2 - 6}" y="${y2 - 6}" width="12" height="12" rx="3" fill="#3E8E2F" style="cursor:nwse-resize"/>`;
+  const c = g.firstElementChild, col = c.getAttribute('stroke') || c.getAttribute('fill');
+  if (col && STROKES.includes(col)) { ST.stroke = col; swatches('strokes', STROKES, 'stroke'); }
+  if (c.getAttribute('stroke-width')) { $('sw').value = c.getAttribute('stroke-width'); $('swv').textContent = $('sw').value; }
+}
+function delSel() { if (ST.sel) { ST.sel.remove(); select(null); commit(); } }
+function dupSel() { const g = ST.sel; if (!g) return; const n = g.cloneNode(true); n.dataset.id = 'o' + (++uidN) + Date.now().toString(36); n.dataset.tx = +g.dataset.tx + 16; n.dataset.ty = +g.dataset.ty + 16; layer.appendChild(n); place(n); select(n); commit(); }
+function order(d) { const g = ST.sel; if (!g) return; d > 0 ? layer.appendChild(g) : layer.insertBefore(g, layer.firstChild); commit(); }
+function rot(a) { const g = ST.sel; if (!g) return; g.dataset.r = ((+g.dataset.r + a) % 360 + 360) % 360; place(g); select(g); commit(); }
+function flip() { const g = ST.sel; if (!g) return; g.dataset.fx = -g.dataset.fx; place(g); select(g); commit(); }
+
+/* ===== 바탕 그림 (따라 그리기용, 흐리게) ===== */
+function bgLoad(inp) {
+  const f = inp.files[0]; inp.value = ''; if (!f) return;
+  const r = new FileReader(); r.onload = () => { const im = new Image(); im.onload = () => {
+    const W = +cv.getAttribute('width'), H = +cv.getAttribute('height'), k = Math.min(W / im.width, H / im.height);
+    bg.innerHTML = `<image href="${r.result}" x="${(W - im.width * k) / 2}" y="${(H - im.height * k) / 2}" width="${im.width * k}" height="${im.height * k}" opacity=".35"/>`; commit();
+    if (confirm('바탕 그림을 깔았습니다. 그림을 따라 그린 뒤 저장할 때 바탕 그림도 넣을까요?\n(확인: 넣기 · 취소: 따라 그리기용으로만 쓰고 저장할 땐 뺌)')) bg.dataset.keep = '1'; else delete bg.dataset.keep;
+  }; im.src = r.result; }; r.readAsDataURL(f);
+}
+
+/* ===== 되돌리기·자동 저장 ===== */
+const HK = 'sciDrawV1'; let hist = [], hi = -1;
+const snap = () => JSON.stringify({w: cv.getAttribute('width'), h: cv.getAttribute('height'), layer: layer.innerHTML, bg: bg.innerHTML, keep: bg.dataset.keep || ''});
+function restore(s) { const d = JSON.parse(s); cv.setAttribute('width', d.w); cv.setAttribute('height', d.h); cv.setAttribute('viewBox', `0 0 ${d.w} ${d.h}`); layer.innerHTML = d.layer; bg.innerHTML = d.bg || ''; if (d.keep) bg.dataset.keep = '1'; else delete bg.dataset.keep; $('size').value = d.w + 'x' + d.h; select(null); }
+function commit() { const s = snap(); if (hist[hi] === s) return; hist = hist.slice(0, hi + 1); hist.push(s); if (hist.length > 80) hist.shift(); hi = hist.length - 1; try { localStorage.setItem(HK, s); } catch(e) {} }
+function undo() { if (hi > 0) { hi--; restore(hist[hi]); try { localStorage.setItem(HK, hist[hi]); } catch(e) {} } }
+function redo() { if (hi < hist.length - 1) { hi++; restore(hist[hi]); try { localStorage.setItem(HK, hist[hi]); } catch(e) {} } }
+function clearAll() { if (layer.children.length && !confirm('지금 그림을 지우고 새로 시작할까요? (되돌리기로 살릴 수 있습니다)')) return; layer.innerHTML = ''; bg.innerHTML = ''; select(null); commit(); }
+
+/* ===== 저장: 선택 표시 빼고, 바탕 그림은 고른 경우만 ===== */
+function exportSVG() {
+  const c = cv.cloneNode(true); c.querySelector('#ui').remove();
+  if (!bg.dataset.keep) c.querySelector('#bg').remove(); else c.querySelectorAll('#bg image').forEach(i => i.setAttribute('opacity', '1'));
+  c.querySelectorAll('.obj').forEach(g => { g.removeAttribute('class'); for (const k of Object.keys(g.dataset)) delete g.dataset[k]; });
+  c.insertAdjacentHTML('afterbegin', `<rect width="100%" height="100%" fill="#fff"/>`); c.removeAttribute('style'); c.removeAttribute('id');
+  return '<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(c);
+}
+const fname = ext => { const d = new Date(), z = n => String(n).padStart(2, '0'); return `과학그림_${d.getFullYear()}${z(d.getMonth() + 1)}${z(d.getDate())}_${z(d.getHours())}${z(d.getMinutes())}.${ext}`; };
+function dl(url, name) { const a = document.createElement('a'); a.href = url; a.download = name; a.click(); }
+function saveSVG() { select(null); dl(URL.createObjectURL(new Blob([exportSVG()], {type: 'image/svg+xml'})), fname('svg')); }
+function savePNG() {
+  select(null);
+  const W = +cv.getAttribute('width'), H = +cv.getAttribute('height'), k = 2, url = URL.createObjectURL(new Blob([exportSVG()], {type: 'image/svg+xml'})), im = new Image();
+  im.onload = () => { const c = document.createElement('canvas'); c.width = W * k; c.height = H * k; const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(im, 0, 0, c.width, c.height); URL.revokeObjectURL(url); c.toBlob(b => dl(URL.createObjectURL(b), fname('png')), 'image/png'); };
+  im.src = url;
+}
+
+/* ===== 단축키 ===== */
+document.addEventListener('keydown', e => {
+  if (txtAt || /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return;
+  const k = e.key.toLowerCase();
+  if ((e.ctrlKey || e.metaKey) && k === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo(); return; }
+  if ((e.ctrlKey || e.metaKey) && k === 'y') { e.preventDefault(); redo(); return; }
+  if ((e.ctrlKey || e.metaKey) && k === 'd') { e.preventDefault(); dupSel(); return; }
+  if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); delSel(); return; }
+  if (ST.sel && e.key.startsWith('Arrow')) { e.preventDefault(); const s = e.shiftKey ? 10 : 1, g = ST.sel; g.dataset.tx = +g.dataset.tx + (k === 'arrowleft' ? -s : k === 'arrowright' ? s : 0); g.dataset.ty = +g.dataset.ty + (k === 'arrowup' ? -s : k === 'arrowdown' ? s : 0); place(g); select(g); commit(); return; }
+  const m = {v: 'sel', p: 'pen', l: 'line', a: 'arrow', r: 'rect', o: 'ellipse', t: 'text'}[k];
+  if (m && !e.ctrlKey && !e.metaKey) setTool(m);
+});
+
+/* 시작: 저장된 그림 불러오기 */
+try { const s = localStorage.getItem(HK); if (s) restore(s); } catch(e) {}
+commit();
+if (window.lucide) lucide.createIcons();
+</script>
+</body>
+</html>
