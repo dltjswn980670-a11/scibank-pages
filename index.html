@@ -81,6 +81,21 @@ select:focus,input[type=number]:focus,input[type=text]:focus,textarea:focus{outl
 .hi-btn{cursor:pointer;background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 12px;font-weight:700;font-size:.8rem;color:var(--ink)}.hi-btn:hover{border-color:var(--c-make);color:var(--c-make)}
 .book-mode button{padding:8px 14px;border-radius:999px;border:1px solid var(--line);font-weight:700;font-size:.85rem;color:var(--muted);background:#fff}
 .book-mode button.on{border-color:var(--accent);background:var(--accent-s);color:var(--ink)}
+.bv-tabs{display:flex;gap:4px;overflow-x:auto;padding-bottom:4px;border-bottom:1px solid var(--line)}
+.bv-tabs button{flex:none;padding:8px 12px;border-radius:8px 8px 0 0;font-size:.82rem;font-weight:600;color:var(--muted);background:#f6f7f9;border:1px solid var(--line);border-bottom:none;white-space:nowrap}
+.bv-tabs button.on{background:#fff;color:var(--ink);box-shadow:inset 0 3px 0 var(--accent)}
+.bv-tabs button small{color:#9ca3af;font-weight:500;margin-left:4px}
+.bv-wrap{display:grid;grid-template-columns:150px minmax(0,1fr);gap:16px}
+.bv-pages{display:flex;flex-direction:column;gap:4px;max-height:72vh;overflow:auto;padding-right:4px}
+.bv-pages button{display:flex;justify-content:space-between;gap:6px;padding:6px 8px;border:1px solid var(--line);border-radius:8px;font-size:.8rem;font-weight:600;background:#fff;text-align:left}
+.bv-pages button.on{border-color:var(--accent);background:var(--accent-s)}
+.bv-pages button .bv-c{color:#9ca3af;font-weight:500}.bv-pages button .bv-in{color:var(--accent)}
+.bv-sheet{border:1px solid var(--line);border-radius:10px;padding:18px;background:#fff;columns:2;column-gap:28px;column-rule:1px solid var(--line);min-height:50vh}
+.bv-q{break-inside:avoid;margin-bottom:18px;padding:8px;border-radius:8px;border:2px solid transparent;cursor:pointer}
+.bv-q:hover{background:#f8fafc}.bv-q.on{border-color:var(--accent);background:var(--accent-s)}
+.bv-q img{max-width:100%}
+.bv-nb{padding:4px;border:1px solid var(--line);border-radius:6px}
+@media (max-width:767px){.bv-wrap{grid-template-columns:1fr}.bv-pages{flex-direction:row;max-height:none;overflow-x:auto}.bv-pages button{flex:none}.bv-sheet{columns:1;padding:12px}}
 #book-list label,#book-years label{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:.85rem;cursor:pointer}
 #book-list label:has(input:checked),#book-years label:has(input:checked){border-color:var(--accent);background:var(--accent-s)}
 #db-stats,#book-stats{background:var(--soft);padding:4px 10px;border-radius:999px;font-weight:600;color:var(--muted)}
@@ -191,6 +206,15 @@ input[type=password]:focus,input[type=date]:focus{outline:none;border-color:var(
 .msg-form textarea:focus{border-color:var(--c-msg)}
 .msg-send{flex:none;background:var(--c-msg);color:#fff;font-weight:700;border-radius:20px;padding:9px 16px;font-size:14px}
 .msg-send:disabled{opacity:.5}
+.msg-pic{flex:none;width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:50%;color:var(--c-msg);border:1px solid #E5E7EB;background:#fff}
+.msg-pic:hover{background:var(--c-msg-s)}
+.msg-prev{position:relative;padding:8px 10px 0;border-top:1px solid #E5E7EB;background:#fff}
+.msg-prev img{max-height:110px;border-radius:10px;border:1px solid #E5E7EB}
+.msg-prev button{position:absolute;top:12px;left:14px;background:rgba(0,0,0,.6);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center}
+.msg-prev button svg{width:14px;height:14px}
+.msg-img{display:block;max-width:100%;max-height:260px;border-radius:12px;cursor:zoom-in;margin:2px 0}
+.msg-zoom{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;padding:16px;cursor:zoom-out}
+.msg-zoom img{max-width:100%;max-height:100%;border-radius:8px}
 @media (max-width:700px){.msg-wrap{flex-direction:column;height:auto}.msg-side{width:auto;border-right:0;border-bottom:1px solid #E5E7EB;max-height:220px}.msg-main{height:70vh}}
 .sb-chat{height:min(68vh,620px)}
 .sb-chat-btn{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--c-msg);color:#fff;font-weight:600;padding:13px;border-radius:12px}
@@ -261,6 +285,7 @@ input.dn-over[type=number]{border-color:#ef4444!important;background:#fef2f2!imp
         <button type="button" onclick="importFolder()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-semibold shadow"><i data-lucide="folder"></i>폴더째 불러오기</button>
         <button onclick="exportDB()" class="bg-gray-700 hover:bg-gray-800 text-white px-3 py-2 rounded-lg text-xs font-semibold shadow"><i data-lucide="download"></i>DB 내보내기</button>
         <button onclick="resetDB()" class="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-2 rounded-lg text-xs font-semibold">DB 비우기</button>
+        <button id="trash-btn" onclick="trashRestore()" class="hidden bg-amber-100 hover:bg-amber-200 text-amber-800 px-3 py-2 rounded-lg text-xs font-semibold" title="22개정에 없는 단원이라 숨긴 문제를 되살립니다"><i data-lucide="archive-restore"></i>휴지통 <span id="trash-n"></span></button>
         <span id="db-stats" class="text-xs text-gray-600 ml-auto"></span>
       </div>
     </div>
@@ -353,6 +378,29 @@ input.dn-over[type=number]{border-color:#ef4444!important;background:#fef2f2!imp
   <section id="tab-stu" class="hidden max-w-5xl w-full mx-auto bg-white rounded-xl shadow-md p-6"><div id="stu-body"></div></section>
   <section id="tab-cls" class="hidden max-w-5xl w-full mx-auto bg-white rounded-xl shadow-md p-6"><div id="cls-body"></div></section>
   <section id="tab-msg" class="hidden max-w-5xl w-full mx-auto bg-white rounded-xl shadow-md p-0 overflow-hidden"><div id="msg-body"></div></section>
+  <section id="tab-bview" class="hidden max-w-6xl w-full mx-auto bg-white rounded-xl shadow-md p-4 md:p-6 space-y-3">
+    <div class="flex flex-wrap items-center gap-2 border-b pb-3">
+      <h2 class="text-xl font-semibold text-gray-900 mr-2">교재 보기</h2>
+      <select id="bv-subj" onchange="bvSubj()" class="border rounded-lg p-2 text-sm font-medium"></select>
+      <span id="bv-stats" class="text-xs text-gray-500 ml-auto"></span>
+    </div>
+    <div id="bv-books" class="bv-tabs" role="tablist"></div>
+    <div class="bv-wrap">
+      <div id="bv-pages" class="bv-pages"></div>
+      <div class="min-w-0">
+        <div class="flex items-center gap-2 mb-2 flex-wrap">
+          <button type="button" onclick="bvStep(-1)" class="bv-nb" title="이전 쪽"><i data-lucide="chevron-left"></i></button>
+          <b id="bv-pg-t" class="text-sm"></b>
+          <button type="button" onclick="bvStep(1)" class="bv-nb" title="다음 쪽"><i data-lucide="chevron-right"></i></button>
+          <button type="button" onclick="bvPickPage()" class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-2 py-1 rounded font-semibold">이 쪽 전부 담기</button>
+          <span id="bv-cart-n" class="ml-auto text-sm font-semibold text-indigo-700"></span>
+          <button type="button" onclick="bvClear()" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-2 py-1 rounded font-semibold">비우기</button>
+          <button type="button" onclick="bvMake()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-semibold shadow"><i data-lucide="file-text"></i>담은 문제로 시험지</button>
+        </div>
+        <div id="bv-page" class="bv-sheet"></div>
+      </div>
+    </div>
+  </section>
 
 
   <section id="tab-diff" class="hidden bg-white rounded-xl shadow-md p-6 max-w-3xl mx-auto space-y-4">
@@ -443,10 +491,10 @@ const SB_CONFIG = { url: 'https://rltgdzwwakvjjvpotpsi.supabase.co', anonKey: 's
 const curriculum2022 = {
   "중1": ["과학과 인류의 지속가능한 삶", "생물의 구성과 다양성", "열", "물질의 상태 변화", "힘의 작용", "기체의 성질", "태양계"],
   "중2": ["물질의 특성", "지권의 변화", "빛과 파동", "물질의 구성", "식물과 에너지", "동물과 에너지", "전기와 자기", "별과 우주"],
-  "중3": ["화학 반응의 규칙성", "기권과 날씨", "수권과 해수의 순환", "운동과 에너지", "자극과 반응", "생식과 유전", "생태계와 환경", "재해·재난과 안전", "과학과 나의 미래"],
+  "중3": ["화학 반응의 규칙성", "날씨와 기후변화", "수권과 해수의 순환", "운동과 에너지", "자극과 반응", "생식과 유전", "재해·재난과 안전", "과학과 나의 미래"],
   "고1": ["[통합과학1] 1. 과학의 기초", "[통합과학1] 2. 물질과 규칙성", "[통합과학1] 3. 시스템과 상호작용", "[통합과학2] 1. 변화와 다양성", "[통합과학2] 2. 환경과 에너지", "[통합과학2] 3. 과학과 미래 사회"],
-  "고2_일반": ["[물리학] 1. 힘과 에너지", "[물리학] 2. 전기와 자기", "[물리학] 3. 빛과 물질", "[화학] 1. 화학의 언어", "[화학] 2. 물질의 구조와 성질", "[화학] 3. 화학 평형", "[화학] 4. 역동적인 화학 반응", "[생명과학] 1. 생명 시스템 구성", "[생명과학] 2. 항상성과 몸의 조절", "[생명과학] 3. 생명의 연속성과 다양성"],
-  "고3_진로": ["[역학과 에너지] 시공간과 운동", "[역학과 에너지] 열과 에너지", "[역학과 에너지] 탄성파와 소리", "[전자기와 양자] 전자기적 상호작용", "[전자기와 양자] 빛과 정보 통신", "[전자기와 양자] 양자와 미시세계", "[물질과 에너지] 기체의 성질", "[물질과 에너지] 용액의 성질", "[물질과 에너지] 화학 변화의 자발성", "[물질과 에너지] 반응 속도", "[화학 반응의 세계] 산 염기 평형", "[화학 반응의 세계] 산화·환원 반응", "[화학 반응의 세계] 탄소 화합물과 반응", "[세포와 물질대사] 세포의 구조와 기능", "[세포와 물질대사] 물질대사와 효소", "[세포와 물질대사] 세포 호흡과 광합성", "[생물의 유전] 유전자와 유전물질", "[생물의 유전] 유전자의 발현과 조절", "[생물의 유전] 생명공학기술"]
+  "고2_일반": ["[물리학] 1. 힘과 에너지", "[물리학] 2. 전기와 자기", "[물리학] 3. 빛과 물질", "[화학] 1. 화학의 언어", "[화학] 2. 물질의 구조와 성질", "[화학] 3. 화학 평형", "[화학] 4. 역동적인 화학 반응", "[생명과학] 1. 생명 시스템의 구성", "[생명과학] 2. 항상성과 몸의 조절", "[생명과학] 3. 생명의 연속성과 다양성", "[지구과학] 1. 대기와 해양의 상호작용", "[지구과학] 2. 지구의 역사와 한반도의 암석", "[지구과학] 3. 태양계 천체와 별과 우주의 진화"],
+  "고3_진로": ["[역학과 에너지] 시공간과 운동", "[역학과 에너지] 열과 에너지", "[역학과 에너지] 탄성파와 소리", "[전자기와 양자] 전자기적 상호작용", "[전자기와 양자] 빛과 정보 통신", "[전자기와 양자] 양자와 미시세계", "[물질과 에너지] 물질의 세 가지 상태", "[물질과 에너지] 용액의 성질", "[물질과 에너지] 화학 변화의 자발성", "[물질과 에너지] 반응 속도", "[화학 반응의 세계] 산 염기 평형", "[화학 반응의 세계] 산화·환원 반응", "[화학 반응의 세계] 탄소 화합물과 반응", "[세포와 물질대사] 세포", "[세포와 물질대사] 물질대사와 에너지", "[세포와 물질대사] 세포호흡과 광합성", "[생물의 유전] 유전자와 유전물질", "[생물의 유전] 유전자의 발현", "[생물의 유전] 생명공학기술"]
 };
 /* 중단원(교과 목차). 문제 JSON의 "sub" 값은 아래 이름과 똑같이 써야 중단원 선택에서 추출됩니다. */
 const subCurriculum = {
@@ -501,7 +549,8 @@ const subCurriculum = {
   "지권의 변화": [
    "지구 내부 구조",
    "지각의 구성 물질",
-   "판구조론과 대륙이동"
+   "판구조론과 대륙이동",
+   "풍화와 토양"
   ],
   "빛과 파동": [
    "빛의 직진과 반사(거울)",
@@ -515,7 +564,8 @@ const subCurriculum = {
   ],
   "식물과 에너지": [
    "광합성",
-   "식물의 호흡"
+   "식물의 호흡",
+   "광합성 산물의 저장과 이동"
   ],
   "동물과 에너지": [
    "영양소와 소화",
@@ -538,9 +588,12 @@ const subCurriculum = {
   "화학 반응의 규칙성": [
    "물리 변화와 화학 변화",
    "화학 반응식과 질량 보존 법칙",
-   "일정 성분비 법칙과 기체 반응 법칙"
+   "일정 성분비 법칙과 기체 반응 법칙",
+   "화학 반응과 열에너지 출입"
   ],
-  "기권과 날씨": [
+  "날씨와 기후변화": [
+   "기권의 구조와 복사 평형(온실효과)",
+   "대기 대순환",
    "대기 중의 수증기와 습도",
    "구름과 강수 현상",
    "기압과 바람, 날씨의 변화"
@@ -566,10 +619,13 @@ const subCurriculum = {
    "멘델의 유전 원리",
    "사람의 유전"
   ],
-  "생태계와 환경": [
-   "생태계의 구성과 상호 작용",
-   "생태계 평형과 에너지 흐름",
-   "기후 변화와 환경오염 대책"
+  "재해·재난과 안전": [
+   "재해·재난의 원인과 피해",
+   "재해·재난 대비와 대처"
+  ],
+  "과학과 나의 미래": [
+   "과학 관련 직업과 미래 사회",
+   "진로와 과학 학습"
   ]
  },
  "고1": {
@@ -643,7 +699,7 @@ const subCurriculum = {
    "가역 반응",
    "산화 환원 반응"
   ],
-  "[생명과학] 1. 생명 시스템 구성": [
+  "[생명과학] 1. 생명 시스템의 구성": [
    "생명과학의 탐구 방법",
    "세포와 생명체의 구성 체계"
   ],
@@ -652,6 +708,9 @@ const subCurriculum = {
    "자극의 전달과 신경계",
    "항상성 유지 및 방어 작용"
   ],
+  "[지구과학] 1. 대기와 해양의 상호작용": ["해수의 성질", "해수의 심층 순환", "날씨 변화와 악기상", "대기와 해양의 상호작용(용승, 엔소)", "기후변화의 원인과 대책"],
+  "[지구과학] 2. 지구의 역사와 한반도의 암석": ["지층과 상대·절대 연령", "지질시대와 화석", "화성암과 변성암", "한반도의 지질과 지질공원"],
+  "[지구과학] 3. 태양계 천체와 별과 우주의 진화": ["식 현상과 행성의 겉보기 운동", "별의 분광형과 물리량", "별의 진화와 H-R도", "은하의 분류", "우주의 팽창과 진화"],
   "[생명과학] 3. 생명의 연속성과 다양성": [
    "생식세포 형성과 염색체 변화",
    "생물의 진화와 분류"
@@ -690,7 +749,7 @@ const subCurriculum = {
    "슈뢰딩거 방정식과 입자의 상태",
    "양자 터널링 및 양자 기술"
   ],
-  "[물질과 에너지] 기체의 성질": [
+  "[물질과 에너지] 물질의 세 가지 상태": [
    "이상 기체 상태 방정식",
    "분자간 상호작용",
    "액체와 고체 상태"
@@ -724,16 +783,16 @@ const subCurriculum = {
    "작용기에 따른 반응 특성",
    "유기 합성 맛보기"
   ],
-  "[세포와 물질대사] 세포의 구조와 기능": [
+  "[세포와 물질대사] 세포": [
    "세포의 유기물 구성",
    "세포 소기관의 유기적 관계",
    "세포막을 통한 물질 이동"
   ],
-  "[세포와 물질대사] 물질대사와 효소": [
+  "[세포와 물질대사] 물질대사와 에너지": [
    "물질대사에서 에너지 흐름(ATP)",
    "효소의 기능과 활성 조절"
   ],
-  "[세포와 물질대사] 세포 호흡과 광합성": [
+  "[세포와 물질대사] 세포호흡과 광합성": [
    "세포 호흡의 단계(글리콜리시스, TCA 회로, 전자전달계)",
    "광합성의 단계(명반응, 암반응)"
   ],
@@ -741,7 +800,7 @@ const subCurriculum = {
    "DNA의 구조와 복제 원리",
    "염색체와 세포 분열"
   ],
-  "[생물의 유전] 유전자의 발현과 조절": [
+  "[생물의 유전] 유전자의 발현": [
    "전사와 번역(단백질 합성)",
    "유전자 발현 조절(오페론 이론 등)"
   ],
@@ -764,9 +823,53 @@ let masterDB = SEED.slice();
 const idb = () => new Promise((res, rej) => { const r = indexedDB.open('sciBank', 1); r.onupgradeneeded = () => r.result.createObjectStore('kv'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
 const idbGet = async k => { const d = await idb(); return new Promise((res, rej) => { const t = d.transaction('kv').objectStore('kv').get(k); t.onsuccess = () => res(t.result); t.onerror = () => rej(t.error); }); };
 const idbSet = async (k, v) => { const d = await idb(); return new Promise((res, rej) => { const t = d.transaction('kv', 'readwrite'); t.objectStore('kv').put(v, k); t.oncomplete = () => res(); t.onerror = () => rej(t.error); }); };
+/* ===== 옛(2015) 단원 이름 → 2022 개정 단원. 22개정에 없는 단원(생태계와 환경, 전자기 유도 등)은 'trash' ===== */
+const UNIT_FIX = {
+  '기권과 날씨': ['중3', '날씨와 기후변화'], '화학 반응의 규칙과 에너지 변화': ['중3', '화학 반응의 규칙성'], '열과 우리 생활': ['중1', '열'],
+  '[생명과학] 1. 생명 시스템 구성': [, '[생명과학] 1. 생명 시스템의 구성'], '[전자기와 양자] 양자와 미시 세계': [, '[전자기와 양자] 양자와 미시세계'],
+  '[물질과 에너지] 기체의 성질': [, '[물질과 에너지] 물질의 세 가지 상태'], '[세포와 물질대사] 세포의 구조와 기능': [, '[세포와 물질대사] 세포'],
+  '[세포와 물질대사] 물질대사와 효소': [, '[세포와 물질대사] 물질대사와 에너지'], '[세포와 물질대사] 세포 호흡과 광합성': [, '[세포와 물질대사] 세포호흡과 광합성'],
+  '[생물의 유전] 유전자의 발현과 조절': [, '[생물의 유전] 유전자의 발현']
+};
+const UNIT_TRASH = new Set(['생태계와 환경']);
+const ROMAN = {'Ⅰ': 1, 'Ⅱ': 2, 'Ⅲ': 3, 'Ⅳ': 4};
+/* q.unit을 고침(제자리). 반환: 'trash'(22개정에 없음) | true(바뀜) | false */
+function fixUnit(q) {
+  const u = String(q.unit || '').trim(); if (!u) return false;
+  if (UNIT_TRASH.has(u)) return 'trash';
+  let m = UNIT_FIX[u];
+  if (m) { if (m[0]) q.grade = m[0]; q.unit = m[1]; return true; }
+  if ((m = u.match(/^\[완자 기출픽 (통합과학[12])(?: 부록)?\]\s*([ⅠⅡⅢⅣ])\.\s*(.+)$/))) { q.grade = '고1'; q.unit = `[${m[1]}] ${ROMAN[m[2]]}. ${m[3]}`; return true; }
+  if (u === '에너지 전환과 보존') {
+    const t = String(q.question || '') + (q.choices || []).join(' ');
+    if (/유도\s*전류|전자기\s*유도|발전기|코일.*자석|자석.*코일/.test(t)) return 'trash';
+    if (/소비\s*전력|전력량|전기\s*에너지|전기\s*기구/.test(t)) { q.grade = '중2'; q.unit = '전기와 자기'; return true; }
+    q.grade = '중3'; q.unit = '운동과 에너지'; return true;
+  }
+  return false;
+}
+const TK = 'sciBankTrash_v1';
+let trashDB = [];
+function trashUI() { const b = $('trash-btn'); if (!b) return; b.classList.toggle('hidden', !trashDB.length); $('trash-n').textContent = trashDB.length ? `(${trashDB.length})` : ''; }
+async function trashRestore() {
+  if (!trashDB.length) return;
+  if (!confirm(`22개정에 없는 단원이라 숨겨 둔 문제 ${trashDB.length}개를 문제 DB로 되살릴까요?`)) return;
+  const keys = new Set(masterDB.map(keyOf)); let n = 0;
+  for (const q of trashDB) { const k = keyOf(q); if (!keys.has(k)) { keys.add(k); masterDB.push(q); n++; } }
+  trashDB = []; await idbSet(TK, trashDB).catch(() => {}); saveDB(); updateCurriculum(); trashUI(); toast(`${n}문제를 되살렸습니다.`);
+}
+/* 문제 배열의 단원을 고치고, 22개정에 없는 문제는 빼서 돌려줌 */
+function fixUnits(arr) { const keep = [], out = []; let ch = 0;
+  for (const q of arr) { const r = q && fixUnit(q); if (r === 'trash') out.push(q); else { if (r) ch++; keep.push(q); } }
+  return { keep, out, ch }; }
 const dbReady = (async () => { try { let a = await idbGet(LS);
   if (!Array.isArray(a)) { const s = localStorage.getItem(LS); a = s ? JSON.parse(s) : null; }
-  if (Array.isArray(a)) masterDB = a; } catch(e) {} updateStats(); })();
+  if (Array.isArray(a)) masterDB = a;
+  const t = await idbGet(TK).catch(() => null); if (Array.isArray(t)) trashDB = t;
+  const r = fixUnits(masterDB);
+  if (r.ch || r.out.length) { masterDB = r.keep; trashDB.push(...r.out); saveDB(); await idbSet(TK, trashDB).catch(() => {});
+    setTimeout(() => toast(`단원 이름을 22개정에 맞췄습니다: ${r.ch}문제 고침${r.out.length ? `, 22개정에 없는 ${r.out.length}문제는 휴지통으로(되살리기 가능)` : ''}`), 800); }
+} catch(e) {} updateStats(); setTimeout(trashUI, 0); })();
 let currentQuestions = [];
 
 const $ = id => document.getElementById(id);
@@ -975,7 +1078,11 @@ const srcTab = () => src === 'book' ? 'book' : 'selector';
 /* ===== 시중 교재·EBS: 문제 파일은 'bk:파일키'로 이 브라우저에 저장하고, 가벼운 목록(색인)만 바로 읽어 둠 ===== */
 const BIK = 'sciBankBookIdx_v1', BDK = 'sciBankBookDir_v1';
 let bookIdx = {recs: [], at: 0}, bookDir = null, bookPoolC = [], bookMode = 'book';
-const bookReady = (async () => { try { const a = await idbGet(BIK); if (a && Array.isArray(a.recs)) bookIdx = a; bookDir = (await idbGet(BDK)) || null; } catch(e) {} })();
+const bookReady = (async () => { try { const a = await idbGet(BIK); if (a && Array.isArray(a.recs)) bookIdx = a; bookDir = (await idbGet(BDK)) || null;
+  /* 색인 단원도 22개정 이름으로(22개정에 없는 단원은 목록에서 뺌) */
+  const n0 = bookIdx.recs.length; let ch = 0;
+  bookIdx.recs = bookIdx.recs.filter(r => { const x = fixUnit(r); if (x === true) ch++; return x !== 'trash'; });
+  if (ch || bookIdx.recs.length < n0) idbSet(BIK, bookIdx).catch(() => {}); } catch(e) {} })();
 /* 교재 이름: 출처에서 쪽·번호·회차를 떼어 냄 (예: "오투 고등화학 시험대비 p50 3번" → "오투 고등화학 시험대비"). EBS는 시험 종류(exam) */
 function bookOf(q) {
   if (q.exam) return String(q.exam);
@@ -1019,6 +1126,77 @@ function bookPick() {
   bookPoolC = bookRecs().filter(r => on.has(r.book) && (bookMode !== 'ebs' || ys.has(String(r.yr))));
   updateCurriculum('b');
 }
+/* ===== 교재 보기: 교재마다 탭 → 쪽 목록 → 쪽 미리보기에서 문제를 눌러 담기 → 담은 문제로 시험지 ===== */
+let bvBook = '', bvPages = [], bvPg = 0, bvSeq = 0;
+const bvCart = new Map();
+const bvKey = r => r.f + '#' + r.i;
+/* 쪽 이름: 출처의 p50 → 50쪽, EBS는 연도·시험, 그 밖엔 회차·중단원·단원 */
+function bvPageOf(q) {
+  const s = String(q.source || ''); let m;
+  if ((m = /p\.?\s?(\d+)/i.exec(s))) return [+m[1], m[1] + '쪽'];
+  if (q.exam) return [-(+q.year || 0) * 100 + exRank(String(q.exam)), `${q.year ? q.year + ' ' : ''}${q.exam}`];
+  if ((m = /(\d+)\s*(회|세트|강|차시)/.exec(s))) return [+m[1], m[1] + m[2]];
+  return [1e6, uName(q.sub || q.unit || '기타')];
+}
+const bvNo = q => (/(\d+)번\s*$/.exec(q.source || '') || [])[1] || '';
+function renderBview() {
+  bookReady.then(() => {
+    const sel = $('bv-subj'), cur = sel.value, recs = bookIdx.recs;
+    const cnt = x => recs.filter(r => r.grade === x.g && subjOfU(r.unit) === x.s).length;
+    sel.innerHTML = subjOpts(cnt);
+    sel.value = cur && SUBJ.some(x => x.v === cur && cnt(x)) ? cur : ((SUBJ.find(x => cnt(x)) || SUBJ[0]).v);
+    bvSubj();
+  });
+}
+function bvSubj() {
+  const v = $('bv-subj').value, g = gOf(v), s = v.split('|')[1] || '', by = {};
+  bookIdx.recs.filter(r => r.grade === g && subjOfU(r.unit) === s).forEach(r => by[r.book] = (by[r.book] || 0) + 1);
+  const names = Object.keys(by).sort((a, b) => exRank(a) - exRank(b) || a.localeCompare(b, 'ko'));
+  $('bv-stats').textContent = names.length ? `교재 ${names.length}권` : '';
+  if (!names.includes(bvBook)) bvBook = names[0] || '';
+  $('bv-books').innerHTML = names.length ? names.map(b => `<button type="button" role="tab" class="${b === bvBook ? 'on' : ''}" data-b="${esc(b)}" onclick="bvOpen(this.dataset.b)">${esc(b)}<small>${by[b]}</small></button>`).join('')
+    : `<p class="text-sm text-gray-400 p-2">${bookIdx.recs.length ? '이 교과의 교재가 없습니다.' : '시중 교재 탭에서 JSON변환 폴더를 먼저 불러오세요.'}</p>`;
+  if (bvBook) bvOpen(bvBook); else { bvPages = []; bvDraw(); }
+}
+async function bvOpen(b) {
+  bvBook = b; const my = ++bvSeq;
+  document.querySelectorAll('#bv-books button').forEach(x => x.classList.toggle('on', x.dataset.b === b));
+  const v = $('bv-subj').value, g = gOf(v), s = v.split('|')[1] || '';
+  const recs = bookIdx.recs.filter(r => r.book === b && r.grade === g && subjOfU(r.unit) === s);
+  $('bv-page').innerHTML = '<p class="text-sm text-gray-400">교재를 여는 중…</p>'; $('bv-pages').innerHTML = '';
+  const files = new Map(); let items = [];
+  try {
+    for (const r of recs) { if (!files.has(r.f)) files.set(r.f, await bookArr(r.f)); const q = files.get(r.f)[r.i]; if (q && valid(q)) items.push({r, q}); }
+  } catch(e) { if (my === bvSeq) $('bv-page').innerHTML = '<p class="text-sm text-red-500">교재 파일을 읽지 못했습니다. 시중 교재 탭에서 폴더째 다시 불러와 주세요.</p>'; return; }
+  if (my !== bvSeq) return;
+  const pg = new Map();
+  items.forEach(it => { const [k, nm] = bvPageOf(it.q); if (!pg.has(nm)) pg.set(nm, {k, nm, items: []}); pg.get(nm).items.push(it); });
+  bvPages = [...pg.values()].sort((a, b) => a.k - b.k || a.nm.localeCompare(b.nm, 'ko'));
+  bvPages.forEach(p => p.items.sort((a, b) => (+bvNo(a.q) || 0) - (+bvNo(b.q) || 0)));
+  bvPg = 0; bvDraw();
+}
+function bvDraw() {
+  $('bv-cart-n').textContent = bvCart.size ? `담은 문제 ${bvCart.size}개` : '문제를 눌러 담으세요';
+  $('bv-pages').innerHTML = bvPages.map((p, k) => { const n = p.items.filter(it => bvCart.has(bvKey(it.r))).length;
+    return `<button type="button" class="${k === bvPg ? 'on' : ''}" onclick="bvGo(${k})"><span>${esc(p.nm)}</span><span class="${n ? 'bv-in' : 'bv-c'}">${n ? n + '/' : ''}${p.items.length}</span></button>`; }).join('');
+  const p = bvPages[bvPg];
+  $('bv-pg-t').textContent = p ? `${bvBook} · ${p.nm} (${bvPg + 1}/${bvPages.length})` : '';
+  $('bv-page').innerHTML = p ? p.items.map((it, j) => { const q = it.q, no = bvNo(q) || j + 1, on = bvCart.has(bvKey(it.r));
+    const body = q.imageOnly ? (q.image ? `<img src="${esc(q.image)}" loading="lazy">` : fx(q.question)) : fmtQ(q.question, no, q.image ? `<img src="${esc(q.image)}" class="my-2 max-h-72" loading="lazy">` : '') + (q.choices || []).map(c => `<p class="ml-4 text-sm">${fx(c)}</p>`).join('');
+    return `<div class="bv-q ${on ? 'on' : ''}" data-j="${j}" onclick="bvToggle(${j})" title="눌러서 담기/빼기"><div class="flex items-center gap-2 text-xs text-gray-500 mb-1"><input type="checkbox" ${on ? 'checked' : ''} tabindex="-1" class="accent-indigo-600 pointer-events-none">${q.imageOnly ? no + '번' : ''}<span class="ml-auto">${esc(uName(q.unit))} · ${esc(dif(q))}</span></div>${body}</div>`; }).join('')
+    : '<p class="text-sm text-gray-400">쪽이 없습니다.</p>';
+  if (window.lucide) lucide.createIcons();
+}
+function bvGo(k) { bvPg = k; bvDraw(); $('bv-page').scrollIntoView({block: 'nearest'}); }
+function bvStep(d) { if (bvPages.length) bvGo((bvPg + d + bvPages.length) % bvPages.length); }
+function bvToggle(j) { const it = bvPages[bvPg].items[j], k = bvKey(it.r); if (bvCart.has(k)) bvCart.delete(k); else bvCart.set(k, it.q); bvDraw(); }
+function bvPickPage() { const p = bvPages[bvPg]; if (!p) return; p.items.forEach(it => bvCart.set(bvKey(it.r), it.q)); bvDraw(); }
+function bvClear() { bvCart.clear(); bvDraw(); }
+function bvMake() {
+  if (!bvCart.size) { toast('담은 문제가 없습니다. 미리보기에서 문제를 눌러 먼저 담으세요.'); return; }
+  currentQuestions = [...bvCart.values()].map(q => JSON.parse(JSON.stringify(q)));
+  pvExtra = []; curExamId = uid('e'); src = 'book'; switchTab('preview');
+}
 async function bookWalk(h, pre, out) {
   for await (const [n, x] of h.entries()) {
     if (x.kind === 'directory') await bookWalk(x, pre + n + '/', out);
@@ -1031,7 +1209,7 @@ async function bookStore(key, arr) {
   await idbSet('bk:' + key, arr);
   bookIdx.recs = bookIdx.recs.filter(r => r.f !== key);
   let ok = 0;
-  arr.forEach((q, i) => { if (!valid(q)) return; ok++;
+  arr.forEach((q, i) => { if (!valid(q) || fixUnit(q) === 'trash') return; ok++;
     const r = {f: key, i, grade: q.grade, unit: q.unit, sub: q.sub || '', difficulty: dif(q), book: bookOf(q)};
     if (q.exam) { r.exam = 1; r.yr = String(q.year || (/(\d{4})학년도/.exec(q.source || '') || [])[1] || ''); }
     bookIdx.recs.push(r); });
@@ -1054,7 +1232,7 @@ async function bookLoad(recs) {
   try {
     for (const [f, rs] of by) {
       const arr = await bookArr(f);
-      rs.forEach(r => { const q = arr[r.i]; if (q && q.unit === r.unit && valid(q)) got.set(r, q); });
+      rs.forEach(r => { const q = arr[r.i]; if (q && valid(q) && fixUnit(q) !== 'trash' && q.unit === r.unit) got.set(r, q); });
     }
   } catch(e) { toast('교재 파일을 읽지 못했습니다. 폴더째 불러오기로 JSON변환 폴더를 다시 불러와 주세요.'); return null; }
   if (got.size < recs.length) toast(`교재 파일이 바뀌어 ${recs.length - got.size}문항을 찾지 못했습니다. 교재 JSON을 다시 불러오면 목록이 새로 만들어집니다.`);
@@ -1072,6 +1250,7 @@ function jsonKind(d) {
 function addBank(arr, c, keys) {
   for (const q of arr) {
     if (!valid(q)) continue;
+    if (fixUnit(q) === 'trash') { c.trash = (c.trash || 0) + 1; continue; }
     const k = keyOf(q);
     if (keys.has(k)) { if (q.image) { const o = masterDB.find(x => keyOf(x) === k); if (o && !o.image) { o.image = q.image; c.img++; } } c.dup++; continue; }
     keys.add(k);
@@ -1082,7 +1261,7 @@ function addBank(arr, c, keys) {
 function addPast(arr, c) {
   for (const x of arr) {
     if (!pastValid(x)) { c.bad++; continue; }
-    PF.forEach(k => x[k] = String(x[k]).trim());
+    PF.forEach(k => x[k] = String(x[k]).trim()); pastFixUnits(x);
     const i = pastDB.findIndex(y => PF.every(k => String(y[k]) === x[k]));
     if (i >= 0) { pastDB[i] = x; c.prep++; } else { pastDB.push(x); c.past++; }
   }
@@ -1150,6 +1329,7 @@ async function importAny(files) {
   if (c.book) L.push(`시중 교재 문제 ${c.book}개`);
   if (c.ebs) L.push(`EBS 문제 ${c.ebs}개`);
   if (c.bk) L.push(`백업 ${c.bk}개: 학생 +${c.st} · 시험지 +${c.ex} · 풀이 기록 +${c.rs}`);
+  if (c.trash) L.push(`22개정에 없는 단원이라 뺀 문제 ${c.trash}개`);
   if (c.unk) L.push(`단원명이 목록과 다른 문제 ${c.unk}개 (추출되지 않을 수 있음)`);
   if (c.bad) L.push(`형식을 알 수 없는 파일 ${c.bad}개: ${badN.slice(0, 3).join(', ')}${badN.length > 3 ? ' 등' : ''}`);
   toast(`불러오기 완료 (파일 ${list.length}개)\n` + (L.join('\n') || '새로 추가된 내용이 없습니다'));
@@ -1231,11 +1411,11 @@ function renderPreview() {
     renumImg(q.image, i + 1).then(u => { if (u && img.isConnected && currentQuestions[i] === q) { img.src = u; const p = img.previousElementSibling; if (p) p.style.display = 'none'; } });
   });
 }
-const TABS =['selector','book','diff','preview','editor','past','var','stu','stuname','ex','cls','msg'];
-const SECTIONS = ['selector','book','diff','preview','editor','past','stu','ex','cls','msg'];
+const TABS =['selector','book','bview','diff','preview','editor','past','var','stu','stuname','ex','cls','msg'];
+const SECTIONS = ['selector','book','bview','diff','preview','editor','past','stu','ex','cls','msg'];
 /* 상위 탭 → 하위 탭 [이동할 탭, 이름, 색] */
 const NAV = [
-  {name: '문제', sym: '문', c: 'make', subs: [['selector', '단원별 문제', 'make'], ['book', '시중 교재', 'book']]},
+  {name: '문제', sym: '문', c: 'make', subs: [['selector', '단원별 문제', 'make'], ['book', '시중 교재', 'book'], ['bview', '교재 보기', 'book']]},
   {name: '만든 시험지', sym: '시', c: 'ex', subs: [['ex', '', 'ex']]},
   {name: '기출', sym: '기', c: 'past', subs: [['past', '기출 문제', 'past'], ['var', '기출 변형 문제', 'var']]},
   {name: '수업', sym: '수', c: 'cls', subs: [['cls', '', 'cls']]},
@@ -1257,12 +1437,13 @@ function switchTab(t, fromHistory) {
   let bt = t;
   if (t === 'past' || t === 'var') { pastMode = t === 'var' ? 'var' : 'orig'; t = 'past'; }
   if (t === 'stuname') t = 'stu';
-  if (!['past', 'var', 'stu', 'stuname', 'ex', 'cls', 'msg'].includes(bt)) bt = t === 'book' || (t !== 'selector' && src === 'book') ? 'book' : 'selector';
+  if (!['past', 'var', 'stu', 'stuname', 'ex', 'cls', 'msg', 'bview'].includes(bt)) bt = t === 'book' || (t !== 'selector' && src === 'book') ? 'book' : 'selector';
   SECTIONS.forEach(x => $('tab-'+x).classList.add('hidden'));
   $('tab-'+t).classList.remove('hidden');
   renderNav(bt);
-  document.body.dataset.tab = {selector: 'make', stuname: 'stu'}[bt] || bt;
+  document.body.dataset.tab = {selector: 'make', stuname: 'stu', bview: 'book'}[bt] || bt;
   if (t === 'book') bookReady.then(renderBook);
+  if (t === 'bview') renderBview();
   if (t === 'editor') renderEditor();
   if (t === 'past') renderPastSelects();
   if (t === 'ex') renderEx();
@@ -1471,7 +1652,44 @@ const UFR = {'½':'1/2','¼':'1/4','¾':'3/4','⅓':'1/3','⅔':'2/3','⅛':'1/8
 /* 맞은 분수 → [분자, 분모] 또는 null */
 const fracOf = (m, a, b, c, d, u) => u ? UFR[u].split('/') : a != null ? (/\d/.test(a + b) ? [a, b] : null) : [c, d];
 const fracH = h => h.replace(FRAC, (m, ...g) => { const f = fracOf(m, ...g.slice(0, 5)); return f ? `<span class="frac"><span>${f[0]}</span><span>${f[1]}</span></span>` : m; });
-const fx = s => fracH(esc(s));
+/* ===== 위·아래 첨자: 파일 속 표기(H2O, Cu2+, m/s2, F1, N_A, 10^-3, e^(−kt))를 화면·한글 파일에서 바르게.
+   유니코드 첨자로 바꿀 수 있으면 바꾸고(H₂O, Cu²⁺, m/s², F₁), 못 바꾸는 것(N_A, e^(−2κL))은 표시 기호로 감싸 HTML은 <sub>/<sup>, 한글은 수식 */
+const SUBM = {0:'₀',1:'₁',2:'₂',3:'₃',4:'₄',5:'₅',6:'₆',7:'₇',8:'₈',9:'₉','+':'₊','-':'₋','−':'₋','(':'₍',')':'₎',a:'ₐ',e:'ₑ',o:'ₒ',x:'ₓ',h:'ₕ',k:'ₖ',l:'ₗ',m:'ₘ',n:'ₙ',p:'ₚ',s:'ₛ',t:'ₜ',i:'ᵢ',r:'ᵣ',u:'ᵤ',v:'ᵥ'};
+const SUPM = {0:'⁰',1:'¹',2:'²',3:'³',4:'⁴',5:'⁵',6:'⁶',7:'⁷',8:'⁸',9:'⁹','+':'⁺','-':'⁻','−':'⁻','(':'⁽',')':'⁾',n:'ⁿ',i:'ⁱ'};
+const uMap = (s, M) => [...s].every(c => M[c]) ? [...s].map(c => M[c]).join('') : null;
+const SB0 = '', SP0 = '', SE = '';
+const subW = s => uMap(s, SUBM) || SB0 + s + SE, supW = s => uMap(s, SUPM) || SP0 + s + SE;
+const EL = 'He|Li|Be|Ne|Na|Mg|Al|Si|Cl|Ar|Ca|Mn|Fe|Co|Ni|Cu|Zn|Br|Ag|Sn|Ba|Au|Hg|Pb|H|B|C|N|O|F|P|S|K|I';
+const FORM = new RegExp(`(?<![A-Za-z0-9₀-₉])((?:(?:${EL})\\d{0,2}|\\((?:(?:${EL})\\d{0,2})+\\)\\d{0,2})+)([+\\-−](?=$|[\\s)\\],.·、:;?!+'"]|(?!파)[가-힣]))?(?![A-Za-z0-9])`, 'g');
+const MONO = new RegExp(`^(?:${EL})$`);
+function sciFix(s) {
+  s = String(s ?? '');
+  if (!/[0-9_^+\-−]/.test(s)) return s;
+  /* 거듭제곱 ^ : 10^-3, x^2, e^(−kt), T^(3/2) */
+  s = s.replace(/\^\(([^()]{1,24})\)|\^([-−+]?[0-9A-Za-z.]{1,6})/g, (m, a, b) => supW(a ?? b));
+  /* 아래첨자 _ : N_A, a_1, v_{max} */
+  s = s.replace(/_\{([^{}]{1,12})\}|_([0-9A-Za-z]{1,4})/g, (m, a, b) => subW(a ?? b));
+  /* 단위의 제곱·세제곱: m/s2, g/cm3, cm2, km2 (숫자 뒤의 m2·m3 포함) */
+  s = s.replace(/(\/s|(?<![A-Za-z])(?:c|m|k)m)([23])(?![0-9A-Za-z])/g, (m, u, d) => u + SUPM[d]);
+  s = s.replace(/(\d\s?m)([23])(?![0-9A-Za-z])/g, (m, u, d) => u + SUPM[d]);
+  /* 화학식·이온: H2O, C6H12O6, Ca(OH)2, Cu2+, SO42-, NO3-, Na+, OH- */
+  s = s.replace(FORM, (m, f, q) => {
+    if (!q && !/\d/.test(f)) return m;
+    let ch = '';
+    if (q) { const d = /(\d)$/.exec(f), core = d ? f.slice(0, -1) : f;
+      if (d && (MONO.test(core) || /(?:SO4|CO3|PO4|SiO3|CrO4|Cr2O7|HPO4|C2O4)$/.test(core))) { ch = SUPM[d[1]]; f = core; }
+      ch += q === '+' ? '⁺' : '⁻'; }
+    return f.replace(/\d+/g, d => uMap(d, SUBM)) + ch;
+  });
+  s = s.replace(/(?<![A-Za-z])(mv|mc|ω|r)2(?![0-9A-Za-z])/g, '$1²');
+  /* 물리량 아래첨자: F1, v2, m1, t2, T1, λ1, θ2 (한 글자 + 숫자 하나) */
+  s = s.replace(/(?<![A-Za-z.])([FvmtaThrRVEPIqQdLWλθω])([0-9])(?![0-9a-z.])/g, (m, a, d) => a + SUBM[d]);
+  /* 이미 유니코드 숫자 첨자인데 전하만 ASCII인 것: Cu²+ → Cu²⁺ */
+  s = s.replace(/(?<=[A-Za-z₀-₉][¹²³⁰-⁹])[+\-−](?=$|[\s)\],.·、:;?!+'"]|[가-힣])/g, c => c === '+' ? '⁺' : '⁻');
+  return s;
+}
+const subTag = h => h.replace(/([^]*)/g, '<sub>$1</sub>').replace(/([^]*)/g, '<sup>$1</sup>');
+const fx = s => subTag(fracH(esc(sciFix(s))));
 /* [표] 뒤 글 → 표들 (행·칸 구분이 ' | ', ' / ' 중 어느 쪽이든 칸 수가 맞는 쪽, 여러 표는 ' ; ') */
 function tblParse(s) {
   return s.split(/\s+;\s+/).map(part => {
@@ -1502,7 +1720,14 @@ let hxEqN = 0;
 const hxEq = (a, b) => { const id = 1800000000 + (++hxEqN), w = Math.max(a.length, b.length) * 520 + 500; return `<hp:equation id="${id}" zOrder="0" numberingType="EQUATION" textWrap="TOP_AND_BOTTOM" textFlow="BOTH_SIDES" lock="0" dropcapstyle="None" version="Equation Version 60" baseLine="66" textColor="#000000" baseUnit="1000" lineMode="CHAR" font="HancomEQN"><hp:sz width="${w}" widthRelTo="ABSOLUTE" height="2250" heightRelTo="ABSOLUTE" protect="0"/><hp:pos treatAsChar="1" affectLSpacing="0" flowWithText="1" allowOverlap="0" holdAnchorAndSO="0" vertRelTo="PARA" horzRelTo="PARA" vertAlign="TOP" horzAlign="LEFT" vertOffset="0" horzOffset="0"/><hp:outMargin left="56" right="56" top="0" bottom="0"/><hp:shapeComment>수식입니다.</hp:shapeComment><hp:script>{${X(a)}} over {${X(b)}}</hp:script></hp:equation>`; };
 /* 글 → <hp:t> + 분수는 한글 수식 */
 const eqS = s => s.replace(/√(\w+)/g, 'sqrt{$1}');
-const hxT = t => { let o = '', p = 0; t.replace(FRAC, (m, ...g) => { const f = fracOf(m, ...g.slice(0, 5)), k = g[5]; if (f) { if (k > p) o += `<hp:t>${X(t.slice(p, k))}</hp:t>`; o += hxEq(eqS(f[0]), eqS(f[1])); p = k + m.length; } return m; }); if (p < t.length) o += `<hp:t>${X(t.slice(p))}</hp:t>`; return o; };
+/* 첨자(유니코드로 못 바꾼 것) → 한글 수식 {}_{A} / {}^{−2κL} */
+const hxEqS = (sc, n) => hxEq('', '').replace(/width="\d+"/, `width="${n * 600 + 300}"`).replace('height="2250"', 'height="1500"').replace(/<hp:script>[\s\S]*?<\/hp:script>/, `<hp:script>${X(sc)}</hp:script>`);
+const HXRE = new RegExp(`\\uE000([^\\uE001]*)\\uE001|\\uE002([^\\uE001]*)\\uE001|${FRAC.source}`, 'g');
+const hxT = t => { t = sciFix(t); let o = '', p = 0; t.replace(HXRE, (m, sb, sp, ...g) => { const k = g[5]; let e = '';
+  if (sb != null) e = hxEqS(`{}_{${eqS(sb)}}`, sb.length); else if (sp != null) e = hxEqS(`{}^{${eqS(sp)}}`, sp.length);
+  else { const f = fracOf(m, ...g.slice(0, 5)); if (f) e = hxEq(eqS(f[0]), eqS(f[1])); }
+  if (e) { if (k > p) o += `<hp:t>${X(t.slice(p, k))}</hp:t>`; o += e; p = k + m.length; } return m; });
+  if (p < t.length) o += `<hp:t>${X(t.slice(p).replace(/[-]/g, ''))}</hp:t>`; return o; };
 const hxP = (t, c, br) => `<hp:p id="0" paraPrIDRef="${c[0]}" styleIDRef="${c[1]}" pageBreak="${br?1:0}" columnBreak="0" merged="0"><hp:run charPrIDRef="${c[2]}">${t === '' ? '' : hxT(String(t))}</hp:run></hp:p>`;
 /* 표 (bf = 실선 테두리 borderFill id, 단 너비 안 가운데) */
 let hxTblN = 0;
@@ -1602,7 +1827,10 @@ const PK = 'sciBankPast_v1', PF = ['school','grade','subject','year','semester',
 const PL = {school:'학교',grade:'학년',subject:'과목',year:'년도',semester:'학기',round:'차수'}, PD = {year:'년',semester:'학기',round:'차'};
 const sfx = (v, s) => String(v).endsWith(s) ? String(v) : v + s;
 let pastDB = [], pastSel = {}, curPast, pastMode = 'orig';
-const pastReady = (async () => { try { const a = await idbGet(PK); if (Array.isArray(a)) pastDB = a; } catch(e) {} renderPastSelects(); })();
+/* 기출은 실제 시험이라 문항을 빼지 않고 단원 이름만 22개정으로 */
+const pastFixUnits = x => { let ch = 0; for (const s of [x.questions, ...(x.variants || []).map(v => v && v.questions)]) for (const q of s || []) if (q && fixUnit(q) === true) ch++; return ch; };
+const pastReady = (async () => { try { const a = await idbGet(PK); if (Array.isArray(a)) pastDB = a;
+  if (pastDB.reduce((n, x) => n + pastFixUnits(x), 0)) idbSet(PK, pastDB).catch(() => {}); } catch(e) {} renderPastSelects(); })();
 const pastValid = x => x && PF.every(f => x[f] != null && String(x[f]).trim() !== '') && Array.isArray(x.questions) && x.questions.every(q => q && typeof q.question === 'string');
 function renderPastSelects() {
   const box = $('past-selects'); box.innerHTML = '';
@@ -2456,13 +2684,13 @@ async function sbChat(prefill, back) {
   $('sb-back').onclick = () => { sbChatStop(); back ? back() : sbMyPage(); };
   let sig = '';
   const load = async first => {
-    let list; try { list = await sbCall('sb_msg_my', {t: tokGet()}) || []; } catch(e) { if (first) { sbChatStop(); /not logged in/.test(e.message) ? sbFail(e) : ($('msg-log').innerHTML = '<p class="text-center text-gray-500 text-sm py-10">메시지를 불러오지 못했습니다.</p>'); } return; }
+    let list; try { list = await msgList('sb_msg_my2', 'sb_msg_my', {t: tokGet()}) || []; } catch(e) { if (first) { sbChatStop(); /not logged in/.test(e.message) ? sbFail(e) : ($('msg-log').innerHTML = '<p class="text-center text-gray-500 text-sm py-10">메시지를 불러오지 못했습니다.</p>'); } return; }
     const log = $('msg-log'); if (!log) { sbChatStop(); return; }
     const s = list.length + ':' + list.filter(m => m.read_at).length; if (s === sig) return; sig = s;
     log.innerHTML = list.length ? msgBubbles(list, false) : '<p class="text-center text-gray-400 text-sm py-10">아직 주고받은 메시지가 없습니다.<br>모르는 문제나 궁금한 점을 물어보세요.</p>';
     log.scrollTop = log.scrollHeight;
   };
-  msgBindForm(async t => { await sbCall('sb_msg_send', {t: tokGet(), msg: t}); sig = ''; load(); });
+  msgBindForm(async (t, img) => { await (img ? sbCall('sb_msg_send_img', {t: tokGet(), msg: t, im: img}) : sbCall('sb_msg_send', {t: tokGet(), msg: t})); sig = ''; load(); });
   if (prefill) { const i = $('msg-in'); i.value = prefill; i.focus(); i.setSelectionRange(i.value.length, i.value.length); }
   await load(true);
   sbChatTimer = setInterval(load, 8000);
@@ -2687,7 +2915,9 @@ function msgBubbles(list, mineIsTeacher) {
   return list.map(m => {
     const mine = m.from_teacher === mineIsTeacher, d = new Date(m.created_at).toLocaleDateString('ko-KR', {month: 'long', day: 'numeric', weekday: 'short'});
     const sep = d !== day ? `<div class="msg-day">${(day = d)}</div>` : '';
-    return `${sep}<div class="msg-row ${mine ? 'me' : ''}"><div class="msg-b">${esc(m.body)}</div><span class="msg-t">${mine && m.read_at ? '읽음<br>' : ''}${new Date(m.created_at).toLocaleTimeString('ko-KR', {hour: 'numeric', minute: '2-digit'})}</span></div>`;
+    const im = m.img && /^data:image\/(jpeg|png|webp);base64,/.test(m.img) ? `<img src="${m.img}" class="msg-img" alt="사진" onclick="msgZoom(this.src)">` : '';
+    const tx = im && m.body === '[사진]' ? '' : esc(m.body);
+    return `${sep}<div class="msg-row ${mine ? 'me' : ''}"><div class="msg-b">${im}${im && tx ? '<br>' : ''}${tx}</div><span class="msg-t">${mine && m.read_at ? '읽음<br>' : ''}${new Date(m.created_at).toLocaleTimeString('ko-KR', {hour: 'numeric', minute: '2-digit'})}</span></div>`;
   }).join('');
 }
 function msgNeed() {
@@ -2721,12 +2951,12 @@ async function msgRefresh(drawChat) {
 }
 async function msgChat(full) {
   const s = stuDB.students.find(x => x.id === msgSid), main = $('msg-main'); if (!s || !main) return;
-  let list; try { list = await sbCall('sb_msg_list_t', {p: stuDB.pin, sid: s.id}) || []; } catch(e) { return; }
+  let list; try { list = await msgList('sb_msg_list_t2', 'sb_msg_list_t', {p: stuDB.pin, sid: s.id}) || []; } catch(e) { return; }
   if (full || !$('msg-log') || main.dataset.sid !== s.id) {
     main.dataset.sid = s.id; msgLastN = -1;
     main.innerHTML = `<div class="msg-head"><button onclick="stuOpen('${s.id}')" class="font-semibold hover:underline">${esc(stuName(s))}</button>${s.lid ? '' : '<span class="text-xs text-red-500 ml-2">계정이 없어 학생이 볼 수 없습니다</span>'}</div><div id="msg-log" class="msg-log"></div>
       <form id="msg-form" class="msg-form"><textarea id="msg-in" rows="1" maxlength="2000" placeholder="메시지 입력 (Enter 보내기 · Shift+Enter 줄 바꿈)"></textarea><button class="msg-send">보내기</button></form>`;
-    msgBindForm(async txt => { await sbCall('sb_msg_send_t', {p: stuDB.pin, sid: s.id, msg: txt}); msgRefresh(false); });
+    msgBindForm(async (txt, img) => { await (img ? sbCall('sb_msg_send_img_t', {p: stuDB.pin, sid: s.id, msg: txt, im: img}) : sbCall('sb_msg_send_t', {p: stuDB.pin, sid: s.id, msg: txt})); msgRefresh(false); });
   }
   const log = $('msg-log'), sig = list.length + ':' + list.filter(m => m.read_at).length;
   if (sig === msgLastN) return;
@@ -2734,18 +2964,46 @@ async function msgChat(full) {
   msgLastN = sig; log.innerHTML = msgBubbles(list, true);
   if (atEnd) log.scrollTop = log.scrollHeight;
 }
-/* 보내기 칸 공용: Enter 보내기, Shift+Enter 줄 바꿈, 높이 자동 */
+/* 사진: 긴 변 1280px JPEG로 줄여 dataURL (보통 100~400KB) */
+async function msgShrink(file) {
+  const url = URL.createObjectURL(file);
+  try { const im = await loadImg(url), k = Math.min(1, 1280 / Math.max(im.naturalWidth, im.naturalHeight));
+    const c = document.createElement('canvas'); c.width = Math.round(im.naturalWidth * k); c.height = Math.round(im.naturalHeight * k);
+    const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(im, 0, 0, c.width, c.height);
+    let q = 0.82, d = c.toDataURL('image/jpeg', q); while (d.length > 1400000 && q > 0.4) { q -= 0.15; d = c.toDataURL('image/jpeg', q); } return d;
+  } finally { URL.revokeObjectURL(url); }
+}
+function msgZoom(src) {
+  const o = document.createElement('div'); o.className = 'msg-zoom'; o.innerHTML = `<img src="${src}" alt="사진">`; o.onclick = () => o.remove(); document.body.appendChild(o);
+}
+/* 대화 불러오기: 사진을 주는 새 함수(update6)가 없으면 예전 함수로 */
+let msgV2 = true;
+async function msgList(v2, v1, args) {
+  if (msgV2) try { return await sbCall(v2, args); } catch(e) { if (!/function|schema cache|not find|404/i.test(e.message)) throw e; msgV2 = false; }
+  return sbCall(v1, args);
+}
+/* 보내기 칸 공용: Enter 보내기, Shift+Enter 줄 바꿈, 높이 자동, 사진 버튼·붙여넣기. send(글, 사진dataURL|null) */
 function msgBindForm(send) {
   const f = $('msg-form'), i = $('msg-in');
+  let img = null;
+  f.insertAdjacentHTML('afterbegin', `<input type="file" id="msg-file" accept="image/*" class="hidden"><button type="button" id="msg-pic" class="msg-pic" title="사진 보내기" aria-label="사진 보내기"><i data-lucide="image-plus"></i></button>`);
+  f.insertAdjacentHTML('beforebegin', `<div id="msg-prev" class="msg-prev hidden"><img alt="보낼 사진"><button type="button" title="사진 빼기" aria-label="사진 빼기"><i data-lucide="x"></i></button></div>`);
+  const pv = $('msg-prev'), fi = $('msg-file');
+  const setImg = d => { img = d; pv.classList.toggle('hidden', !d); if (d) pv.querySelector('img').src = d; };
+  const take = async file => { if (!file || !/^image\//.test(file.type)) return; try { setImg(await msgShrink(file)); i.focus(); } catch(e) { toast('사진을 읽지 못했습니다.'); } };
+  $('msg-pic').onclick = () => fi.click();
+  fi.onchange = () => { take(fi.files[0]); fi.value = ''; };
+  pv.querySelector('button').onclick = () => setImg(null);
+  i.onpaste = e => { const it = [...(e.clipboardData || {}).items || []].find(x => x.type.startsWith('image/')); if (it) { e.preventDefault(); take(it.getAsFile()); } };
   const fit = () => { i.style.height = 'auto'; i.style.height = Math.min(i.scrollHeight, 140) + 'px'; };
   i.oninput = fit;
   i.onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); f.requestSubmit(); } };
   f.onsubmit = async e => {
     e.preventDefault();
-    const t = i.value.trim(); if (!t) return;
-    const bt = f.querySelector('button'); bt.disabled = true;
-    try { await send(t); i.value = ''; fit(); }
-    catch(x) { toast(/too many/.test(x.message) ? '잠시 뒤에 다시 보내 주세요. (10분에 20개까지)' : '보내지 못했습니다. 인터넷 연결을 확인하세요.'); }
+    const t = i.value.trim(); if (!t && !img) return;
+    const bt = f.querySelector('.msg-send'); bt.disabled = true;
+    try { await send(t, img); i.value = ''; fit(); setImg(null); }
+    catch(x) { toast(/too many/.test(x.message) ? '잠시 뒤에 다시 보내 주세요. (10분에 20개까지)' : /function|schema cache|not find/i.test(x.message) ? '사진 보내기는 Supabase에서 supabase-update6.sql을 실행해야 쓸 수 있습니다.' : /bad image/.test(x.message) ? '사진이 너무 큽니다.' : '보내지 못했습니다. 인터넷 연결을 확인하세요.'); }
     bt.disabled = false; i.focus();
   };
 }
