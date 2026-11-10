@@ -217,6 +217,8 @@ input[type=password]:focus,input[type=date]:focus{outline:none;border-color:var(
 .msg-zoom img{max-width:100%;max-height:100%;border-radius:8px}
 @media (max-width:700px){.msg-wrap{flex-direction:column;height:auto}.msg-side{width:auto;border-right:0;border-bottom:1px solid #E5E7EB;max-height:220px}.msg-main{height:70vh}}
 .sb-chat{height:min(68vh,620px)}
+.ntf-btn{display:inline-flex;align-items:center;font-size:.75rem;font-weight:600;color:var(--muted);padding:5px 10px;border-radius:999px;border:1px solid var(--line);background:#fff}
+.ntf-btn:hover{color:var(--ink)}.ntf-btn.on{color:var(--c-msg);border-color:var(--c-msg);background:var(--c-msg-s)}
 .sb-chat-btn{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--c-msg);color:#fff;font-weight:600;padding:13px;border-radius:12px}
 .sb-cls{text-align:left;background:#fff;border:1px solid #E5E7EB;border-radius:12px;padding:14px}.sb-cls:hover{border-color:var(--accent)}
 .sb-ex{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #E5E7EB;border-radius:12px;padding:12px 14px}.sb-ex:hover{border-color:var(--accent)}
@@ -231,6 +233,63 @@ input[type=password]:focus,input[type=date]:focus{outline:none;border-color:var(
 .sb-grid div.blank{border-color:#F3B4B4;background:#FDF2F2;color:#C62F2F}.sb-grid div.blank b{color:#C62F2F}
 input.dn-over[type=number]{border-color:#ef4444!important;background:#fef2f2!important}
 @media print{#hero,header,footer,#tab-selector,#tab-book,#tab-editor,#past-controls{display:none!important}body{background:#fff!important}main{padding:0!important;max-width:none!important}#print-area{box-shadow:none!important;border-radius:0!important;padding:0!important;max-width:none!important}.pq{break-inside:avoid}#pv-controls{display:none!important}.pvgap{background:none!important;box-shadow:none!important;min-height:0!important}.pvgap::after{display:none!important}#pv-paper{box-shadow:none!important;border-radius:0!important;padding:0!important;max-width:none!important}}
+</style>
+<style>
+/* ===== 2026-11 정리: 주기율표 한 블록처럼 — 장식은 줄이고 선과 간격으로만 구분 ===== */
+:root{--bg:#F4F6F8;--ink:#172030;--muted:#5B6576;--line:#E1E5EB;--soft:#F0F2F5;--r-panel:14px;--r-ctl:8px}
+body{font-size:15px;line-height:1.6}
+/* 상단바: 채운 칩 대신 밑줄 탭, 원소 기호만 색 */
+header{background:#fff!important;backdrop-filter:none}
+header .max-w-7xl{padding-top:8px!important;padding-bottom:0!important;align-items:stretch!important}
+header .logo{align-self:center;font-size:15px}
+#top-nav{gap:2px}
+#top-nav button,#msg-btn{border-radius:0;padding:10px 12px 12px;background:transparent!important;box-shadow:none}
+#top-nav button:hover,#msg-btn:hover{background:transparent!important;color:var(--ink)}
+#top-nav button.on,#msg-btn.on{background:transparent!important;box-shadow:inset 0 -2px 0 var(--c)}
+#msg-btn{align-self:stretch}
+#msg-badge{top:4px}
+/* 하위 탭: 회색 홈 안의 흰 조각 (세그먼트) */
+#sub-nav{width:max-content;max-width:calc(100% - 32px);margin:10px auto;padding:3px;gap:2px;background:var(--soft);border-radius:10px}
+#sub-nav:empty{display:none}
+#sub-nav button{border:0;border-radius:8px;padding:6px 16px;background:transparent;color:var(--muted)}
+#sub-nav button:hover{color:var(--ink)}
+#sub-nav button.on{background:#fff;color:var(--ink);box-shadow:0 0 0 1px var(--line)}
+/* 단계: 진하게 칠하지 않고 글자색과 밑줄로 */
+#steps{gap:2px!important}
+#steps .text-gray-300{color:#C7CDD6}
+.step{border:0;background:transparent;border-radius:6px!important;padding:6px 10px!important}
+.step.step-done{background:transparent;color:var(--accent)}
+.step.step-on{background:transparent;color:var(--ink);box-shadow:inset 0 -2px 0 var(--accent)}
+.step:not(:disabled):hover{background:var(--soft)}
+/* 처음 화면: 여섯 칸을 한 장의 표로 */
+#hero{min-height:calc(100vh - 60px);padding-top:0!important}
+.hero-title{font-size:clamp(2rem,4.6vw,3rem);font-weight:750;letter-spacing:-.045em;margin-top:40px}
+.hero-sub{font-size:1.02rem;margin-top:10px}
+#hero #main-tabs{gap:0;margin-top:40px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-panel);overflow:hidden}
+#hero #main-tabs button{min-height:150px;padding:20px;border:0;border-radius:0;box-shadow:inset -1px -1px 0 var(--line);justify-content:flex-start;gap:0;transition:background .15s}
+#hero #main-tabs button:hover{background:var(--cs);box-shadow:inset -1px -1px 0 var(--line),inset 0 3px 0 var(--c)}
+#hero .tab-sym{width:44px;height:44px;font-size:20px;margin-bottom:0}
+#hero .tab-name{font-size:1.05rem;margin-top:18px}
+#hero .tab-desc{font-size:.82rem;margin-top:4px;max-width:22em}
+.hero-import{margin-top:14px;border-style:solid;background:transparent;padding:12px 4px;border-width:0;border-top:1px solid var(--line);border-radius:0;word-break:keep-all}
+@media(max-width:768px){#hero #main-tabs button{min-height:128px;padding:16px}.hero-title{margin-top:28px}}
+/* 패널: 그림자 없이 선 하나, 제목·설명 간격 통일 */
+main section>.bg-white,#tab-selector,#tab-book,#tab-diff,#tab-ex,#tab-stu,#pv-controls,#past-controls,#tab-editor>div:first-child{border-radius:var(--r-panel)!important;border-color:var(--line)}
+main h2.text-xl{font-size:1.3rem!important;font-weight:700!important;color:var(--ink)!important}
+main h2+p.text-sm{color:var(--muted)!important;line-height:1.6;max-width:46em}
+main .border-b{border-color:var(--line)!important}
+/* 작은 버튼은 모두 같은 높이·글씨 */
+main .text-xs.font-semibold.px-3.py-2{display:inline-flex;align-items:center;min-height:34px;padding-top:0!important;padding-bottom:0!important;font-size:.8rem!important}
+main label.bg-emerald-600,main button.bg-emerald-600{color:var(--ink)!important}
+main .bg-indigo-50.text-indigo-700{background:transparent!important;color:var(--accent)!important}
+main .bg-gray-100.text-gray-600{background:transparent!important;color:var(--muted)!important}
+/* 단원 목록: 상자 대신 가는 줄로 나눈 목록 */
+#unit-list,#bunit-list{border:1px solid var(--line);border-radius:10px;padding:0!important}
+#unit-list>*+*,#bunit-list>*+*{margin-top:0!important;border-top:1px solid var(--line)}
+#unit-list label.border,#bunit-list label.border{border:0!important;border-radius:0;padding:11px 14px}
+#unit-list label.border:has(input:checked),#bunit-list label.border:has(input:checked){background:var(--accent-s)}
+select,input[type=number],input[type=text],textarea{border-radius:var(--r-ctl)!important}
+footer{padding:24px 0!important}
 </style>
 <style>i[data-lucide],svg.lucide{display:inline-block;width:1.05em;height:1.05em;vertical-align:-.17em;margin-right:.35em;stroke-width:2;flex:none}</style>
 </head>
@@ -823,6 +882,7 @@ let masterDB = SEED.slice();
 const idb = () => new Promise((res, rej) => { const r = indexedDB.open('sciBank', 1); r.onupgradeneeded = () => r.result.createObjectStore('kv'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
 const idbGet = async k => { const d = await idb(); return new Promise((res, rej) => { const t = d.transaction('kv').objectStore('kv').get(k); t.onsuccess = () => res(t.result); t.onerror = () => rej(t.error); }); };
 const idbSet = async (k, v) => { const d = await idb(); return new Promise((res, rej) => { const t = d.transaction('kv', 'readwrite'); t.objectStore('kv').put(v, k); t.oncomplete = () => res(); t.onerror = () => rej(t.error); }); };
+const idbDel = async k => { const d = await idb(); return new Promise((res, rej) => { const t = d.transaction('kv', 'readwrite'); t.objectStore('kv').delete(k); t.oncomplete = () => res(); t.onerror = () => rej(t.error); }); };
 /* ===== 옛(2015) 단원 이름 → 2022 개정 단원. 22개정에 없는 단원(생태계와 환경, 전자기 유도 등)은 'trash' ===== */
 const UNIT_FIX = {
   '기권과 날씨': ['중3', '날씨와 기후변화'], '화학 반응의 규칙과 에너지 변화': ['중3', '화학 반응의 규칙성'], '열과 우리 생활': ['중1', '열'],
@@ -950,7 +1010,7 @@ const STD_STOP = new Set(['있다', '수있', '할수', '이해', '설명', '하
 const bigr = s => { const t = stdNorm(s), o = new Set(); for (let i = 0; i < t.length - 1; i++) { const b = t.slice(i, i + 2); if (!STD_STOP.has(b)) o.add(b); } return o; };
 /* 성취기준 문장에 잘 안 나오는 핵심 용어 (자동 연결 정확도용) */
 const STD_KW = {
-  '9과01-01': '가설 변인 대조 실험 결론 탐구 과정 관찰', '9과01-02': '인공지능 나노 로봇 사물인터넷 첨단', '9과02-01': '세포막 핵 엽록체 미토콘드리아 세포벽 세포소기관',
+  '9과01-01': '가설 변인 대조 실험 결론 탐구 과정 관찰', '9과01-02': '인공지능 나노 로봇 사물인터넷 첨단', '9과02-01': '세포막 핵 엽록체 마이토콘드리아 미토콘드리아 세포벽 세포소기관 라이보솜 라이소좀',
   '9과02-02': '조직 기관 기관계 개체 구성 단계', '9과02-04': '종 계 문 강 목 과 속 원핵생물 원생생물 균계 식물계 동물계', '9과02-05': '멸종 서식지 외래종 보전',
   '9과03-01': '온도 열평형 입자 운동', '9과03-02': '전도 대류 복사 단열 이동', '9과03-03': '비열 열팽창 바이메탈',
   '9과04-01': '확산 증발 냄새', '9과04-03': '융해 응고 기화 액화 승화', '9과04-04': '융해열 기화열 응고열 액화열 흡수 방출',
@@ -963,7 +1023,7 @@ const STD_KW = {
   '9과11-01': '원소 화합물 화학식 원소 기호 불꽃 반응', '9과11-02': '원자 양성자 중성자 전자 원자핵', '9과11-03': '주기율표 족 주기', '9과11-04': '분자 이온 양이온 음이온 앙금',
   '9과12-01': '광합성 빛의 세기 이산화 탄소 엽록체 산소', '9과12-02': '호흡 광합성 BTB', '9과12-03': '녹말 포도당 설탕 체관 저장',
   '9과13-01': '소화 아밀레이스 펩신 라이페이스 쓸개즙 이자액 녹말 단백질 지방 영양소', '9과13-02': '심장 혈관 혈액 순환 적혈구 백혈구 혈소판 혈장 심방 심실',
-  '9과13-03': '폐 폐포 기관지 횡격막 갈비뼈 들숨 날숨', '9과13-04': '콩팥 오줌 요소 네프론 사구체 보먼주머니 세뇨관 재흡수', '9과13-05': '세포호흡 소화계 순환계 호흡계 배설계',
+  '9과13-03': '폐 허파 허파꽈리 폐포 기관지 횡격막 갈비뼈 들숨 날숨', '9과13-04': '콩팥 오줌 요소 네프론 토리 사구체 보먼주머니 세뇨관 재흡수', '9과13-05': '세포호흡 소화계 순환계 호흡계 배설계',
   '9과14-01': '마찰 전기 정전기 유도 검전기 대전', '9과14-02': '전류 전압 저항 옴의 법칙', '9과14-03': '직렬 병렬 전력 전기 에너지', '9과14-04': '자기장 코일 전동기 자기력',
   '9과15-01': '연주 시차 등급 밝기 표면 온도 색 절대 등급 겉보기', '9과15-02': '우리은하 성운 성단', '9과15-03': '우주 팽창 대폭발', '9과15-04': '우주 탐사 인공위성 탐사선',
   '9과16-01': '물리 변화 화학 변화', '9과16-02': '화학 반응식 계수', '9과16-03': '질량 보존', '9과16-04': '일정 성분비 질량비', '9과16-05': '기체 반응 부피비', '9과16-06': '발열 흡열 반응 열에너지',
@@ -1206,8 +1266,12 @@ async function bookWalk(h, pre, out) {
 /* 같은 파일은 어느 경로로 불러와도 같은 키 → 다시 불러오면 새 내용으로 바뀜 */
 const fileKey = f => f.name + '#' + f.size;
 async function bookStore(key, arr) {
+  /* EBS 파일은 이름이 같으면 크기가 달라도 같은 시험 묶음 → 옛 파일을 지우고 새 내용으로 바꿈 */
+  const nm = key.slice(0, key.lastIndexOf('#') + 1), isEbs = arr.some(q => q && q.exam);
+  const old = isEbs ? [...new Set(bookIdx.recs.filter(r => r.f !== key && r.f.startsWith(nm) && r.f.slice(nm.length).match(/^\d+$/)).map(r => r.f))] : [];
   await idbSet('bk:' + key, arr);
-  bookIdx.recs = bookIdx.recs.filter(r => r.f !== key);
+  for (const f of old) await idbDel('bk:' + f).catch(() => {});
+  bookIdx.recs = bookIdx.recs.filter(r => r.f !== key && !old.includes(r.f));
   let ok = 0;
   arr.forEach((q, i) => { if (!valid(q) || fixUnit(q) === 'trash') return; ok++;
     const r = {f: key, i, grade: q.grade, unit: q.unit, sub: q.sub || '', difficulty: dif(q), book: bookOf(q)};
@@ -2566,6 +2630,7 @@ async function sbRoute() {
   if (!t) { sbLogin(SP.get('s') ? '이제 개인 QR 대신 아이디와 비밀번호로 로그인합니다.' : ''); return; }
   try { sbMe = await sbCall('sb_me', {t}); } catch(e) { return sbFail(e); }
   if (!sbMe) { tokSet(null); sbLogin('로그인이 만료되었습니다. 다시 로그인해 주세요.'); return; }
+  sbNtfStart();
   if (sbMe.must_change) { sbChangePw(true); return; }
   const code = (SP.get('e') || '').trim().toUpperCase();
   code ? sbExam(code) : sbMyPage();
@@ -2575,8 +2640,10 @@ function sbLogin(note) {
   R.innerHTML = sbTop() + `<form id="sb-login" class="bg-white border rounded-xl p-5 space-y-3"><h1 class="text-xl font-semibold">로그인</h1>${note ? `<p class="text-sm text-gray-600">${note}</p>` : ''}
     <input id="sb-lid" type="text" autocomplete="username" autocapitalize="off" placeholder="아이디 (예: sci홍길동)" class="w-full p-3">
     <input id="sb-pw" type="password" autocomplete="current-password" placeholder="비밀번호" class="w-full p-3">
+    <div class="flex justify-end" style="margin-top:6px"><button type="button" id="sb-help" class="text-xs text-gray-500 underline underline-offset-2 hover:text-gray-800">관리자에게 문의하기</button></div>
     <button class="w-full sb-primary">로그인</button><p id="sb-err" class="text-sm text-red-600"></p>
-    <p class="text-xs text-gray-400">아이디나 비밀번호를 모르면 선생님께 문의하세요.</p></form>`;
+    <p class="text-xs text-gray-400">아이디나 비밀번호를 모르면 선생님께 문의하세요.</p></form>
+    <p class="text-xs text-gray-400 text-center mt-4" style="word-break:keep-all">ID에는 본인 이름이 들어가며, 수업이 종강되면 ID는 폐기됩니다.</p>`;
   $('sb-login').onsubmit = async e => {
     e.preventDefault();
     const lid = $('sb-lid').value.trim(), pw = $('sb-pw').value; if (!lid || !pw) return;
@@ -2586,6 +2653,30 @@ function sbLogin(note) {
       tokSet(r.token); sbRoute();
     } catch(err) { $('sb-err').textContent = /locked/.test(err.message) ? '로그인에 여러 번 실패해 10분 동안 잠겼습니다. 잠시 뒤 다시 시도하세요.' : '서버 연결에 실패했습니다. 잠시 뒤 다시 시도하세요.'; }
   };
+  $('sb-help').onclick = () => sbPwHelp($('sb-lid').value.trim());
+}
+/* 비밀번호를 잊은 학생: 아이디로 선생님 메시지함에 '[비밀번호 문의]'를 남김 (supabase-update7.sql) */
+function sbPwHelp(lid0) {
+  const m = document.createElement('div'); m.className = 'sb-modal';
+  m.innerHTML = `<form class="sb-sheet space-y-3" role="dialog" aria-modal="true"><h2 class="text-lg font-semibold">관리자에게 문의하기</h2>
+    <p class="text-sm text-gray-500" style="word-break:keep-all">비밀번호를 잊었다면 아이디를 적고 보내세요. 선생님 메시지함에 문의가 가고, 선생님이 임시 비밀번호를 다시 알려 줍니다.</p>
+    <input name="lid" type="text" autocapitalize="off" placeholder="아이디 (예: sci홍길동)" class="w-full p-3" value="${esc(lid0)}">
+    <textarea name="msg" rows="2" maxlength="300" placeholder="남길 말 (선택)" class="w-full p-3"></textarea>
+    <p class="sb-h-err text-sm text-red-600"></p>
+    <div class="flex gap-2"><button type="button" class="flex-1 sb-ghost" data-x>취소</button><button class="flex-1 sb-primary">문의 보내기</button></div></form>`;
+  const f = m.querySelector('form'), err = m.querySelector('.sb-h-err'), close = () => m.remove();
+  m.querySelector('[data-x]').onclick = close; m.onclick = e => { if (e.target === m) close(); };
+  f.onsubmit = async e => {
+    e.preventDefault();
+    const lid = f.lid.value.trim(); if (!lid) { err.textContent = '아이디를 입력하세요.'; return; }
+    const b = f.querySelector('.sb-primary'); b.disabled = true;
+    try {
+      const ok = await sbCall('sb_pw_help', {lid, msg: f.msg.value});
+      if (!ok) { err.textContent = '그 아이디를 찾지 못했습니다. 아이디를 확인하거나 선생님께 직접 말씀하세요.'; b.disabled = false; return; }
+      close(); toast('선생님께 문의를 보냈습니다. 답을 기다려 주세요.');
+    } catch(x) { err.textContent = /too many/.test(x.message) ? '문의를 이미 여러 번 보냈습니다. 잠시 뒤 다시 시도하세요.' : '보내지 못했습니다. 잠시 뒤 다시 시도하세요.'; b.disabled = false; }
+  };
+  document.body.appendChild(m); f.lid.focus();
 }
 function sbChangePw(forced) {
   const R = sbR(); R.className = 'max-w-sm mx-auto p-4 space-y-4';
@@ -2679,14 +2770,17 @@ async function sbChat(prefill, back) {
   R.innerHTML = sbTop() + `<div class="flex items-center gap-2"><button id="sb-back" class="sb-ghost px-3 text-sm">← 뒤로</button><h1 class="text-lg font-semibold">선생님께 질문</h1></div>
     <div class="bg-white border rounded-xl overflow-hidden flex flex-col sb-chat"><div id="msg-log" class="msg-log"><p class="text-center text-gray-400 text-sm py-10">불러오는 중…</p></div>
     <form id="msg-form" class="msg-form"><textarea id="msg-in" rows="1" maxlength="2000" placeholder="궁금한 것을 적어 보세요"></textarea><button class="msg-send">보내기</button></form></div>
-    <p class="text-xs text-gray-400 text-center">선생님이 확인하면 답장이 이곳에 옵니다.</p>`;
-  sbBindTop();
+    <p class="text-xs text-gray-400 text-center">선생님이 확인하면 답장이 이곳에 옵니다.</p><div class="flex justify-center">${ntfBtn()}</div>`;
+  sbBindTop(); ntfPaint();
   $('sb-back').onclick = () => { sbChatStop(); back ? back() : sbMyPage(); };
   let sig = '';
   const load = async first => {
     let list; try { list = await msgList('sb_msg_my2', 'sb_msg_my', {t: tokGet()}) || []; } catch(e) { if (first) { sbChatStop(); /not logged in/.test(e.message) ? sbFail(e) : ($('msg-log').innerHTML = '<p class="text-center text-gray-500 text-sm py-10">메시지를 불러오지 못했습니다.</p>'); } return; }
     const log = $('msg-log'); if (!log) { sbChatStop(); return; }
-    const s = list.length + ':' + list.filter(m => m.read_at).length; if (s === sig) return; sig = s;
+    const s = list.length + ':' + list.filter(m => m.read_at).length; if (s === sig) return;
+    const lastT = Math.max(0, ...list.filter(m => m.from_teacher).map(m => +m.id));
+    if (sig && document.hidden && lastT > (load.lastT || 0)) ntfShow('선생님이 답장했어요', (list.filter(m => m.from_teacher).pop() || {}).body || '');
+    load.lastT = lastT; sig = s;
     log.innerHTML = list.length ? msgBubbles(list, false) : '<p class="text-center text-gray-400 text-sm py-10">아직 주고받은 메시지가 없습니다.<br>모르는 문제나 궁금한 점을 물어보세요.</p>';
     log.scrollTop = log.scrollHeight;
   };
@@ -2713,7 +2807,7 @@ async function sbMyPage() {
     qs: (x.info || Array.from({length: x.n}, () => ({}))).map((q, i) => ({q: q.q || '', ch: q.ch || [], exp: q.exp || '', unit: q.unit || '', sub: q.sub || '', lv: q.lv || '', type: q.type || '', img: q.img, std: q.std || '', ans: (x.key || [])[i] || 0}))}));
   let from = '', to = '';
   const cls = sbClasses || [];
-  R.innerHTML = sbTop() + (unread >= 0 ? `<button id="sb-chat" class="no-print w-full sb-chat-btn"><i data-lucide="message-circle"></i>선생님께 질문하기${unread ? `<span class="msg-un">${unread}</span><span class="text-xs font-normal">새 답장</span>` : ''}</button>` : '') +
+  R.innerHTML = sbTop() + (unread >= 0 ? `<button id="sb-chat" class="no-print w-full sb-chat-btn"><i data-lucide="message-circle"></i>선생님께 질문하기${unread ? `<span class="msg-un">${unread}</span><span class="text-xs font-normal">새 답장</span>` : ''}</button>${ntfOK() ? `<div class="no-print flex justify-end" style="margin-top:6px">${ntfBtn()}</div>` : ''}` : '') +
     (sbClasses ? `<div class="no-print"><h2 class="font-semibold mb-2">내 수업</h2>${cls.length ? `<div class="grid sm:grid-cols-2 gap-2">${cls.map((c, i) => { const todo = (c.exams || []).filter(e => !e.submitted).length;
         return `<button data-c="${i}" class="sb-cls"><b class="block text-base">${esc(c.name)}</b><span class="text-xs text-gray-500">시험지 ${(c.exams || []).length}개${todo ? ` · <span class="text-red-500 font-semibold">안 푼 시험지 ${todo}개</span>` : ''}</span></button>`; }).join('')}</div>` : '<p class="text-sm text-gray-400 bg-white border rounded-xl p-4">아직 등록된 수업이 없습니다.</p>'}</div>` : '') +
     `<div class="no-print bg-white border rounded-xl p-4 space-y-3">
@@ -2725,6 +2819,7 @@ async function sbMyPage() {
   $('sb-goex').onsubmit = e => { e.preventDefault(); const v = $('sb-code').value.trim(); if (v) location.search = '?e=' + encodeURIComponent(v.toUpperCase()); };
   $('sb-cpw').onclick = () => sbChangePw(false);
   if ($('sb-chat')) $('sb-chat').onclick = () => sbChat();
+  ntfPaint();
   R.querySelectorAll('.sb-cls').forEach(b => b.onclick = () => sbClassPage(cls[+b.dataset.c]));
   const names = {}, byCode = {};
   cls.forEach(c => { names[c.id] = c.name; (c.exams || []).forEach(e => { byCode[e.code] = c.id; }); });
@@ -2929,9 +3024,9 @@ async function msgOpen(sid) {
   if (sid !== undefined) msgSid = sid;
   const b = $('msg-body'), need = msgNeed();
   if (need) { b.innerHTML = `<p class="text-center text-gray-500 py-16">${need}</p>`; return; }
-  if (!$('msg-list')) b.innerHTML = `<div class="msg-wrap"><aside class="msg-side"><div class="p-3 border-b"><select id="msg-new" class="w-full border rounded-lg p-2 text-sm"><option value="">학생에게 새 메시지…</option></select></div><div id="msg-list"></div></aside><section class="msg-main" id="msg-main"></section></div>`;
-  const sel = $('msg-new');
-  sel.innerHTML = '<option value="">학생에게 새 메시지…</option>' + stuDB.students.filter(s => s.lid).sort((x, y) => x.grade.localeCompare(y.grade, 'ko') || x.name.localeCompare(y.name, 'ko')).map(s => `<option value="${s.id}">${esc(stuName(s))}</option>`).join('');
+  if (!$('msg-list')) b.innerHTML = `<div class="msg-wrap"><aside class="msg-side"><div class="p-3 border-b space-y-2"><select id="msg-new" class="w-full border rounded-lg p-2 text-sm"><option value="">학생에게 새 메시지…</option></select>${ntfBtn()}</div><div id="msg-list"></div></aside><section class="msg-main" id="msg-main"></section></div>`;
+  const sel = $('msg-new'); ntfPaint();
+  sel.innerHTML ='<option value="">학생에게 새 메시지…</option>' + stuDB.students.filter(s => s.lid).sort((x, y) => x.grade.localeCompare(y.grade, 'ko') || x.name.localeCompare(y.name, 'ko')).map(s => `<option value="${s.id}">${esc(stuName(s))}</option>`).join('');
   sel.onchange = () => { if (sel.value) msgOpen(sel.value); };
   await msgRefresh(true);
   msgStop(); msgTimer = setInterval(() => msgRefresh(false), 8000);
@@ -2945,7 +3040,7 @@ async function msgRefresh(drawChat) {
   const rows = msgThreads.map(t => ({t, s: stuDB.students.find(x => x.id === t.student_id)})).filter(o => o.s);
   if (msgSid && !rows.some(o => o.s.id === msgSid)) { const s = stuDB.students.find(x => x.id === msgSid); if (s) rows.unshift({t: {unread: 0, last_body: '', last_at: null}, s}); }
   $('msg-list').innerHTML = rows.map(({t, s}) => `<button type="button" onclick="msgOpen('${s.id}')" class="msg-th ${s.id === msgSid ? 'on' : ''}"><span class="msg-av">${esc(s.name.slice(-2))}</span><span class="flex-1 min-w-0 text-left"><b class="block truncate">${esc(s.name)} <span class="text-xs font-normal text-gray-400">${s.grade}</span></b><span class="block text-xs text-gray-500 truncate">${t.last_from_teacher ? '나: ' : ''}${esc(t.last_body || '')}</span></span><span class="text-right flex-none"><span class="block text-[11px] text-gray-400">${t.last_at ? msgTime(t.last_at) : ''}</span>${t.unread ? `<span class="msg-un">${t.unread}</span>` : ''}</span></button>`).join('') || '<p class="text-center text-gray-400 text-sm py-10">아직 받은 메시지가 없습니다.</p>';
-  msgSetBadge(msgThreads.reduce((n, t) => n + (t.unread || 0), 0));
+  msgSetBadge(msgThreads.reduce((n, t) => n + (t.unread || 0), 0)); msgNotice(msgThreads);
   if (msgSid) await msgChat(drawChat);
   else if (drawChat) $('msg-main').innerHTML = '<p class="text-center text-gray-400 py-16">왼쪽에서 학생을 고르세요.</p>';
 }
@@ -3010,7 +3105,65 @@ function msgBindForm(send) {
 function msgSetBadge(n) { const b = $('msg-badge'); if (!b) return; b.textContent = n > 99 ? '99+' : n; b.classList.toggle('hidden', !n); }
 async function msgPollBadge() {
   if (msgTimer || !sbOn() || !stuDB.pin || SP.get('e') || SP.has('me')) return;
-  try { msgSetBadge((await sbCall('sb_msg_threads', {p: stuDB.pin}) || []).reduce((n, t) => n + (t.unread || 0), 0)); } catch(e) {}
+  try { const th = await sbCall('sb_msg_threads', {p: stuDB.pin}) || []; msgSetBadge(th.reduce((n, t) => n + (t.unread || 0), 0)); msgNotice(th); } catch(e) {}
+}
+/* ===== 브라우저 알림: 새 메시지가 오면 (다른 탭을 보거나 창이 내려가 있을 때) 알림 창
+   서버 푸시가 아니라 페이지가 열려 있는 동안 확인하는 방식. 안드로이드 크롬은 sw.js로 띄움, 아이폰은 지원 안 됨 ===== */
+const ntfOK = () => 'Notification' in window;
+const ntfOn = () => { try { return ntfOK() && Notification.permission === 'granted' && localStorage.getItem('sb_ntf') !== '0'; } catch(e) { return false; } };
+let ntfReg = null;
+async function ntfSW() {
+  if (ntfReg !== null) return ntfReg; ntfReg = false;
+  if ('serviceWorker' in navigator && location.protocol === 'https:') try { await navigator.serviceWorker.register('sw.js'); ntfReg = await navigator.serviceWorker.ready; } catch(e) {}
+  return ntfReg;
+}
+async function ntfShow(title, body, onClick) {
+  if (!ntfOn()) return;
+  const opt = {body: String(body || '').slice(0, 140), tag: 'scibank-msg', renotify: true, data: {url: location.href}};
+  try { const n = new Notification(title, opt); n.onclick = () => { window.focus(); n.close(); if (onClick) onClick(); }; return; } catch(e) {}
+  try { const r = await ntfSW(); if (r) await r.showNotification(title, opt); } catch(e) {}
+}
+function ntfBtn() { return ntfOK() ? '<button type="button" class="ntf-btn" onclick="ntfToggle()"></button>' : ''; }
+function ntfPaint() {
+  document.querySelectorAll('.ntf-btn').forEach(b => { const on = ntfOn();
+    b.innerHTML = `<i data-lucide="${on ? 'bell-ring' : 'bell'}"></i>${on ? '새 메시지 알림 켜짐' : '새 메시지 알림 켜기'}`; b.classList.toggle('on', on);
+    b.title = on ? '누르면 알림을 끕니다' : '새 메시지가 오면 브라우저 알림 창으로 알려 줍니다'; });
+  if (window.lucide) lucide.createIcons();
+}
+async function ntfToggle() {
+  if (!ntfOK()) return;
+  if (ntfOn()) { try { localStorage.setItem('sb_ntf', '0'); } catch(e) {} toast('새 메시지 알림을 껐습니다.'); }
+  else if (Notification.permission === 'denied') toast('브라우저에서 이 사이트의 알림이 차단되어 있습니다.\n주소창 왼쪽 아이콘 → 알림 → 허용으로 바꾼 뒤 다시 눌러 주세요.');
+  else {
+    const p = await Notification.requestPermission();
+    try { localStorage.setItem('sb_ntf', p === 'granted' ? '1' : '0'); } catch(e) {}
+    if (p === 'granted') { ntfSW(); ntfShow('새 메시지 알림을 켰습니다', '새 메시지가 오면 이렇게 알려 드립니다.'); }
+  }
+  ntfPaint();
+}
+/* 선생님: 안 읽은 수가 늘면 가장 최근 대화로 알림 */
+let msgPrevUnread = null;
+function msgNotice(th) {
+  const n = th.reduce((k, t) => k + (t.unread || 0), 0);
+  if (msgPrevUnread !== null && n > msgPrevUnread && (document.hidden || !msgTimer)) {
+    const t = th.filter(x => x.unread).sort((a, b) => Date.parse(b.last_at) - Date.parse(a.last_at))[0], s = t && stuDB.students.find(x => x.id === t.student_id);
+    const pw = t && /^\[비밀번호 문의\]/.test(t.last_body || '');
+    ntfShow((pw ? '비밀번호 문의' : '새 메시지') + (s ? ' · ' + s.name : ''), t ? t.last_body : '', () => { switchTab('msg'); if (s) msgOpen(s.id); });
+  }
+  msgPrevUnread = n;
+}
+setInterval(msgPollBadge, 15000);
+/* 학생: 로그인해 있는 동안 20초마다 새 답장 확인 */
+let sbNtfTimer = null, sbNtfPrev = null;
+function sbNtfStart() {
+  if (sbNtfTimer) return;
+  const tick = async () => {
+    if (!tokGet()) return; let n;
+    try { n = await sbCall('sb_msg_unread', {t: tokGet()}) || 0; } catch(e) { return; }
+    if (sbNtfPrev !== null && n > sbNtfPrev && (document.hidden || !sbChatTimer)) ntfShow('선생님이 답장했어요', '눌러서 확인하세요.', () => sbChat());
+    sbNtfPrev = n;
+  };
+  tick(); sbNtfTimer = setInterval(tick, 20000);
 }
 
 /* ===== 백업 ===== */
