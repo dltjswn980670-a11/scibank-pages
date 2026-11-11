@@ -2119,9 +2119,9 @@ function renderStu() {
     b.innerHTML = `<h2 class="text-xl font-semibold text-center my-6">학년을 선택하세요</h2><div class="grid grid-cols-3 gap-3 max-w-xl mx-auto mb-6">${GR.map(g => `<button onclick="stuGo('list','${g}')" class="stu-btn text-lg">${g}</button>`).join('')}</div>
       <div class="max-w-xl mx-auto border rounded-xl p-4 bg-indigo-50 space-y-2 mb-4">
         <b class="text-sm">서버(Supabase) 연결</b>
-        <div class="flex gap-2 flex-wrap"><button onclick="sbSetPin()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-semibold">PIN 설정</button><button onclick="sbSyncStudents(true)" class="bg-white hover:bg-gray-100 border px-3 py-2 rounded-lg text-xs font-semibold">학생 명단 동기화</button><button onclick="syncSB()" class="bg-white hover:bg-gray-100 border px-3 py-2 rounded-lg text-xs font-semibold">지금 답 가져오기</button></div>
+        <div class="flex gap-2 flex-wrap items-center">${tIsTok(stuDB.pin) ? `<span id="t-who" class="text-xs font-semibold text-gray-700">로그인됨</span><button onclick="sbTeacherPw()" class="bg-white hover:bg-gray-100 border px-3 py-2 rounded-lg text-xs font-semibold">비밀번호 바꾸기</button><button onclick="sbTeacherLogout()" class="bg-white hover:bg-gray-100 border px-3 py-2 rounded-lg text-xs font-semibold">로그아웃</button>` : `<button onclick="sbTeacherLogin()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-semibold">선생님 로그인</button>`}<button onclick="sbSyncStudents(true)" class="bg-white hover:bg-gray-100 border px-3 py-2 rounded-lg text-xs font-semibold">학생 명단 동기화</button><button onclick="syncSB()" class="bg-white hover:bg-gray-100 border px-3 py-2 rounded-lg text-xs font-semibold">지금 답 가져오기</button></div>
         <p id="sb-status" class="text-xs text-gray-500">${sbOn() ? '' : '파일 맨 위 SB_CONFIG에 Supabase 주소·키·페이지 주소를 입력하면 사용할 수 있습니다.'}</p>
-        <p id="sync-status" class="text-xs text-gray-500">${syLast || (stuDB.pin ? '기기 연동 준비 중…' : 'PIN을 설정하면 학생·수업·만든 시험지가 PC·휴대폰 사이에서 자동으로 맞춰집니다.')}</p>
+        <p id="sync-status" class="text-xs text-gray-500">${syLast || (stuDB.pin ? '기기 연동 준비 중…' : '선생님 로그인을 하면 학생·수업·만든 시험지가 PC·휴대폰 사이에서 자동으로 맞춰집니다.')}</p>
       </div>
       <div class="max-w-xl mx-auto border rounded-xl p-4 bg-gray-50 space-y-2">
         <b class="text-sm">백업</b>
@@ -2129,8 +2129,9 @@ function renderStu() {
         <div class="flex gap-2 flex-wrap"><button onclick="exportBackup()" class="bg-gray-700 hover:bg-gray-800 text-white px-3 py-2 rounded-lg text-xs font-semibold"><i data-lucide="download"></i>백업 파일 저장</button>
           <input type="file" id="bk-file" accept=".json" class="hidden" onchange="importBackup(this.files[0])">
           <label for="bk-file" class="cursor-pointer bg-white hover:bg-gray-100 border px-3 py-2 rounded-lg text-xs font-semibold"><i data-lucide="folder-open"></i>백업 파일 불러오기 (합치기)</label></div>
-        <p class="text-xs text-gray-400">※ 보안을 위해 PIN은 백업 파일에 들어가지 않습니다. 새 컴퓨터에서는 PIN 설정을 다시 해 주세요.</p>
+        <p class="text-xs text-gray-400">※ 보안을 위해 로그인 정보는 백업 파일에 들어가지 않습니다. 새 컴퓨터에서는 선생님 로그인을 다시 해 주세요.</p>
       </div>`;
+    setTimeout(sbTeacherShow);
   } else if (v === 'name') {
     const q = (a || '').trim(), ss = q ? stuDB.students.filter(s => s.name.includes(q)).sort((x, y) => x.name.localeCompare(y.name, 'ko') || x.grade.localeCompare(y.grade, 'ko')) : [];
     b.innerHTML = `<h2 class="text-xl font-semibold text-center my-6">이름으로 학생 찾기</h2>
@@ -2373,7 +2374,7 @@ function buildReport(all, o) {
 /* ===== 학생 계정: 아이디 sci+이름, 임시 비밀번호(6자리) 발급 → 학생이 첫 로그인 때 변경 ===== */
 const pw6 = () => String(Math.floor(100000 + Math.random() * 900000));
 async function issueAccounts(ids, reset) {
-  if (!sbOn() || !stuDB.pin) { toast('먼저 학생 화면 첫 페이지에서 PIN을 설정하세요.'); return; }
+  if (!sbOn() || !stuDB.pin) { toast('먼저 학생 탭 첫 화면에서 선생님 로그인을 하세요.'); return; }
   const list = stuDB.students.filter(s => ids.includes(s.id) && (reset || !s.lid));
   if (!list.length) { toast('새로 계정을 만들 학생이 없습니다.\n이미 계정이 있는 학생은 학생 개인 화면에서 비밀번호를 초기화하세요.'); return; }
   if (reset && list.some(s => s.lid) && !confirm(`${list.map(s => s.name).join(', ')} 학생의 비밀번호를 새 임시 비밀번호로 바꿀까요?\n지금 쓰는 비밀번호로는 더 이상 로그인할 수 없습니다.`)) return;
@@ -2436,16 +2437,83 @@ async function sbCall(fn, args) {
   return t ? JSON.parse(t) : null;
 }
 async function sbSyncStudents(manual) {
-  if (!sbOn() || !stuDB.pin) { if (manual) toast('먼저 PIN을 설정하세요. (SB_CONFIG 입력도 확인)'); return; }
+  if (!sbOn() || !stuDB.pin) { if (manual) toast('먼저 선생님 로그인을 하세요. (SB_CONFIG 입력도 확인)'); return; }
   try {
     await sbCall('sb_upsert_students', {p: stuDB.pin, payload: stuDB.students.map(s => ({id: s.id, grade: s.grade, name: s.name}))});
     if (manual) toast('학생 명단을 서버에 동기화했습니다.');
   } catch(e) { if (manual) toast('동기화 실패: ' + e.message); }
 }
-function sbSetPin() {
-  const v = prompt('Supabase SQL에서 설정한 PIN을 입력하세요.', stuDB.pin || '');
-  if (v === null) return;
-  stuDB.pin = v.trim(); stuSave(); sbSyncStudents(true); syncSB(); syncState();
+/* ===== 선생님 로그인 (supabase-update8.sql): 아이디·비밀번호 → 로그인 토큰을 stuDB.pin 자리에 보관
+   (서버 함수는 예전처럼 p 값을 받고, 서버가 PIN 대신 토큰을 확인함. 처음 한 번만 지금 PIN으로 계정 만들기) ===== */
+const tIsTok = v => /^t_[0-9a-f]{48}$/.test(v || '');
+function tModal(html, onSubmit) {
+  const m = document.createElement('div'); m.className = 'sb-modal';
+  m.innerHTML = `<form class="sb-sheet space-y-3" role="dialog" aria-modal="true">${html}<p class="t-err text-sm text-red-600"></p>
+    <div class="flex gap-2"><button type="button" class="flex-1 sb-ghost" data-x>취소</button><button class="flex-1 sb-primary" data-ok></button></div></form>`;
+  const f = m.querySelector('form'), err = m.querySelector('.t-err'), close = () => m.remove();
+  m.querySelector('[data-x]').onclick = close;
+  f.onsubmit = async e => { e.preventDefault(); err.textContent = ''; const b = f.querySelector('[data-ok]'); b.disabled = true;
+    try { if (await onSubmit(f, msg => { err.textContent = msg; }) !== false) close(); } catch(x) { err.textContent = '서버에 연결하지 못했습니다. 인터넷을 확인하세요.'; }
+    b.disabled = false; };
+  document.body.appendChild(m); const first = [...f.querySelectorAll('input')].find(i => !i.value); (first || f.querySelector('input')).focus();
+  return f;
+}
+function tLoggedIn(tok) {
+  stuDB.pin = tok; stuSave(); sbSyncStudents(true); syncSB(); syncState();
+  if (!$('tab-stu').classList.contains('hidden')) renderStu();
+}
+async function sbTeacherLogin() {
+  if (!sbOn()) { toast('파일 맨 위 SB_CONFIG에 Supabase 주소·키를 먼저 입력하세요.'); return; }
+  let exists; try { exists = await sbCall('sb_teacher_exists', {}); }
+  catch(e) { toast(/function|schema cache|not find|PGRST202/i.test(e.message) ? '서버에 선생님 로그인 기능이 없습니다. Supabase에서 supabase-update8.sql을 실행하세요.' : '서버에 연결하지 못했습니다.'); return; }
+  if (!exists) {
+    const oldPin = tIsTok(stuDB.pin) ? '' : (stuDB.pin || '');
+    const f = tModal(`<h2 class="text-lg font-semibold">선생님 계정 만들기</h2>
+      <p class="text-sm text-gray-500" style="word-break:keep-all">처음 한 번만 지금 PIN으로 본인 확인을 합니다. 계정을 만들면 서버의 PIN은 지워지고, 그 뒤로는 아이디·비밀번호로 로그인합니다. 학생·수업·시험지 정보는 그대로입니다.</p>
+      <input name="pin" type="password" autocomplete="off" placeholder="지금 PIN" class="w-full p-3" value="${esc(oldPin)}">
+      ${oldPin ? '<p class="text-xs text-gray-400" style="margin-top:4px">이 브라우저에 저장된 PIN을 채워 두었습니다.</p>' : ''}
+      <input name="lid" type="text" autocomplete="username" autocapitalize="off" placeholder="새 아이디 (3자 이상)" class="w-full p-3">
+      <input name="pw" type="password" autocomplete="new-password" placeholder="새 비밀번호 (8자 이상)" class="w-full p-3">
+      <input name="pw2" type="password" autocomplete="new-password" placeholder="새 비밀번호 한 번 더" class="w-full p-3">`, async (f, err) => {
+      const lid = f.lid.value.trim(), pw = f.pw.value;
+      if (lid.length < 3) return err('아이디는 3자 이상이어야 합니다.'), false;
+      if (pw.length < 8) return err('비밀번호는 8자 이상이어야 합니다.'), false;
+      if (pw !== f.pw2.value) return err('비밀번호가 서로 다릅니다.'), false;
+      try { const tok = await sbCall('sb_teacher_setup', {pin: f.pin.value.trim(), lid, pw}); tLoggedIn(tok); toast(`선생님 계정(${lid})을 만들고 로그인했습니다.\n서버의 PIN은 지웠습니다.`); }
+      catch(x) { const m = x.message || ''; err(/bad pin/.test(m) ? 'PIN이 맞지 않습니다.' : /locked/.test(m) ? '여러 번 틀려 10분 동안 잠겼습니다.' : /already set/.test(m) ? '이미 선생님 계정이 있습니다. 창을 닫고 다시 로그인하세요.' : '계정을 만들지 못했습니다: ' + m); return false; }
+    });
+    f.querySelector('[data-ok]').textContent = '계정 만들기';
+    return;
+  }
+  const f = tModal(`<h2 class="text-lg font-semibold">선생님 로그인</h2>
+    <input name="lid" type="text" autocomplete="username" autocapitalize="off" placeholder="아이디" class="w-full p-3">
+    <input name="pw" type="password" autocomplete="current-password" placeholder="비밀번호" class="w-full p-3">`, async (f, err) => {
+    const lid = f.lid.value.trim(), pw = f.pw.value; if (!lid || !pw) return err('아이디와 비밀번호를 입력하세요.'), false;
+    try { const tok = await sbCall('sb_teacher_login', {lid, pw}); if (!tok) return err('아이디 또는 비밀번호가 맞지 않습니다.'), false; tLoggedIn(tok); toast('로그인했습니다.'); }
+    catch(x) { err(/locked/.test(x.message) ? '여러 번 틀려 10분 동안 잠겼습니다. 잠시 뒤 다시 시도하세요.' : '로그인하지 못했습니다.'); return false; }
+  });
+  f.querySelector('[data-ok]').textContent = '로그인';
+}
+async function sbTeacherLogout() {
+  if (!confirm('이 기기에서 선생님 로그아웃할까요?\n학생·시험지 정보는 지워지지 않고, 다시 로그인하면 이어서 씁니다.')) return;
+  const t = stuDB.pin; try { await sbCall('sb_teacher_logout', {t}); } catch(e) {}
+  stuDB.pin = ''; stuSave(); msgSetBadge(0); renderStu(); toast('로그아웃했습니다.');
+}
+function sbTeacherPw() {
+  const f = tModal(`<h2 class="text-lg font-semibold">선생님 비밀번호 바꾸기</h2>
+    <input name="o" type="password" autocomplete="current-password" placeholder="지금 비밀번호" class="w-full p-3">
+    <input name="n" type="password" autocomplete="new-password" placeholder="새 비밀번호 (8자 이상)" class="w-full p-3">
+    <input name="n2" type="password" autocomplete="new-password" placeholder="새 비밀번호 한 번 더" class="w-full p-3">`, async (f, err) => {
+    if (f.n.value.length < 8) return err('새 비밀번호는 8자 이상이어야 합니다.'), false;
+    if (f.n.value !== f.n2.value) return err('새 비밀번호가 서로 다릅니다.'), false;
+    try { if (!await sbCall('sb_teacher_pw', {t: stuDB.pin, oldpw: f.o.value, newpw: f.n.value})) return err('지금 비밀번호가 맞지 않습니다.'), false; toast('비밀번호를 바꿨습니다. 다른 기기는 다시 로그인해야 합니다.'); }
+    catch(x) { err(/not logged in/.test(x.message) ? '로그인이 만료되었습니다. 다시 로그인하세요.' : '바꾸지 못했습니다.'); return false; }
+  });
+  f.querySelector('[data-ok]').textContent = '바꾸기';
+}
+async function sbTeacherShow() {
+  const el = $('t-who'); if (!el || !tIsTok(stuDB.pin)) return;
+  try { const id = await sbCall('sb_teacher_me', {t: stuDB.pin}); if ($('t-who')) $('t-who').textContent = id ? `${id}(으)로 로그인됨` : '로그인이 만료되었습니다. 다시 로그인하세요.'; } catch(e) {}
 }
 /* ===== 선생님 기기 간 연동: 학생·수업·만든 시험지·결과를 서버(sb_tstate)와 맞춤 =====
    그림(data:…)은 해시로 바꿔 sb_blobs에 한 번만 올림. 마지막으로 맞춘 상태(base)와 비교하는 3방향 병합. */
@@ -2555,7 +2623,7 @@ async function syncState() {
       syStat(`기기 연동됨 · ${new Date().toLocaleTimeString('ko-KR')}` + (ms !== ls ? ' · 다른 기기 변경 반영' : ' · 올림'));
       break;
     }
-  } catch(e) { const m = String(e.message || e); syStat('기기 연동 실패: ' + (m.includes('bad pin') ? 'PIN이 맞지 않습니다.' : /sb_state_ver|PGRST202/.test(m) ? '서버에 연동 기능(update5 SQL)이 없습니다.' : '인터넷 연결을 확인하세요.')); }
+  } catch(e) { const m = String(e.message || e); syStat('기기 연동 실패: ' + (m.includes('bad pin') ? '로그인이 만료되었습니다. 학생 탭 첫 화면에서 다시 로그인하세요.' : /sb_state_ver|PGRST202/.test(m) ? '서버에 연동 기능(update5 SQL)이 없습니다.' : '인터넷 연결을 확인하세요.')); }
   finally { syBusy = false; if (syAgain) sySoon(); }
 }
 setInterval(() => { if (!document.hidden) syncState(); }, 6000);
@@ -2587,7 +2655,7 @@ async function syncSB() {
     const up = await sbPushOldExams();
     if (up) toast(`예전 시험지 ${up}개의 해설·단원 정보를 서버에 올렸습니다. 이제 학생 화면에서도 보입니다.`);
     if (st) st.textContent = `연결됨 · ${new Date().toLocaleTimeString('ko-KR')} 확인` + (n ? ` · 새 답 ${n}건 반영` : '');
-  } catch(e) { if (st) st.textContent = '연결 실패: PIN·서버 설정·인터넷을 확인하세요.'; }
+  } catch(e) { if (st) st.textContent = '연결 실패: 선생님 로그인·서버 설정·인터넷을 확인하세요.'; }
 }
 /* ===== 학생 화면 (GitHub Pages 주소): 아이디·비밀번호 로그인 → 답안 제출(?e=코드) / 내 학습 페이지(?me=1) ===== */
 const tokGet = () => { try { return localStorage.getItem('sb_tok'); } catch(e) { return null; } };
@@ -3017,7 +3085,7 @@ function msgBubbles(list, mineIsTeacher) {
 }
 function msgNeed() {
   if (!sbOn()) return '파일 맨 위 SB_CONFIG에 Supabase 설정이 필요합니다.';
-  if (!stuDB.pin) return '학생 탭 첫 화면에서 PIN을 먼저 설정하세요.';
+  if (!stuDB.pin) return '학생 탭 첫 화면에서 선생님 로그인을 먼저 하세요.';
   return '';
 }
 async function msgOpen(sid) {
@@ -3180,7 +3248,7 @@ function bkBanner() {
   let snooze = 0; try { snooze = +localStorage.getItem('sciBankBkSnooze') || 0; } catch(e) {}
   const show = has && (!t || Date.now() - t > 7 * 864e5) && Date.now() > snooze;
   el.classList.toggle('hidden', !show); if (!show) return;
-  el.querySelector('span').innerHTML = `<b>${t ? `마지막 백업 후 ${Math.floor((Date.now() - t) / 864e5)}일이 지났습니다.` : '아직 백업한 적이 없습니다.'}</b> 문제 DB·기출은 이 브라우저에만 저장됩니다. (학생·수업·만든 시험지는 PIN을 설정하면 다른 기기와 자동으로 맞춰집니다.)`;
+  el.querySelector('span').innerHTML = `<b>${t ? `마지막 백업 후 ${Math.floor((Date.now() - t) / 864e5)}일이 지났습니다.` : '아직 백업한 적이 없습니다.'}</b> 문제 DB·기출은 이 브라우저에만 저장됩니다. (학생·수업·만든 시험지는 선생님 로그인을 하면 다른 기기와 자동으로 맞춰집니다.)`;
 }
 function bkSnooze() { try { localStorage.setItem('sciBankBkSnooze', Date.now() + 864e5); } catch(e) {} bkBanner(); }
 function exportBackup() {
