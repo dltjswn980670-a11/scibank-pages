@@ -227,6 +227,11 @@ input[type=password]:focus,input[type=date]:focus{outline:none;border-color:var(
 .sb-modal{position:fixed;inset:0;background:rgba(22,32,46,.45);display:flex;align-items:flex-end;justify-content:center;z-index:60;padding:16px}
 .sb-sheet{background:#fff;border-radius:16px;max-width:28rem;width:100%;padding:20px;max-height:85vh;overflow:auto}
 @media(min-width:640px){.sb-modal{align-items:center}}
+/* 선생님 로그인 첫 화면: 로그인 전에는 앱을 덮음 */
+.t-gate{position:fixed;inset:0;z-index:70;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto}
+.t-gate .sb-sheet{max-width:24rem;border:1px solid var(--line);padding:28px 24px;max-height:none}
+.t-gate .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.15rem}
+html.t-lock body>*:not(.t-gate):not(script){visibility:hidden}
 .sb-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:12px 0}
 .sb-grid div{border:1px solid var(--line);border-radius:8px;text-align:center;padding:6px 0;font-size:.75rem;color:var(--muted)}
 .sb-grid div b{display:block;font-size:1.1rem;color:var(--ink)}
@@ -294,7 +299,7 @@ footer{padding:24px 0!important}
 <style>i[data-lucide],svg.lucide{display:inline-block;width:1.05em;height:1.05em;vertical-align:-.17em;margin-right:.35em;stroke-width:2;flex:none}</style>
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
-<input type="file" id="any-file" accept=".json" multiple class="hidden" onchange="importAny(this.files)">
+<input type="file" id="any-file" accept=".json,application/json,text/plain,application/octet-stream" multiple class="hidden" onchange="importAny(this.files)">
 <input type="file" id="any-dir" webkitdirectory multiple class="hidden" onchange="importAny(this.files)">
 <header class="hidden bg-indigo-600 text-white shadow-md">
   <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
@@ -322,8 +327,7 @@ footer{padding:24px 0!important}
   <div class="hero-import">
     <span><b>JSON 한번에 불러오기</b> 단원별 문제·기출 문제(변형 포함)·시중 교재·EBS·백업 파일을 섞어서 골라도 알아서 나눠 넣습니다.</span>
     <label for="any-file" class="hi-btn"><i data-lucide="folder-open"></i>파일 고르기</label>
-    <button type="button" onclick="importFolder()" class="hi-btn"><i data-lucide="folder"></i>폴더째 불러오기</button>
-  </div>
+    <button type="button" onclick="importFolder()" class="hi-btn"><i data-lucide="folder"></i>폴더째 불러오기</button>  </div>
 </div>
 
 <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
@@ -493,7 +497,7 @@ footer{padding:24px 0!important}
       </div>
       <label class="text-sm cursor-pointer"><input type="checkbox" id="pv-ans" onchange="renderPreview()" class="mr-1">정답·해설 포함</label>
       <label class="text-sm cursor-pointer" title="문항마다 성취기준 코드를 화면에만 표시합니다 (인쇄·한글 파일에는 들어가지 않음)"><input type="checkbox" id="pv-std" onchange="renderPreview()" class="mr-1">성취기준 표시</label>
-      <label class="text-sm flex items-center gap-2" title="수업을 고르면 그 수업 학생의 개인 페이지에 이 시험지가 보입니다">수업 <select id="pv-cls" onchange="pvSetClass(this.value)" class="border rounded-lg p-2 text-sm"></select></label>
+      <label class="text-sm flex items-center gap-2" title="수업을 고르면 그 수업 학생의 개인 페이지에 이 시험지가 보입니다">수업 <select id="pv-cls" onchange="pvSetClass(this.value)" class="border rounded-lg p-2 text-sm"></select></label><span id="pv-stu-box"></span>
       <button onclick="saveExamNow()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium text-sm"><i data-lucide="save"></i>시험지 저장</button>
       <button onclick="exportHwpx()" class="bg-gray-700 text-white px-4 py-2 rounded-lg font-medium text-sm"><i data-lucide="download"></i>다운로드 (.hwpx)</button>
       <button onclick="window.print()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium text-sm"><i data-lucide="printer"></i>인쇄</button>
@@ -520,7 +524,7 @@ footer{padding:24px 0!important}
         <select id="past-set" onchange="renderPast(curPast)" class="border rounded-lg p-2 text-sm"><option value="0">원본</option></select>
         <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition text-sm"><i data-lucide="printer"></i>인쇄</button>
         <button onclick="pastDownload()" class="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded-lg font-medium transition text-sm"><i data-lucide="download"></i>다운로드 (.hwpx)</button>
-        <span class="flex items-center gap-2"><select id="past-cls" onchange="pastSetClass(this.value)" class="border rounded-lg p-2 text-sm" title="QR 시험지의 수업"></select><button id="past-reg" onclick="pastRegister()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition text-sm"><i data-lucide="qr-code"></i>QR 시험지로 등록</button></span>
+        <span class="flex items-center gap-2"><select id="past-cls" onchange="pastSetClass(this.value)" class="border rounded-lg p-2 text-sm" title="QR 시험지의 수업"></select><span id="past-stu-box"></span><button id="past-reg" onclick="pastRegister()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition text-sm"><i data-lucide="qr-code"></i>QR 시험지로 등록</button></span>
       </div>
       <div id="past-units" class="flex items-center gap-2 flex-wrap"></div>
       <div class="flex items-center gap-4 flex-wrap text-sm">
@@ -1353,6 +1357,10 @@ function impProg(msg) {
   el.textContent = msg;
 }
 async function importFolder() {
+  /* 휴대폰 브라우저는 폴더 선택이 안 됨 → 여러 파일 고르기로 */
+  if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Macintosh/.test(navigator.userAgent))) {
+    toast('휴대폰에서는 폴더째 불러오기가 안 됩니다.\n파일 고르기 창에서 OneDrive → Claude 폴더로 가서 JSON 파일을 여러 개 골라 주세요.'); $('any-file').click(); return;
+  }
   if (!window.showDirectoryPicker) { $('any-dir').click(); return; }
   let h;
   try { h = await showDirectoryPicker({id: 'scibank-json', mode: 'read'}); } catch(e) { if (e.name !== 'AbortError') toast('폴더를 읽지 못했습니다: ' + e.message); return; }
@@ -2022,6 +2030,7 @@ function pastRegUI(x, pe) {
   const b = $('past-reg'), sel = $('past-cls'); if (!b || !sel) return;
   const cur = pe ? pe.classId || '' : sel.value;
   sel.innerHTML = '<option value="">수업 없음</option>' + CL().slice().sort((a, b) => a.name.localeCompare(b.name, 'ko')).map(c => `<option value="${c.id}" ${c.id === cur ? 'selected' : ''}>${esc(c.name)}</option>`).join('');
+  stuPickUI('past-stu-box', cur, pe ? pe.studentIds : pastPendStu, 'past');
   b.disabled = !x;
   b.innerHTML = pe ? `<i data-lucide="qr-code"></i>QR 등록됨 · 코드 ${exCode(pe.id)}` : '<i data-lucide="qr-code"></i>QR 시험지로 등록';
   b.className = (pe ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-indigo-600 hover:bg-indigo-700') + ' text-white px-4 py-2 rounded-lg font-medium transition text-sm disabled:opacity-50';
@@ -2033,18 +2042,33 @@ function pastRegister() {
   const k = pastCur(x), id = pastExamId(x, k), cid = $('past-cls').value;
   let e = stuDB.exams.find(y => y.id === id), isNew = !e;
   if (!e) { e = {id, at: Date.now()}; stuDB.exams.push(e); }
+  const prevCls = e.classId;
   if (cid && CL().some(c => c.id === cid)) e.classId = cid; else delete e.classId;
+  if (e.classId !== prevCls) delete e.studentIds;
+  if (isNew && e.classId && pastPendStu) e.studentIds = pastPendStu;
+  pastPendStu = null;
   e.name = pastName(x, k); e.questions = JSON.parse(JSON.stringify(pastQs(x, qs))); e.past = true;
   stuSave();
   if (sbOn() && stuDB.pin) sbPushExam(e).catch(() => toast('서버에 올리지 못했습니다. 인터넷 연결을 확인하세요.'));
   renderPast(x);
   toast(!sbReady() ? '시험지로 등록했습니다. QR은 Supabase 연결 설정 뒤에 표시됩니다.' : (isNew ? '시험지로 등록했습니다. ' : '문항·정답을 다시 올렸습니다. ') + `시험지 코드 ${exCode(id)}`);
 }
+let pastPendStu = null;   // 등록 전에 고른 학생 (등록할 때 적용)
 function pastSetClass(cid) {
-  const e = pastExam(); if (!e) return;   // 등록 전이면 등록할 때 이 수업으로 들어감
+  const e = pastExam();
+  if (!e) { pastPendStu = null; stuPickUI('past-stu-box', cid, null, 'past'); return; }   // 등록 전이면 등록할 때 이 수업으로 들어감
   if (cid) e.classId = cid; else delete e.classId;
+  delete e.studentIds;
   stuSave(); sbPushExamClass(e); renderPast(curPast);
-  const c = CL().find(y => y.id === cid); toast(c ? `"${c.name}" 수업에 넣었습니다.` : '수업에서 뺐습니다.');
+  const c = CL().find(y => y.id === cid); toast(c ? `"${c.name}" 수업에 넣었습니다. 이 수업 학생만 볼 수 있습니다.` : '수업에서 뺐습니다.');
+}
+function pastSetStudents(ids) {
+  const e = pastExam();
+  if (!e) { pastPendStu = ids; stuPickUI('past-stu-box', $('past-cls').value, ids, 'past'); toast('QR 시험지로 등록하면 고른 학생에게만 보입니다.'); return; }
+  if (!e.classId) return;
+  if (ids) e.studentIds = ids; else delete e.studentIds;
+  stuSave(); sbPushExamClass(e); renderPast(curPast);
+  toast(ids ? `고른 학생 ${ids.length}명만 이 시험지를 볼 수 있습니다.` : '수업 학생 전체가 이 시험지를 볼 수 있습니다.');
 }
 /* ===== 기출 문제: 직접 그린 그림 넣기 (변형 문제는 JSON의 variants로 불러옴) ===== */
 const pastShown = () => { const x = curPast, k = x ? pastCur(x) : 0; return !x ? null : k ? x.variants[k-1].questions : x.questions; };
@@ -2127,7 +2151,7 @@ function renderStu() {
         <b class="text-sm">백업</b>
         <p class="text-xs text-gray-500">학생·시험지·정오표·문제 DB·기출을 한 파일로 저장하고 다시 불러옵니다. 브라우저 데이터를 지우거나 컴퓨터를 바꾸기 전에 꼭 백업하세요.<br><span id="bk-last"></span></p>
         <div class="flex gap-2 flex-wrap"><button onclick="exportBackup()" class="bg-gray-700 hover:bg-gray-800 text-white px-3 py-2 rounded-lg text-xs font-semibold"><i data-lucide="download"></i>백업 파일 저장</button>
-          <input type="file" id="bk-file" accept=".json" class="hidden" onchange="importBackup(this.files[0])">
+          <input type="file" id="bk-file" accept=".json,application/json,text/plain,application/octet-stream" class="hidden" onchange="importBackup(this.files[0])">
           <label for="bk-file" class="cursor-pointer bg-white hover:bg-gray-100 border px-3 py-2 rounded-lg text-xs font-semibold"><i data-lucide="folder-open"></i>백업 파일 불러오기 (합치기)</label></div>
         <p class="text-xs text-gray-400">※ 보안을 위해 로그인 정보는 백업 파일에 들어가지 않습니다. 새 컴퓨터에서는 선생님 로그인을 다시 해 주세요.</p>
       </div>`;
@@ -2446,12 +2470,13 @@ async function sbSyncStudents(manual) {
 /* ===== 선생님 로그인 (supabase-update8.sql): 아이디·비밀번호 → 로그인 토큰을 stuDB.pin 자리에 보관
    (서버 함수는 예전처럼 p 값을 받고, 서버가 PIN 대신 토큰을 확인함. 처음 한 번만 지금 PIN으로 계정 만들기) ===== */
 const tIsTok = v => /^t_[0-9a-f]{48}$/.test(v || '');
-function tModal(html, onSubmit) {
-  const m = document.createElement('div'); m.className = 'sb-modal';
-  m.innerHTML = `<form class="sb-sheet space-y-3" role="dialog" aria-modal="true">${html}<p class="t-err text-sm text-red-600"></p>
-    <div class="flex gap-2"><button type="button" class="flex-1 sb-ghost" data-x>취소</button><button class="flex-1 sb-primary" data-ok></button></div></form>`;
-  const f = m.querySelector('form'), err = m.querySelector('.t-err'), close = () => m.remove();
-  m.querySelector('[data-x]').onclick = close;
+function tModal(html, onSubmit, gate) {
+  const m = document.createElement('div'); m.className = gate ? 't-gate' : 'sb-modal';
+  m.innerHTML = `<form class="sb-sheet space-y-3" role="dialog" aria-modal="true">${gate ? '<p class="logo" style="margin-bottom:14px"><span class="logo-tile"><i>51</i>Sb</span>Sci-Bank</p>' : ''}${html}<p class="t-err text-sm text-red-600"></p>
+    <div class="flex gap-2">${gate ? '' : '<button type="button" class="flex-1 sb-ghost" data-x>취소</button>'}<button class="flex-1 sb-primary" data-ok></button></div></form>`;
+  const f = m.querySelector('form'), err = m.querySelector('.t-err'), close = () => { m.remove(); if (gate) tUnlock(); };
+  if (gate) document.querySelectorAll('.t-gate').forEach(x => x.remove());
+  if (!gate) m.querySelector('[data-x]').onclick = close;
   f.onsubmit = async e => { e.preventDefault(); err.textContent = ''; const b = f.querySelector('[data-ok]'); b.disabled = true;
     try { if (await onSubmit(f, msg => { err.textContent = msg; }) !== false) close(); } catch(x) { err.textContent = '서버에 연결하지 못했습니다. 인터넷을 확인하세요.'; }
     b.disabled = false; };
@@ -2671,6 +2696,7 @@ function sbBindTop() {
 }
 function sbFail(e) {
   if (/not logged in/.test(String(e && e.message))) { tokSet(null); sbMe = null; sbLogin('로그인이 만료되었습니다. 다시 로그인해 주세요.'); return; }
+  if (/not allowed/.test(String(e && e.message))) { sbR().innerHTML = sbTop() + '<p class="text-center text-gray-500 py-10">이 시험지는 해당 수업 학생만 제출할 수 있습니다.</p><a href="?me=1" class="block text-center underline text-sm">내 학습 페이지로</a>'; sbBindTop(); return; }
   sbR().innerHTML = sbTop() + '<p class="text-center text-gray-500 py-10">서버 연결에 실패했습니다. 인터넷 연결을 확인하고 새로고침해 주세요.</p>'; sbBindTop();
 }
 /* 제출 확인 창: 고른 답을 한눈에 보여 주고 확인 후 제출 */
@@ -2770,6 +2796,7 @@ function sbChangePw(forced) {
 }
 async function sbExam(code) {
   let st; try { st = await sbCall('sb_exam_open', {t: tokGet(), c: code}); } catch(e) { return sbFail(e); }
+  if (st && st.denied) { sbR().innerHTML = sbTop() + '<p class="text-center text-gray-500 py-10">이 시험지는 해당 수업 학생만 볼 수 있습니다.<br>내 수업이 맞다면 선생님께 문의하세요.</p><a href="?me=1" class="block text-center underline text-sm">내 학습 페이지로</a>'; sbBindTop(); return; }
   if (!st) { sbR().innerHTML = sbTop() + '<p class="text-center text-gray-500 py-10">시험지를 찾을 수 없습니다. 시험지 코드를 확인하세요.</p><a href="?me=1" class="block text-center underline text-sm">내 학습 페이지로</a>'; sbBindTop(); return; }
   st.submitted ? sbResult(code, st) : sbAnswer(code, st);
 }
@@ -2982,7 +3009,10 @@ async function sbSyncClasses(manual) {
   } catch(e) { toast('수업을 서버에 올리지 못했습니다.\nSupabase에서 supabase-update4.sql을 실행했는지 확인하세요.'); }
 }
 function sbPushExamClass(e) {
-  if (sbOn() && stuDB.pin) sbCall('sb_set_exam_class', {p: stuDB.pin, c: exCode(e.id), cls: e.classId || ''}).catch(() => {});
+  if (!(sbOn() && stuDB.pin)) return;
+  sbCall('sb_set_exam_class', {p: stuDB.pin, c: exCode(e.id), cls: e.classId || ''}).catch(() => {});
+  sbCall('sb_set_exam_students', {p: stuDB.pin, c: exCode(e.id), ids: e.classId && e.studentIds ? e.studentIds : []})
+    .catch(() => { if (e.studentIds && !sbPushExamClass.warned) { sbPushExamClass.warned = true; toast('학생 고르기를 서버에 올리지 못했습니다.\nSupabase에서 supabase-update9.sql을 실행했는지 확인하세요.'); } });
 }
 function clsGo(...v) { clsView = v; renderCls(); }
 function renderCls() {
@@ -3017,8 +3047,8 @@ function renderCls() {
     <div class="flex items-center gap-2 mb-2 flex-wrap"><h3 class="font-semibold">이 수업 시험지 ${exs.length}개</h3>
       <button onclick="clsNewExam('${c.id}')" class="ml-auto bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-semibold"><i data-lucide="file-plus"></i>이 수업으로 새 시험지 만들기</button></div>
     ${free.length ? `<div class="flex gap-2 mb-3"><select id="cls-attach" class="flex-1 border rounded-lg p-2 text-sm">${free.map(e => `<option value="${e.id}">${esc(e.name)} (${new Date(e.at).toLocaleDateString('ko-KR')} · ${e.questions.length}문항)</option>`).join('')}</select><button onclick="clsAttach('${c.id}',$('cls-attach').value)" class="bg-white border px-3 py-2 rounded-lg text-sm font-semibold">이미 만든 시험지 넣기</button></div>` : ''}
-    <div class="space-y-2">${exs.map(e => { const n = stuDB.results.filter(r => r.examId === e.id && c.members.includes(r.studentId)).length;
-      return `<div><div class="flex items-center gap-3 border rounded-xl px-4 py-3 flex-wrap"><div class="flex-1 min-w-[12rem]"><div class="font-semibold">${esc(e.name)}</div><div class="text-xs text-gray-500">${new Date(e.at).toLocaleDateString('ko-KR')} · ${e.questions.length}문항 · 코드 ${exCode(e.id)} · 제출 ${n}/${mem.length}명</div></div>
+    <div class="space-y-2">${exs.map(e => { const tg = exTargets(e), n = stuDB.results.filter(r => r.examId === e.id && tg.includes(r.studentId)).length;
+      return `<div><div class="flex items-center gap-3 border rounded-xl px-4 py-3 flex-wrap"><div class="flex-1 min-w-[12rem]"><div class="font-semibold">${esc(e.name)}${e.studentIds ? ` <span class="text-xs font-normal text-gray-500" title="${esc(tg.map(id => (stuDB.students.find(s => s.id === id) || {}).name).join(', '))}">· 고른 학생 ${tg.length}명만</span>` : ''}</div><div class="text-xs text-gray-500">${new Date(e.at).toLocaleDateString('ko-KR')} · ${e.questions.length}문항 · 코드 ${exCode(e.id)} · 제출 ${n}/${tg.length}명</div></div>
         <button onclick="exOpen('${e.id}')" class="bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-semibold">문제 보기·QR 인쇄</button><button onclick="exSub('${e.id}','cls-sub-')" class="bg-emerald-600 text-white px-3 py-2 rounded-lg text-sm font-semibold">제출 현황</button><button onclick="clsAttach('','${e.id}')" class="text-xs text-gray-500">수업에서 빼기</button></div><div id="cls-sub-${e.id}" class="hidden"></div></div>`; }).join('') || '<p class="text-gray-400 text-sm">아직 이 수업에서 낸 시험지가 없습니다.</p>'}</div>`;
 }
 function clsAdd(ev) {
@@ -3044,12 +3074,13 @@ function clsDel(cid) {
   const c = CL().find(x => x.id === cid);
   if (!c || !confirm(`"${c.name}" 수업을 삭제할까요?\n학생과 시험지, 풀이 기록은 지워지지 않고 수업 묶음만 없어집니다.`)) return;
   stuDB.classes = CL().filter(x => x !== c);
-  stuDB.exams.forEach(e => { if (e.classId === cid) delete e.classId; });
+  stuDB.exams.forEach(e => { if (e.classId === cid) { delete e.classId; delete e.studentIds; } });
   clsSave(); clsGo('list');
 }
 function clsAttach(cid, eid) {
   const e = stuDB.exams.find(x => x.id === eid); if (!e) return;
   if (cid) e.classId = cid; else delete e.classId;
+  delete e.studentIds;
   stuSave(); sbPushExamClass(e); renderCls();
 }
 function clsNewExam(cid) { pendingCls = cid; toast('시험지를 만들면 이 수업에 들어갑니다. 미리보기 화면의 "수업"에서 바꿀 수 있습니다.'); switchTab('selector'); }
@@ -3058,14 +3089,46 @@ function pvClsOptions() {
   const sel = $('pv-cls'); if (!sel) return;
   const e = stuDB.exams.find(x => x.id === curExamId), cur = e ? e.classId || '' : pendingCls;
   sel.innerHTML = '<option value="">수업 없음</option>' + CL().slice().sort((a, b) => a.name.localeCompare(b.name, 'ko')).map(c => `<option value="${c.id}" ${c.id === cur ? 'selected' : ''}>${esc(c.name)}</option>`).join('');
+  stuPickUI('pv-stu-box', cur, e ? e.studentIds : null, 'pv');
 }
 function pvSetClass(cid) {
   saveExamRecord();
   const e = stuDB.exams.find(x => x.id === curExamId); if (!e) return;
   if (cid) e.classId = cid; else delete e.classId;
+  delete e.studentIds;
   stuSave(); sbPushExamClass(e); renderPreview();
   const c = CL().find(x => x.id === cid);
-  toast(c ? `"${c.name}" 수업 학생의 개인 페이지에 이 시험지가 보입니다.` : '수업에서 뺐습니다.');
+  toast(c ? `"${c.name}" 수업 학생만 이 시험지를 볼 수 있습니다. 옆의 "학생"에서 일부만 고를 수도 있습니다.` : '수업에서 뺐습니다.');
+}
+function pvSetStudents(ids) {
+  saveExamRecord();
+  const e = stuDB.exams.find(x => x.id === curExamId); if (!e || !e.classId) return;
+  if (ids) e.studentIds = ids; else delete e.studentIds;
+  stuSave(); sbPushExamClass(e); renderPreview();
+  toast(ids ? `고른 학생 ${ids.length}명만 이 시험지를 볼 수 있습니다.` : '수업 학생 전체가 이 시험지를 볼 수 있습니다.');
+}
+/* 시험지를 볼 학생 고르기: e.studentIds가 없으면 수업 학생 전체 */
+const clsMem = cid => { const c = cid && CL().find(x => x.id === cid); return c ? c.members.map(id => stuDB.students.find(s => s.id === id)).filter(Boolean).sort((x, y) => x.grade.localeCompare(y.grade, 'ko') || x.name.localeCompare(y.name, 'ko')) : []; };
+const exTargets = e => { const m = clsMem(e.classId).map(s => s.id); return e.studentIds ? m.filter(id => e.studentIds.includes(id)) : m; };
+function stuPickUI(boxId, cid, ids, kind) {
+  const box = $(boxId); if (!box) return;
+  const mem = clsMem(cid);
+  if (!mem.length) { box.innerHTML = cid ? '<span class="text-xs text-gray-400">수업에 학생이 없습니다</span>' : ''; return; }
+  const on = id => !ids || ids.includes(id), k = mem.filter(s => on(s.id)).length;
+  box.innerHTML = `<details class="relative inline-block text-sm"><summary class="border rounded-lg px-3 py-2 cursor-pointer bg-white list-none" title="이 시험지를 볼 학생">학생 ${k === mem.length ? `전체 ${k}명` : `${k}/${mem.length}명`} ▾</summary>
+    <div class="absolute z-30 mt-1 bg-white border rounded-lg shadow-lg p-3 w-64 space-y-2"><label class="flex items-center gap-2 font-semibold border-b pb-2 cursor-pointer"><input type="checkbox" class="sp-all accent-indigo-600" ${k === mem.length ? 'checked' : ''}>전체 선택</label>
+      <div class="max-h-64 overflow-auto space-y-1">${mem.map(s => `<label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" class="sp-one accent-indigo-600" value="${s.id}" ${on(s.id) ? 'checked' : ''}>${esc(s.name)} <span class="text-xs text-gray-400">${s.grade}</span></label>`).join('')}</div>
+      <button type="button" class="sp-ok w-full bg-indigo-600 text-white rounded-lg py-2 font-semibold">적용</button></div></details>`;
+  const d = box.firstElementChild, all = d.querySelector('.sp-all'), ones = [...d.querySelectorAll('.sp-one')];
+  all.onchange = () => ones.forEach(x => x.checked = all.checked);
+  ones.forEach(x => x.onchange = () => { const n = ones.filter(y => y.checked).length; all.checked = n === ones.length; all.indeterminate = n > 0 && n < ones.length; });
+  all.indeterminate = k > 0 && k < mem.length;
+  d.querySelector('.sp-ok').onclick = () => {
+    const sel = ones.filter(x => x.checked).map(x => x.value);
+    if (!sel.length) { toast('학생을 한 명 이상 고르세요.'); return; }
+    const v = sel.length === mem.length ? null : sel;
+    kind === 'past' ? pastSetStudents(v) : pvSetStudents(v);
+  };
 }
 function stuOpen(sid) { switchTab('stu'); stuGo('detail', sid); }
 
