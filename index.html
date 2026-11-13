@@ -2487,10 +2487,29 @@ function tLoggedIn(tok) {
   stuDB.pin = tok; stuSave(); sbSyncStudents(true); syncSB(); syncState();
   if (!$('tab-stu').classList.contains('hidden')) renderStu();
 }
-async function sbTeacherLogin() {
+/* 첫 화면 잠금: 선생님 화면(학생 링크가 아닐 때)은 로그인해야 지금 첫 화면이 보임 */
+function tUnlock() { document.documentElement.classList.remove('t-lock'); document.querySelectorAll('.t-gate').forEach(x => x.remove()); }
+function tGateMsg(msg, retry) {
+  const m = document.createElement('div'); m.className = 't-gate';
+  m.innerHTML = `<div class="sb-sheet space-y-3"><p class="logo" style="margin-bottom:14px"><span class="logo-tile"><i>51</i>Sb</span>Sci-Bank</p><p class="text-sm text-gray-600" style="word-break:keep-all">${msg}</p>${retry ? '<button class="w-full sb-primary">다시 시도</button>' : ''}</div>`;
+  document.querySelectorAll('.t-gate').forEach(x => x.remove()); document.body.appendChild(m);
+  if (retry) m.querySelector('button').onclick = () => sbTeacherLogin(true);
+}
+async function tGateStart() {
+  if (!sbOn()) return tUnlock();
+  await stuReady;
+  if (!tIsTok(stuDB.pin)) return sbTeacherLogin(true);
+  tUnlock();
+  try { if (!await sbCall('sb_teacher_me', {t: stuDB.pin})) { stuDB.pin = ''; stuSave(); document.documentElement.classList.add('t-lock'); sbTeacherLogin(true, '로그인이 만료되었습니다. 다시 로그인하세요.'); } } catch(e) {}
+}
+async function sbTeacherLogin(gate, note) {
   if (!sbOn()) { toast('파일 맨 위 SB_CONFIG에 Supabase 주소·키를 먼저 입력하세요.'); return; }
+  gate = gate === true;
   let exists; try { exists = await sbCall('sb_teacher_exists', {}); }
-  catch(e) { toast(/function|schema cache|not find|PGRST202/i.test(e.message) ? '서버에 선생님 로그인 기능이 없습니다. Supabase에서 supabase-update8.sql을 실행하세요.' : '서버에 연결하지 못했습니다.'); return; }
+  catch(e) {
+    const msg = /function|schema cache|not find|PGRST202/i.test(e.message) ? '서버에 선생님 로그인 기능이 없습니다. Supabase에서 supabase-update8.sql을 실행하세요.' : '서버에 연결하지 못했습니다. 인터넷 연결을 확인하세요.';
+    gate ? tGateMsg(msg, true) : toast(msg); return;
+  }
   if (!exists) {
     const oldPin = tIsTok(stuDB.pin) ? '' : (stuDB.pin || '');
     const f = tModal(`<h2 class="text-lg font-semibold">선생님 계정 만들기</h2>
@@ -2506,23 +2525,24 @@ async function sbTeacherLogin() {
       if (pw !== f.pw2.value) return err('비밀번호가 서로 다릅니다.'), false;
       try { const tok = await sbCall('sb_teacher_setup', {pin: f.pin.value.trim(), lid, pw}); tLoggedIn(tok); toast(`선생님 계정(${lid})을 만들고 로그인했습니다.\n서버의 PIN은 지웠습니다.`); }
       catch(x) { const m = x.message || ''; err(/bad pin/.test(m) ? 'PIN이 맞지 않습니다.' : /locked/.test(m) ? '여러 번 틀려 10분 동안 잠겼습니다.' : /already set/.test(m) ? '이미 선생님 계정이 있습니다. 창을 닫고 다시 로그인하세요.' : '계정을 만들지 못했습니다: ' + m); return false; }
-    });
+    }, gate);
     f.querySelector('[data-ok]').textContent = '계정 만들기';
     return;
   }
-  const f = tModal(`<h2 class="text-lg font-semibold">선생님 로그인</h2>
+  const f = tModal(`<h2 class="text-lg font-semibold">선생님 로그인</h2>${note ? `<p class="text-sm text-gray-600">${esc(note)}</p>` : ''}
     <input name="lid" type="text" autocomplete="username" autocapitalize="off" placeholder="아이디" class="w-full p-3">
     <input name="pw" type="password" autocomplete="current-password" placeholder="비밀번호" class="w-full p-3">`, async (f, err) => {
     const lid = f.lid.value.trim(), pw = f.pw.value; if (!lid || !pw) return err('아이디와 비밀번호를 입력하세요.'), false;
     try { const tok = await sbCall('sb_teacher_login', {lid, pw}); if (!tok) return err('아이디 또는 비밀번호가 맞지 않습니다.'), false; tLoggedIn(tok); toast('로그인했습니다.'); }
     catch(x) { err(/locked/.test(x.message) ? '여러 번 틀려 10분 동안 잠겼습니다. 잠시 뒤 다시 시도하세요.' : '로그인하지 못했습니다.'); return false; }
-  });
+  }, gate);
   f.querySelector('[data-ok]').textContent = '로그인';
 }
 async function sbTeacherLogout() {
   if (!confirm('이 기기에서 선생님 로그아웃할까요?\n학생·시험지 정보는 지워지지 않고, 다시 로그인하면 이어서 씁니다.')) return;
   const t = stuDB.pin; try { await sbCall('sb_teacher_logout', {t}); } catch(e) {}
   stuDB.pin = ''; stuSave(); msgSetBadge(0); renderStu(); toast('로그아웃했습니다.');
+  document.documentElement.classList.add('t-lock'); sbTeacherLogin(true);
 }
 function sbTeacherPw() {
   const f = tModal(`<h2 class="text-lg font-semibold">선생님 비밀번호 바꾸기</h2>
@@ -3333,7 +3353,8 @@ updateCurriculum();
 $('question-list').addEventListener('input', saveDraft);
 $('exam-name').addEventListener('input', saveDraft);
 if (SP.get('e') || SP.get('s') || SP.has('me')) renderSbStudent();
-else Promise.all([dbReady, pastReady, stuReady, idbGet(DK).catch(() => null)]).then(([, , , d]) => {
+else { if (sbOn()) document.documentElement.classList.add('t-lock'); tGateStart(); }
+if (!(SP.get('e') || SP.get('s') || SP.has('me'))) Promise.all([dbReady, pastReady, stuReady, idbGet(DK).catch(() => null)]).then(([, , , d]) => {
   if (d && Array.isArray(d.questions) && d.questions.length && !currentQuestions.length) {
     currentQuestions = d.questions; curExamId = d.examId || null; pvExtra = d.pvExtra || [];
     if (d.name) $('exam-name').value = d.name;
