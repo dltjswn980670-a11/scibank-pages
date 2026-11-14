@@ -3133,13 +3133,23 @@ const exTargets = e => { const m = clsMem(e.classId).map(s => s.id); return e.st
 function stuPickUI(boxId, cid, ids, kind) {
   const box = $(boxId); if (!box) return;
   const mem = clsMem(cid);
-  if (!mem.length) { box.innerHTML = cid ? '<span class="text-xs text-gray-400">수업에 학생이 없습니다</span>' : ''; return; }
+  if (!mem.length) {
+    const c = cid && CL().find(x => x.id === cid);
+    box.innerHTML = `<span class="text-xs text-gray-400" style="word-break:keep-all">${!c ? '수업을 고르면 볼 학생도 고를 수 있습니다' : c.members.length ? '수업 학생 정보가 이 기기에 없습니다. 학생 탭에서 명단을 확인하세요' : '이 수업에 학생이 없습니다. 수업 탭에서 학생을 넣으세요'}</span>`;
+    return;
+  }
   const on = id => !ids || ids.includes(id), k = mem.filter(s => on(s.id)).length;
   box.innerHTML = `<details class="relative inline-block text-sm"><summary class="border rounded-lg px-3 py-2 cursor-pointer bg-white list-none" title="이 시험지를 볼 학생">학생 ${k === mem.length ? `전체 ${k}명` : `${k}/${mem.length}명`} ▾</summary>
     <div class="absolute z-30 mt-1 bg-white border rounded-lg shadow-lg p-3 w-64 space-y-2"><label class="flex items-center gap-2 font-semibold border-b pb-2 cursor-pointer"><input type="checkbox" class="sp-all accent-indigo-600" ${k === mem.length ? 'checked' : ''}>전체 선택</label>
       <div class="max-h-64 overflow-auto space-y-1">${mem.map(s => `<label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" class="sp-one accent-indigo-600" value="${s.id}" ${on(s.id) ? 'checked' : ''}>${esc(s.name)} <span class="text-xs text-gray-400">${s.grade}</span></label>`).join('')}</div>
       <button type="button" class="sp-ok w-full bg-indigo-600 text-white rounded-lg py-2 font-semibold">적용</button></div></details>`;
   const d = box.firstElementChild, all = d.querySelector('.sp-all'), ones = [...d.querySelectorAll('.sp-one')];
+  d.ontoggle = () => {   // 좁은 화면에서 목록이 오른쪽으로 잘리지 않게
+    const p = d.querySelector('div'); p.style.left = '0'; if (!d.open) return;
+    const r = p.getBoundingClientRect(), cw = document.documentElement.clientWidth;
+    let sh = Math.max(0, r.right - (cw - 8)); sh = Math.min(sh, Math.max(0, r.left - 8));
+    p.style.left = -sh + 'px';
+  };
   all.onchange = () => ones.forEach(x => x.checked = all.checked);
   ones.forEach(x => x.onchange = () => { const n = ones.filter(y => y.checked).length; all.checked = n === ones.length; all.indeterminate = n > 0 && n < ones.length; });
   all.indeterminate = k > 0 && k < mem.length;
