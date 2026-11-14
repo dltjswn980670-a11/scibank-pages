@@ -1240,6 +1240,17 @@ async function bvOpen(b) {
     for (const r of recs) { if (!files.has(r.f)) files.set(r.f, await bookArr(r.f)); const q = files.get(r.f)[r.i]; if (q && valid(q)) items.push({r, q}); }
   } catch(e) { if (my === bvSeq) $('bv-page').innerHTML = '<p class="text-sm text-red-500">교재 파일을 읽지 못했습니다. 시중 교재 탭에서 폴더째 다시 불러와 주세요.</p>'; return; }
   if (my !== bvSeq) return;
+  /* 같은 교재가 여러 파일로 들어 있어도 같은 문제는 한 번만: 출처(쪽·번호)가 같거나 지문이 같으면 하나 (그림 있는 쪽, 새 목록 우선) */
+  { const by = new Map(), keep = [];
+    const better = (a, b) => (!!b.q.image - !!a.q.image) || (!!b.r.qh - !!a.r.qh);
+    for (const it of items) {
+      const src = String(it.q.source || '').replace(/\s+/g, ''), t = sqT(it.q);
+      const ks = [src && 's:' + src, t.length >= 15 && 't:' + t].filter(Boolean);
+      const hit = ks.map(k => by.get(k)).find(i => i !== undefined);
+      if (hit === undefined) { ks.forEach(k => by.set(k, keep.length)); keep.push(it); }
+      else { if (better(keep[hit], it) > 0) keep[hit] = it; ks.forEach(k => by.set(k, hit)); }
+    }
+    items = keep; }
   const pg = new Map();
   items.forEach(it => { const [k, nm] = bvPageOf(it.q); if (!pg.has(nm)) pg.set(nm, {k, nm, items: []}); pg.get(nm).items.push(it); });
   bvPages = [...pg.values()].sort((a, b) => a.k - b.k || a.nm.localeCompare(b.nm, 'ko'));
@@ -1499,7 +1510,18 @@ function diffTotal() {
   });
   $('diff-total').innerHTML = `총 ${t}문항` + (short ? ` <span class="text-red-500">· DB 부족 ${short}문항 (빨간 칸, 실제 추출 ${t - short}문항)</span>` : '');
 }
+/* 최근에 뽑은 문제 기억: 새로 만들 때 안 쓴 문제부터, 그다음 오래전에 쓴 문제 순으로 뽑음 (이 브라우저에만 저장) */
+const UK = 'sciBankUsed_v1';
+let usedQ = {};
+const usedReady = idbGet(UK).then(v => { if (v && typeof v === 'object') usedQ = v; }).catch(() => {});
+const useKey = q => q.f != null ? (q.qh || q.f + '#' + q.i) : syHash(sqT(q));
+function markUsed(list) {
+  const now = Date.now(); list.forEach(q => { usedQ[useKey(q)] = now; });
+  const ks = Object.keys(usedQ); if (ks.length > 30000) ks.sort((a, b) => usedQ[a] - usedQ[b]).slice(0, ks.length - 30000).forEach(k => delete usedQ[k]);
+  idbSet(UK, usedQ).catch(() => {});
+}
 async function extractNow() {
+  await usedReady;
   const grade = srcGrade, pool = srcPool(), lack = [], seen = new Set();
   /* 같은 지문은 한 번만 뽑음 (교재 목록은 지문 정보 r.qh, 없으면 파일·번호) */
   const qk = q => q.f != null ? (q.qh ? (q.ql >= 15 ? q.qh : q.qh + '|' + q.ch) : q.f + '#' + q.i) : (t => t.length >= 15 ? t : t + '|' + sqC(q))(sqT(q));
@@ -1508,12 +1530,14 @@ async function extractNow() {
     const n = Math.max(0, parseInt($(`dn${i}_${k}`).value) || 0); if (!n) return;
     const a = pool.filter(q => q.grade===grade && q.unit===u && dif(q)===lv && (!subs.length || subs.includes(q.sub)));
     for (let x = a.length-1; x > 0; x--) { const j = Math.floor(Math.random()*(x+1)); [a[x],a[j]] = [a[j],a[x]]; }
+    a.sort((x, y) => (usedQ[useKey(x)] || 0) - (usedQ[useKey(y)] || 0));   // 안 쓴 문제 먼저 (같은 조건끼리는 섞인 순서 그대로)
     const got = [];
     for (const q of a) { if (got.length >= n) break; const k = qk(q); if (seen.has(k)) continue; seen.add(k); got.push(q); }
     if (got.length < n) lack.push(`${u}${subs.length ? ' [' + subs.join('·') + ']' : ''} (${lv}): ${got.length}/${n}문제`);
     out.push(...got);
   }));
   if (!out.length) { toast('추출할 문제가 없습니다. 문항 수를 입력하거나 DB에 문제를 추가하세요.'); return; }
+  markUsed(out);
   if (src === 'book') { out = await bookLoad(out); if (!out || !out.length) return; }
   out = uniqQs(out);
   if (lack.length) toast('DB 문제가 부족해 일부만 추출합니다.\n' + lack.join('\n'));
