@@ -933,6 +933,8 @@ const dbReady = (async () => { try { let a = await idbGet(LS);
   const r = fixUnits(masterDB);
   if (r.ch || r.out.length) { masterDB = r.keep; trashDB.push(...r.out); saveDB(); await idbSet(TK, trashDB).catch(() => {});
     setTimeout(() => toast(`단원 이름을 22개정에 맞췄습니다: ${r.ch}문제 고침${r.out.length ? `, 22개정에 없는 ${r.out.length}문제는 휴지통으로(되살리기 가능)` : ''}`), 800); }
+  /* 이미 들어 있는 같은 지문 정리 (그림 있는 쪽만) */
+  const dn = dedupMaster(); if (dn) { saveDB(); setTimeout(() => toast(`단원별 문제에서 지문이 같은 문제 ${dn}개를 정리했습니다 (그림 있는 쪽만 남김).`), 1600); }
 } catch(e) {} updateStats(); setTimeout(trashUI, 0); })();
 let currentQuestions = [];
 
@@ -1146,6 +1148,11 @@ const bookReady = (async () => { try { const a = await idbGet(BIK); if (a && Arr
   /* 색인 단원도 22개정 이름으로(22개정에 없는 단원은 목록에서 뺌) */
   const n0 = bookIdx.recs.length; let ch = 0;
   bookIdx.recs = bookIdx.recs.filter(r => { const x = fixUnit(r); if (x === true) ch++; return x !== 'trash'; });
+  /* 같은 이름 파일이 크기만 다르게 두 번 들어 있으면(고친 파일을 다시 불러온 경우) 지문 정보가 있는 새 쪽만 남김 */
+  const byName = new Map(); bookIdx.recs.forEach(r => { const nm = r.f.slice(0, r.f.lastIndexOf('#')), o = byName.get(nm) || new Map(); o.set(r.f, (o.get(r.f) || 0) || (r.qh ? 1 : 0)); byName.set(nm, o); });
+  const stale = new Set(); byName.forEach(o => { if (o.size > 1 && [...o.values()].some(Boolean)) o.forEach((v, f) => { if (!v) stale.add(f); }); });
+  if (stale.size) { bookIdx.recs = bookIdx.recs.filter(r => !stale.has(r.f)); stale.forEach(f => idbDel('bk:' + f).catch(() => {})); }
+  bookDedup();
   if (ch || bookIdx.recs.length < n0) idbSet(BIK, bookIdx).catch(() => {}); } catch(e) {} })();
 /* 교재 이름: 출처에서 쪽·번호·회차를 떼어 냄 (예: "오투 고등화학 시험대비 p50 3번" → "오투 고등화학 시험대비"). EBS는 시험 종류(exam) */
 function bookOf(q) {
@@ -1270,9 +1277,9 @@ async function bookWalk(h, pre, out) {
 /* 같은 파일은 어느 경로로 불러와도 같은 키 → 다시 불러오면 새 내용으로 바뀜 */
 const fileKey = f => f.name + '#' + f.size;
 async function bookStore(key, arr) {
-  /* EBS 파일은 이름이 같으면 크기가 달라도 같은 시험 묶음 → 옛 파일을 지우고 새 내용으로 바꿈 */
-  const nm = key.slice(0, key.lastIndexOf('#') + 1), isEbs = arr.some(q => q && q.exam);
-  const old = isEbs ? [...new Set(bookIdx.recs.filter(r => r.f !== key && r.f.startsWith(nm) && r.f.slice(nm.length).match(/^\d+$/)).map(r => r.f))] : [];
+  /* 이름이 같은 파일은 크기가 달라도(내용을 고친 파일) 같은 교재 → 옛 파일을 지우고 새 내용으로 바꿈 (교재 이름도 같을 때만) */
+  const nm = key.slice(0, key.lastIndexOf('#') + 1), books = new Set(arr.filter(q => q && valid(q)).map(bookOf));
+  const old = [...new Set(bookIdx.recs.filter(r => r.f !== key && r.f.startsWith(nm) && /^\d+$/.test(r.f.slice(nm.length)) && books.has(r.book)).map(r => r.f))];
   await idbSet('bk:' + key, arr);
   for (const f of old) await idbDel('bk:' + f).catch(() => {});
   bookIdx.recs = bookIdx.recs.filter(r => r.f !== key && !old.includes(r.f));
@@ -1340,6 +1347,23 @@ const sqC = q => (q.choices || []).map(x => String(x).replace(/\s+/g, '').replac
 const sqBare = q => (q.choices || []).every(x => !String(x).replace(/[\s①②③④⑤.]/g, ''));
 const sameQ = (a, b) => { const t = sqT(a); if (!t || t !== sqT(b)) return false;
   return t.length >= 15 || (!sqBare(a) && sqC(a) === sqC(b)); };
+/* 이미 DB에 들어 있는 같은 지문 정리: 그림 있는 쪽 하나만 남김. 반환: 뺀 수 */
+function dedupMaster() {
+  const g = new Map(), keep = []; let out = 0;
+  for (const q of masterDB) {
+    const t = sqT(q), list = g.get(t) || [], i = list.findIndex(k => sameQ(keep[k], q));
+    if (i < 0) { list.push(keep.length); g.set(t, list); keep.push(q); continue; }
+    out++; if (q.image && !keep[list[i]].image) keep[list[i]] = q;
+  }
+  if (out) masterDB = keep;
+  return out;
+}
+/* 뽑은 문제에서 같은 지문 빼기 (그림 있는 쪽 남김, 순서 유지) */
+function uniqQs(qs) {
+  const keep = [];
+  for (const q of qs) { const i = keep.findIndex(k => sameQ(k, q)); if (i < 0) keep.push(q); else if (q.image && !keep[i].image) keep[i] = q; }
+  return keep;
+}
 function addBank(arr, c, keys) {
   if (!c._tm) { c._tm = new Map(); masterDB.forEach((x, i) => { const t = sqT(x); if (!c._tm.has(t)) c._tm.set(t, []); c._tm.get(t).push(i); }); }
   for (const q of arr) {
@@ -1418,7 +1442,8 @@ async function importAny(files) {
     } catch(e) { c.bad++; badN.push(f.name); }
   }
   impProg();
-  if (c.q || c.img) saveDB();
+  c.mdup = dedupMaster();
+  if (c.q || c.img || c.mdup) saveDB();
   if (c.past || c.prep) idbSet(PK, pastDB).catch(() => toast('기출 시험지를 브라우저에 저장하지 못했습니다.'));
   if (c.bk) stuSave();
   if (c.bookF) { c.bdup = bookDedup(); bookIdx.at = Date.now(); await idbSet(BIK, bookIdx).catch(() => toast('교재 목록을 브라우저에 저장하지 못했습니다.')); }
@@ -1428,6 +1453,7 @@ async function importAny(files) {
   const L = [];
   if (c.q || c.dup) L.push(`단원별 문제 +${c.q}` + (c.dup ? ` (중복 제외 ${c.dup})` : ''));
   if (c.img) L.push(`같은 지문의 그림 있는 문제로 ${c.img}개 바꿈`);
+  if (c.mdup) L.push(`단원별 문제에 이미 있던 같은 지문 ${c.mdup}개 정리`);
   if (c.bdup) L.push(`교재·EBS에서 지문이 같은 문제 ${c.bdup}개는 그림 있는 쪽만 남김`);
   if (c.past || c.prep) L.push(`기출 시험지 +${c.past}` + (c.prep ? ` · 새 내용으로 바꿈 ${c.prep}` : ''));
   if (c.book) L.push(`시중 교재 문제 ${c.book}개`);
@@ -1474,17 +1500,22 @@ function diffTotal() {
   $('diff-total').innerHTML = `총 ${t}문항` + (short ? ` <span class="text-red-500">· DB 부족 ${short}문항 (빨간 칸, 실제 추출 ${t - short}문항)</span>` : '');
 }
 async function extractNow() {
-  const grade = srcGrade, pool = srcPool(), lack = [];
+  const grade = srcGrade, pool = srcPool(), lack = [], seen = new Set();
+  /* 같은 지문은 한 번만 뽑음 (교재 목록은 지문 정보 r.qh, 없으면 파일·번호) */
+  const qk = q => q.f != null ? (q.qh ? (q.ql >= 15 ? q.qh : q.qh + '|' + q.ch) : q.f + '#' + q.i) : (t => t.length >= 15 ? t : t + '|' + sqC(q))(sqT(q));
   let out = [];
   diffUnits.forEach(({u, subs}, i) => LV.forEach((lv, k) => {
     const n = Math.max(0, parseInt($(`dn${i}_${k}`).value) || 0); if (!n) return;
     const a = pool.filter(q => q.grade===grade && q.unit===u && dif(q)===lv && (!subs.length || subs.includes(q.sub)));
     for (let x = a.length-1; x > 0; x--) { const j = Math.floor(Math.random()*(x+1)); [a[x],a[j]] = [a[j],a[x]]; }
-    if (a.length < n) lack.push(`${u}${subs.length ? ' [' + subs.join('·') + ']' : ''} (${lv}): ${a.length}/${n}문제`);
-    out.push(...a.slice(0, n));
+    const got = [];
+    for (const q of a) { if (got.length >= n) break; const k = qk(q); if (seen.has(k)) continue; seen.add(k); got.push(q); }
+    if (got.length < n) lack.push(`${u}${subs.length ? ' [' + subs.join('·') + ']' : ''} (${lv}): ${got.length}/${n}문제`);
+    out.push(...got);
   }));
   if (!out.length) { toast('추출할 문제가 없습니다. 문항 수를 입력하거나 DB에 문제를 추가하세요.'); return; }
   if (src === 'book') { out = await bookLoad(out); if (!out || !out.length) return; }
+  out = uniqQs(out);
   if (lack.length) toast('DB 문제가 부족해 일부만 추출합니다.\n' + lack.join('\n'));
   currentQuestions = out.map(q => JSON.parse(JSON.stringify(q)));
   pvExtra = []; curExamId = uid('e');
