@@ -1027,7 +1027,7 @@ const STD_KW = {
   '9과11-01': '원소 화합물 화학식 원소 기호 불꽃 반응', '9과11-02': '원자 양성자 중성자 전자 원자핵', '9과11-03': '주기율표 족 주기', '9과11-04': '분자 이온 양이온 음이온 앙금',
   '9과12-01': '광합성 빛의 세기 이산화 탄소 엽록체 산소', '9과12-02': '호흡 광합성 BTB', '9과12-03': '녹말 포도당 설탕 체관 저장',
   '9과13-01': '소화 아밀레이스 펩신 라이페이스 쓸개즙 이자액 녹말 단백질 지방 영양소', '9과13-02': '심장 혈관 혈액 순환 적혈구 백혈구 혈소판 혈장 심방 심실',
-  '9과13-03': '폐 허파 허파꽈리 폐포 기관지 횡격막 갈비뼈 들숨 날숨', '9과13-04': '콩팥 오줌 요소 네프론 토리 사구체 보먼주머니 세뇨관 재흡수', '9과13-05': '세포호흡 소화계 순환계 호흡계 배설계',
+  '9과13-03': '폐 허파 허파꽈리 폐포 기관지 가로막 횡격막 갈비뼈 들숨 날숨', '9과13-04': '콩팥 오줌 요소 네프론 토리 사구체 보먼주머니 세뇨관 재흡수', '9과13-05': '세포호흡 소화계 순환계 호흡계 배설계',
   '9과14-01': '마찰 전기 정전기 유도 검전기 대전', '9과14-02': '전류 전압 저항 옴의 법칙', '9과14-03': '직렬 병렬 전력 전기 에너지', '9과14-04': '자기장 코일 전동기 자기력',
   '9과15-01': '연주 시차 등급 밝기 표면 온도 색 절대 등급 겉보기', '9과15-02': '우리은하 성운 성단', '9과15-03': '우주 팽창 대폭발', '9과15-04': '우주 탐사 인공위성 탐사선',
   '9과16-01': '물리 변화 화학 변화', '9과16-02': '화학 반응식 계수', '9과16-03': '질량 보존', '9과16-04': '일정 성분비 질량비', '9과16-05': '기체 반응 부피비', '9과16-06': '발열 흡열 반응 열에너지',
@@ -1279,9 +1279,27 @@ async function bookStore(key, arr) {
   let ok = 0;
   arr.forEach((q, i) => { if (!valid(q) || fixUnit(q) === 'trash') return; ok++;
     const r = {f: key, i, grade: q.grade, unit: q.unit, sub: q.sub || '', difficulty: dif(q), book: bookOf(q)};
+    const t = sqT(q); r.qh = syHash(t); r.ql = t.length; r.ch = sqBare(q) ? '' : syHash(sqC(q)); if (q.image) r.img = 1;
     if (q.exam) { r.exam = 1; r.yr = String(q.year || (/(\d{4})학년도/.exec(q.source || '') || [])[1] || ''); }
     bookIdx.recs.push(r); });
   return ok;
+}
+/* 교재 목록에서 지문이 같은 문제는 하나만: 그림 있는 쪽을 남김 (지문 정보가 없는 예전 목록은 그대로) */
+function bookDedup() {
+  const g = new Map(); let out = 0;
+  bookIdx.recs.forEach(r => { if (r.qh && r.ql) { if (!g.has(r.qh)) g.set(r.qh, []); g.get(r.qh).push(r); } });
+  const drop = new Set();
+  for (const rs of g.values()) {
+    if (rs.length < 2) continue;
+    rs.sort((a, b) => (b.img || 0) - (a.img || 0));   // 그림 있는 것 먼저
+    const kept = [];
+    for (const r of rs) {
+      const dup = kept.find(k => r.ql >= 15 || (k.ch && k.ch === r.ch));
+      if (dup) { drop.add(r); out++; } else kept.push(r);
+    }
+  }
+  if (out) bookIdx.recs = bookIdx.recs.filter(r => !drop.has(r));
+  return out;
 }
 async function bookArr(f) {
   const a = await idbGet('bk:' + f).catch(() => null);
@@ -1315,15 +1333,28 @@ function jsonKind(d) {
   if (Array.isArray(d)) { const v = d.filter(valid); if (v.length) return v.filter(q => q.source || q.imageOnly || q.exam).length >= v.length * 0.8 ? 'book' : 'bank'; }
   return '';
 }
+/* 같은 지문 찾기: 지문(빈칸 무시)이 같으면 같은 문제(그림이 없어도 하나만).
+   지문이 아주 짧으면('옳은 것은?' 같은 15자 미만) 선택지까지 같아야 같은 문제 */
+const sqT = q => String(q.question || '').replace(/\s+/g, '');
+const sqC = q => (q.choices || []).map(x => String(x).replace(/\s+/g, '').replace(/^[①②③④⑤]/, '')).join('|');
+const sqBare = q => (q.choices || []).every(x => !String(x).replace(/[\s①②③④⑤.]/g, ''));
+const sameQ = (a, b) => { const t = sqT(a); if (!t || t !== sqT(b)) return false;
+  return t.length >= 15 || (!sqBare(a) && sqC(a) === sqC(b)); };
 function addBank(arr, c, keys) {
+  if (!c._tm) { c._tm = new Map(); masterDB.forEach((x, i) => { const t = sqT(x); if (!c._tm.has(t)) c._tm.set(t, []); c._tm.get(t).push(i); }); }
   for (const q of arr) {
     if (!valid(q)) continue;
     if (fixUnit(q) === 'trash') { c.trash = (c.trash || 0) + 1; continue; }
-    const k = keyOf(q);
-    if (keys.has(k)) { if (q.image) { const o = masterDB.find(x => keyOf(x) === k); if (o && !o.image) { o.image = q.image; c.img++; } } c.dup++; continue; }
-    keys.add(k);
+    /* 지문이 같은 문제가 이미 있으면 그림 있는 쪽만 남김 */
+    const t = sqT(q), same = (c._tm.get(t) || []).find(i => sameQ(masterDB[i], q));
+    if (same !== undefined) {
+      if (q.image && !masterDB[same].image) { masterDB[same] = q; keys.add(keyOf(q)); c.img++; }
+      c.dup++; continue;
+    }
+    keys.add(keyOf(q));
     if (!(curriculum2022[q.grade] || []).includes(q.unit)) c.unk++;
     masterDB.push(q); c.q++;
+    if (!c._tm.has(t)) c._tm.set(t, []); c._tm.get(t).push(masterDB.length - 1);
   }
 }
 function addPast(arr, c) {
@@ -1390,13 +1421,14 @@ async function importAny(files) {
   if (c.q || c.img) saveDB();
   if (c.past || c.prep) idbSet(PK, pastDB).catch(() => toast('기출 시험지를 브라우저에 저장하지 못했습니다.'));
   if (c.bk) stuSave();
-  if (c.bookF) { bookIdx.at = Date.now(); await idbSet(BIK, bookIdx).catch(() => toast('교재 목록을 브라우저에 저장하지 못했습니다.')); }
+  if (c.bookF) { c.bdup = bookDedup(); bookIdx.at = Date.now(); await idbSet(BIK, bookIdx).catch(() => toast('교재 목록을 브라우저에 저장하지 못했습니다.')); }
   updateCurriculum(); renderPastSelects(); renderBook();
   if (c.bk) { renderStu(); if (stuDB.pin) sbSyncStudents(); }
   bkRefresh();
   const L = [];
   if (c.q || c.dup) L.push(`단원별 문제 +${c.q}` + (c.dup ? ` (중복 제외 ${c.dup})` : ''));
-  if (c.img) L.push(`기존 문제에 그림 ${c.img}개 추가`);
+  if (c.img) L.push(`같은 지문의 그림 있는 문제로 ${c.img}개 바꿈`);
+  if (c.bdup) L.push(`교재·EBS에서 지문이 같은 문제 ${c.bdup}개는 그림 있는 쪽만 남김`);
   if (c.past || c.prep) L.push(`기출 시험지 +${c.past}` + (c.prep ? ` · 새 내용으로 바꿈 ${c.prep}` : ''));
   if (c.book) L.push(`시중 교재 문제 ${c.book}개`);
   if (c.ebs) L.push(`EBS 문제 ${c.ebs}개`);
