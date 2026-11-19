@@ -559,6 +559,42 @@ footer{padding:24px 0!important}
     </div>
     <div id="print-area" class="bg-white rounded-xl shadow-md p-8 max-w-4xl mx-auto"></div>
   </section>
+  <section id="tab-tbook" class="hidden space-y-6">
+    <div class="bg-white rounded-xl shadow-md p-6 max-w-5xl mx-auto space-y-4 no-print">
+      <div class="flex flex-wrap gap-3 items-center justify-between border-b pb-3">
+        <div>
+          <h2 class="text-xl font-semibold text-gray-900">교재편집기 교재</h2>
+          <p class="text-sm text-gray-500 mt-1">교재편집기에서 만든 교재 JSON을 불러와 단원·단계를 고르면 문제지가 되고, QR 시험지로 등록할 수 있습니다.</p>
+        </div>
+        <div class="flex gap-2 items-center">
+          <label for="tb-file" class="cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-semibold shadow"><i data-lucide="folder-open"></i>교재 JSON 불러오기</label>
+          <input type="file" id="tb-file" accept=".json,application/json" multiple class="hidden" onchange="importAny(this.files).then(() => { this.value = ''; })">
+          <span id="tb-stats" class="text-xs text-gray-600"></span>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <label class="text-sm text-gray-600">교재<select id="tb-book" onchange="tbPick('book')" class="mt-1 w-full border rounded-lg p-2 text-sm"></select></label>
+        <label class="text-sm text-gray-600">단원<select id="tb-unit" onchange="tbPick('unit')" class="mt-1 w-full border rounded-lg p-2 text-sm"></select></label>
+        <label class="text-sm text-gray-600">단계<select id="tb-lv" onchange="tbPick('lv')" class="mt-1 w-full border rounded-lg p-2 text-sm"></select></label>
+      </div>
+      <div class="flex items-center gap-4 flex-wrap">
+        <label class="text-sm cursor-pointer"><input type="checkbox" id="tb-answers" onchange="renderTbook()" class="mr-1">정답·해설 포함</label>
+        <label class="text-sm cursor-pointer" title="체크를 끈 문제는 문제지·QR 시험지에서 빠집니다"><input type="checkbox" id="tb-pick" onchange="renderTbook()" class="mr-1">문제 골라 빼기</label>
+        <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition text-sm"><i data-lucide="printer"></i>인쇄</button>
+        <button onclick="tbDownload()" class="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded-lg font-medium transition text-sm"><i data-lucide="download"></i>다운로드 (.hwpx)</button>
+        <span class="flex items-center gap-2"><select id="tb-cls" onchange="tbSetClass(this.value)" class="border rounded-lg p-2 text-sm" title="QR 시험지의 수업"></select><span id="tb-stu-box"></span><button id="tb-reg" onclick="tbRegister()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition text-sm"><i data-lucide="qr-code"></i>QR 시험지로 등록</button></span>
+      </div>
+      <div class="flex items-center gap-4 flex-wrap text-sm">
+        <span class="font-semibold text-gray-600">시험지 틀</span>
+        <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="tb-tpl" value="1" checked onchange="renderTbook()" class="w-4 h-4 accent-indigo-600">시험지1(학습지)</label>
+        <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="tb-tpl" value="2" onchange="renderTbook()" class="w-4 h-4 accent-indigo-600">시험지2(정기고사)</label>
+        <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="tb-tpl" value="3" onchange="renderTbook()" class="w-4 h-4 accent-indigo-600">시험지3(모의평가)</label>
+        <button onclick="tbRemove()" class="ml-auto text-xs text-red-500 hover:underline">이 교재 목록에서 지우기</button>
+      </div>
+      <p id="tb-note" class="text-xs text-amber-700"></p>
+    </div>
+    <div id="tb-area" class="bg-white rounded-xl shadow-md p-8 max-w-4xl mx-auto"></div>
+  </section>
 </main>
 
 <footer class="text-center py-4 text-sm text-gray-500 border-t bg-white mt-auto">과학 문제은행 시스템 &copy; 2026</footer>
@@ -1364,6 +1400,7 @@ async function bookLoad(recs) {
 /* ===== JSON 한번에 불러오기: 내용을 보고 단원별 문제·기출(변형 포함)·시중 교재·EBS·백업으로 나눠 넣음 ===== */
 function jsonKind(d) {
   if (d && d.app === 'sci-bank' && d.stuDB) return 'backup';
+  if (d && !Array.isArray(d) && Array.isArray(d.units) && d.units.some(u => u && u.sets)) return 'tbook';   // 교재편집기 교재
   const a = Array.isArray(d) ? d : [d];
   if (a.length && a.every(x => x && x.school != null && Array.isArray(x.questions))) return 'past';
   if (Array.isArray(d)) { const v = d.filter(valid); if (v.length) return v.filter(q => q.source || q.imageOnly || q.exam).length >= v.length * 0.8 ? 'book' : 'bank'; }
@@ -1456,7 +1493,7 @@ async function importAny(files) {
   const list = [...(files || [])].filter(f => /\.json$/i.test(f.name));
   ['any-file', 'any-dir', 'bk-file'].forEach(id => { if ($(id)) $(id).value = ''; });
   if (!list.length) { impProg(); toast('JSON 파일이 없습니다.'); return; }
-  await Promise.all([dbReady, pastReady, stuReady, bookReady]);
+  await Promise.all([dbReady, pastReady, stuReady, bookReady, tbReady]);
   const c = {q: 0, dup: 0, unk: 0, img: 0, past: 0, prep: 0, book: 0, ebs: 0, bookF: 0, bk: 0, st: 0, ex: 0, rs: 0, bad: 0}, keys = new Set(masterDB.map(keyOf)), badN = [];
   for (const [k, f] of list.entries()) {
     impProg(`불러오는 중… ${k + 1}/${list.length}  ${f.name}`);
@@ -1467,6 +1504,7 @@ async function importAny(files) {
       else if (kind === 'past') addPast(Array.isArray(d) ? d : [d], c);
       else if (kind === 'bank') addBank(d, c, keys);
       else if (kind === 'book') { const n = await bookStore(fileKey(f), d); c[d.some(q => q && q.exam) ? 'ebs' : 'book'] += n; c.bookF++; }
+      else if (kind === 'tbook') { c.tbq = (c.tbq || 0) + tbAdd(f.name, d); c.tb = (c.tb || 0) + 1; }
       else { c.bad++; badN.push(f.name); }
     } catch(e) { c.bad++; badN.push(f.name); }
   }
@@ -1475,6 +1513,7 @@ async function importAny(files) {
   if (c.q || c.img || c.mdup) saveDB();
   if (c.past || c.prep) idbSet(PK, pastDB).catch(() => toast('기출 시험지를 브라우저에 저장하지 못했습니다.'));
   if (c.bk) stuSave();
+  if (c.tb) { await tbSave(); renderTbook(); }
   if (c.bookF) { c.bdup = bookDedup(); bookIdx.at = Date.now(); await idbSet(BIK, bookIdx).catch(() => toast('교재 목록을 브라우저에 저장하지 못했습니다.')); }
   updateCurriculum(); renderPastSelects(); renderBook();
   if (c.bk) { renderStu(); if (stuDB.pin) sbSyncStudents(); }
@@ -1487,6 +1526,7 @@ async function importAny(files) {
   if (c.past || c.prep) L.push(`기출 시험지 +${c.past}` + (c.prep ? ` · 새 내용으로 바꿈 ${c.prep}` : ''));
   if (c.book) L.push(`시중 교재 문제 ${c.book}개`);
   if (c.ebs) L.push(`EBS 문제 ${c.ebs}개`);
+  if (c.tb) L.push(`교재편집기 교재 ${c.tb}권 (문제 ${c.tbq}개) → 문제 > 교재편집기 교재`);
   if (c.bk) L.push(`백업 ${c.bk}개: 학생 +${c.st} · 시험지 +${c.ex} · 풀이 기록 +${c.rs}`);
   if (c.trash) L.push(`22개정에 없는 단원이라 뺀 문제 ${c.trash}개`);
   if (c.unk) L.push(`단원명이 목록과 다른 문제 ${c.unk}개 (추출되지 않을 수 있음)`);
@@ -1619,10 +1659,10 @@ function renderPreview() {
 }
 let pvTok = 0;
 const TABS =['selector','book','bview','diff','preview','editor','past','var','stu','stuname','ex','cls','msg'];
-const SECTIONS = ['selector','book','bview','diff','preview','editor','past','stu','ex','cls','msg'];
+const SECTIONS = ['selector','book','bview','tbook','diff','preview','editor','past','stu','ex','cls','msg'];
 /* 상위 탭 → 하위 탭 [이동할 탭, 이름, 색] */
 const NAV = [
-  {name: '문제', sym: '문', c: 'make', subs: [['selector', '단원별 문제', 'make'], ['book', '시중 교재', 'book'], ['bview', '교재 보기', 'book']]},
+  {name: '문제', sym: '문', c: 'make', subs: [['selector', '단원별 문제', 'make'], ['book', '시중 교재', 'book'], ['bview', '교재 보기', 'book'], ['tbook', '교재편집기 교재', 'book']]},
   {name: '만든 시험지', sym: '시', c: 'ex', subs: [['ex', '', 'ex']]},
   {name: '기출', sym: '기', c: 'past', subs: [['past', '기출 문제', 'past'], ['var', '기출 변형 문제', 'var']]},
   {name: '수업', sym: '수', c: 'cls', subs: [['cls', '', 'cls']]},
@@ -1644,12 +1684,13 @@ function switchTab(t, fromHistory) {
   let bt = t;
   if (t === 'past' || t === 'var') { pastMode = t === 'var' ? 'var' : 'orig'; t = 'past'; }
   if (t === 'stuname') t = 'stu';
-  if (!['past', 'var', 'stu', 'stuname', 'ex', 'cls', 'msg', 'bview'].includes(bt)) bt = t === 'book' || (t !== 'selector' && src === 'book') ? 'book' : 'selector';
+  if (!['past', 'var', 'stu', 'stuname', 'ex', 'cls', 'msg', 'bview', 'tbook'].includes(bt)) bt = t === 'book' || (t !== 'selector' && src === 'book') ? 'book' : 'selector';
   SECTIONS.forEach(x => $('tab-'+x).classList.add('hidden'));
   $('tab-'+t).classList.remove('hidden');
   renderNav(bt);
-  document.body.dataset.tab = {selector: 'make', stuname: 'stu', bview: 'book'}[bt] || bt;
+  document.body.dataset.tab = {selector: 'make', stuname: 'stu', bview: 'book', tbook: 'book'}[bt] || bt;
   if (t === 'book') bookReady.then(renderBook);
+  if (t === 'tbook') tbReady.then(renderTbook);
   if (t === 'bview') renderBview();
   if (t === 'editor') renderEditor();
   if (t === 'past') renderPastSelects();
@@ -2238,6 +2279,181 @@ async function pastFigFiles(inp) {
   }
   if (ok.length) { pastSave(); $('past-edit').checked = true; renderPast(curPast); }
   toast(`그림 ${ok.length}개를 넣었습니다${ok.length ? ` (${ok.sort((a, b) => a - b).join(', ')}번)` : ''}` + (miss.length ? `\n번호를 찾지 못한 파일: ${miss.join(', ')}` : ''));
+}
+
+/* ===== 교재편집기 교재 → 문제지·QR 시험지. 교재는 IDB 'sciBankTBooks_v1'에 [{key, title, subtitle, lvNames, units:[{title, sets}]}] (개념 글은 빼고 저장) ===== */
+const TBK = 'sciBankTBooks_v1', TB_LV = {c: '1단계 개념 문제', b: '2단계 내신 기초 문제', s: '3단계 실력 문제', h: '4단계 고난도 문제', m: '단원 마무리 문제'};
+const TB_DIF = {c: '하', b: '중', s: '상', h: '최상', m: '중'};
+let tbBooks = [], tbOff = new Set();   // tbOff: 지금 화면에서 뺀 문제 번호(단원·단계 안 순서 'u:k:i')
+const tbReady = (async () => { try { const a = await idbGet(TBK); if (Array.isArray(a)) tbBooks = a; } catch(e) {} })();
+const tbSave = () => idbSet(TBK, tbBooks).catch(() => toast('교재를 브라우저에 저장하지 못했습니다.'));
+function tbAdd(fname, d) {
+  const key = String(fname).replace(/\.json$/i, '');
+  const b = {key, title: d.title || key, subtitle: d.subtitle || '', lvNames: d.lvNames || {}, at: Date.now(),
+    units: (d.units || []).map(u => ({title: u.title || '', sets: u.sets || {}}))};
+  const i = tbBooks.findIndex(x => x.key === key);
+  if (i >= 0) tbBooks[i] = b; else tbBooks.push(b);
+  tbBooks.sort((x, y) => x.key.localeCompare(y.key, 'ko'));
+  return b.units.reduce((n, u) => n + Object.keys(TB_LV).reduce((m, k) => m + (u.sets[k] || []).length, 0), 0);
+}
+const tbLvName = (b, k) => (b.lvNames && b.lvNames[k]) || TB_LV[k];
+/* 교재 제목 → 학년·과목 (교육과정 단원 이름의 [과목]이 제목 안에 있으면 그 학년) */
+function tbMeta(b) {
+  const T = String(b.title + ' ' + b.subtitle).replace(/\s+/g, '');
+  for (const g of Object.keys(curriculum2022)) for (const u of curriculum2022[g]) {
+    const s = subjOfU(u); if (s && T.includes(s.replace(/\s+/g, ''))) return {grade: g, subj: s};
+  }
+  const m = /중([123])/.exec(T); return {grade: m ? '중' + m[1] : '', subj: ''};
+}
+/* HTML → 글: 표는 '[표] a | b / c | d' 줄, 그림 주소는 imgs에 모음 */
+function tbText(h, imgs) {
+  if (!h) return '';
+  const doc = new DOMParser().parseFromString(`<div>${h}</div>`, 'text/html'), out = [];
+  const walk = (n, line) => {
+    for (const c of n.childNodes) {
+      if (c.nodeType === 3) { line.t += c.nodeValue; continue; }
+      if (c.nodeType !== 1) continue;
+      const tg = c.tagName;
+      if (tg === 'IMG') { if (imgs && c.getAttribute('src')) imgs.push(c.getAttribute('src')); continue; }
+      if (tg === 'BR') { out.push(line.t); line.t = ''; continue; }
+      if (tg === 'TABLE') {
+        if (line.t.trim()) { out.push(line.t); line.t = ''; }
+        const rows = [...c.querySelectorAll('tr')].map(tr => [...tr.children].map(td => { const l = {t: ''}; walk(td, l); return l.t.replace(/\s+/g, ' ').trim(); }).join(' | '));
+        out.push('[표] ' + rows.join(' / ')); continue;
+      }
+      if (/^(P|DIV|H\d|LI|UL|OL)$/.test(tg)) { if (line.t.trim()) { out.push(line.t); line.t = ''; } walk(c, line); if (line.t.trim()) out.push(line.t); line.t = ''; continue; }
+      if (tg === 'SUB' || tg === 'SUP') { line.t += (tg === 'SUB' ? '_' : '^') + `(${c.textContent})`; continue; }
+      walk(c, line);
+    }
+  };
+  const l = {t: ''}; walk(doc.body.firstChild, l); if (l.t.trim()) out.push(l.t);
+  return out.map(s => s.replace(/[ \t ]+/g, ' ').trim()).filter(Boolean).join('\n');
+}
+const tbNorm = s => String(s || '').replace(/[\s①②③④⑤.,·]/g, '');
+/* 교재편집기 문제 하나 → 앱 문제 */
+function tbQ(b, u, k, q) {
+  const meta = tbMeta(b), imgs = []; let ty = '';
+  let t = tbText(q.stem, imgs).replace(/^\[(서술형|단답형)\]\s*/, m => { ty = m.includes('서술') ? '서술형' : '단답형'; return ''; });
+  const box = tbText(q.box, imgs);
+  if (box) t += '\n' + (/^ㄱ\./.test(box) ? '<보기> ' + box.replace(/\n/g, ' ') : '<자료> ' + box);
+  const ch = (q.choices || []).map(String).filter(s => s.trim()).map((s, i) => /^[①②③④⑤]/.test(s) ? s : `${circ(i + 1)} ${s}`);
+  let a = String(q.answer ?? '').trim();
+  if (/^[1-5]$/.test(a)) a = circ(+a);
+  else if (ch.length && a && !/^[①②③④⑤]/.test(a)) { const j = ch.findIndex(c => tbNorm(c) === tbNorm(a)); if (j >= 0) a = circ(j + 1); }
+  const r = {question: t, choices: ch, answer: a, explanation: tbText(q.expl), difficulty: TB_DIF[k] || '중', grade: meta.grade,
+    unit: meta.subj ? `[${meta.subj}] ${b.subtitle || u.title}` : (b.subtitle || u.title), sub: u.title, source: q.src || `${b.title} ${u.title}`};
+  if (ty || !ch.length) r.type = ty || '단답형';
+  if (imgs.length) r.image = imgs[0];
+  if (imgs.length > 1) r._moreImg = imgs.length - 1;
+  return r;
+}
+const tbCur = () => tbBooks.find(b => b.key === $('tb-book').value) || null;
+/* 지금 고른 교재·단원·단계의 문제 [{id:'u:k:i', q}] */
+function tbAll() {
+  const b = tbCur(); if (!b) return [];
+  const us = $('tb-unit').value === '' ? b.units.map((u, i) => i) : [+$('tb-unit').value], lv = $('tb-lv').value;
+  const ks = lv ? [lv] : Object.keys(TB_LV), out = [];
+  us.forEach(ui => { const u = b.units[ui]; if (!u) return; ks.forEach(k => (u.sets[k] || []).forEach((q, i) => out.push({id: `${ui}:${k}:${i}`, q: tbQ(b, u, k, q)}))); });
+  return out;
+}
+const tbPicked = () => tbAll().filter(p => !tbOff.has(p.id));
+function tbName() {
+  const b = tbCur(); if (!b) return '';
+  const u = $('tb-unit').value, lv = $('tb-lv').value;
+  return [b.subtitle || b.title, u === '' ? '전체 단원' : `${String(+u + 1).padStart(2, '0')} ${b.units[+u].title}`, lv ? tbLvName(b, lv) : '전체 단계'].join(' · ') + (tbOff.size ? ` (${tbPicked().length}문항)` : '');
+}
+function tbExamId() {
+  const b = tbCur(); if (!b) return '';
+  const s = [b.key, $('tb-unit').value, $('tb-lv').value, [...tbOff].sort().join(',')].join('|');
+  let h = 2166136261; for (const ch of s) { h ^= ch.codePointAt(0); h = Math.imul(h, 16777619) >>> 0; }
+  return 'tb' + h.toString(36).padStart(7, '0');
+}
+const tbExam = () => { const id = tbExamId(); return id ? stuDB.exams.find(e => e.id === id) || null : null; };
+const tbTpl = () => (document.querySelector('input[name=tb-tpl]:checked') || {}).value || '1';
+function tbPick(what) {
+  const b = tbCur();
+  if (what === 'book') { $('tb-unit').value = ''; $('tb-lv').value = ''; }
+  tbOff = new Set(); renderTbook(what === 'book');
+}
+function renderTbook(resetSel) {
+  const bs = $('tb-book'); if (!bs) return;
+  const cur = bs.value;
+  bs.innerHTML = tbBooks.length ? tbBooks.map(b => `<option value="${esc(b.key)}">${esc(b.key)}</option>`).join('') : '<option value="">불러온 교재 없음</option>';
+  if (tbBooks.some(b => b.key === cur)) bs.value = cur;
+  const b = tbCur(), us = $('tb-unit'), ls = $('tb-lv'), uv = resetSel ? '' : us.value, lv = resetSel ? '' : ls.value;
+  $('tb-stats').textContent = tbBooks.length ? `교재 ${tbBooks.length}권` : '';
+  if (!b) { us.innerHTML = ''; ls.innerHTML = ''; $('tb-area').innerHTML = '<p class="text-center text-gray-400 py-12">교재편집기에서 저장한 교재 JSON을 위의 "교재 JSON 불러오기"로 넣으세요. (OneDrive\\Claude\\교재편집기_자료)</p>'; tbRegUI(null); return; }
+  const cnt = (ui, k) => (ui === '' ? b.units : [b.units[+ui]]).reduce((n, u) => n + (k ? (u.sets[k] || []).length : Object.keys(TB_LV).reduce((m, x) => m + (u.sets[x] || []).length, 0)), 0);
+  us.innerHTML = `<option value="">전체 단원 (${cnt('', '')})</option>` + b.units.map((u, i) => `<option value="${i}">${String(i + 1).padStart(2, '0')} ${esc(u.title)} (${cnt(String(i), '')})</option>`).join('');
+  us.value = uv;
+  ls.innerHTML = `<option value="">전체 단계 (${cnt(us.value, '')})</option>` + Object.keys(TB_LV).filter(k => cnt(us.value, k)).map(k => `<option value="${k}">${esc(tbLvName(b, k))} (${cnt(us.value, k)})</option>`).join('');
+  ls.value = [...ls.options].some(o => o.value === lv) ? lv : '';
+  const all = tbAll(), ed = $('tb-pick').checked, qs = all.filter(p => !tbOff.has(p.id)), ans = $('tb-answers').checked, tpl = tbTpl(), pe = tbExam();
+  const noCh = qs.filter(p => !p.q.choices.length).length, more = qs.filter(p => p.q._moreImg).length;
+  $('tb-note').textContent = [noCh ? `선택지 없는 문제 ${noCh}개는 학생 화면에서 자동 채점되지 않습니다(단답·서술형).` : '', more ? `그림이 2개 이상인 문제 ${more}개는 첫 그림만 들어갑니다.` : ''].filter(Boolean).join(' ');
+  tbRegUI(b, pe); setTimeout(drawQR, 0);
+  const area = $('tb-area'); area.dataset.tpl = tpl;
+  const view = ed ? all : qs; let no = 0;
+  area.innerHTML = pvHead(tpl, qs.length, {qs: qs.map(p => p.q), name: tbName(), id: pe ? pe.id : null}) + '<div class="pv-cols">' +
+    (view.length ? '' : '<p class="text-center text-gray-400 py-12 no-print">고른 단원·단계에 문제가 없습니다.</p>') +
+    view.map(p => { const off = tbOff.has(p.id), q = p.q, n = off ? '–' : ++no;
+      return `<div class="pq mb-6 ${off ? 'opacity-40 no-print' : ''}">${ed ? `<label class="no-print text-xs text-gray-500 cursor-pointer"><input type="checkbox" ${off ? '' : 'checked'} onchange="tbToggle('${p.id}')" class="mr-1">넣기</label>` : ''}${fmtQ(q.question, n, q.image ? `<img src="${esc(q.image)}" class="my-2 max-h-64">` : '')}${q.choices.map(c => `<p class="ml-4 text-sm">${fx(c)}</p>`).join('')}</div>`; }).join('') + '</div>' +
+    (ans ? `<div class="pq border-t pt-4 mt-8"><h3 class="font-semibold mb-2">[정답 및 해설]</h3>${qs.map((p, i) => `<p class="text-sm">${i + 1}번 정답: ${fx(p.q.answer)} ${p.q.explanation ? '해설: ' + fx(p.q.explanation) : ''}</p>`).join('')}</div>` : '');
+  if (window.lucide) lucide.createIcons();
+}
+function tbToggle(id) { tbOff.has(id) ? tbOff.delete(id) : tbOff.add(id); tbPendStu = null; renderTbook(); }
+function tbRegUI(b, pe) {
+  const btn = $('tb-reg'), sel = $('tb-cls'); if (!btn || !sel) return;
+  const cur = pe ? pe.classId || '' : sel.value;
+  sel.innerHTML = '<option value="">수업 없음</option>' + CL().slice().sort((a, c) => a.name.localeCompare(c.name, 'ko')).map(c => `<option value="${c.id}" ${c.id === cur ? 'selected' : ''}>${esc(c.name)}</option>`).join('');
+  stuPickUI('tb-stu-box', cur, pe ? pe.studentIds : tbPendStu, 'tb');
+  btn.disabled = !b;
+  btn.innerHTML = pe ? `<i data-lucide="qr-code"></i>QR 등록됨 · 코드 ${exCode(pe.id)}` : '<i data-lucide="qr-code"></i>QR 시험지로 등록';
+  btn.className = (pe ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-indigo-600 hover:bg-indigo-700') + ' text-white px-4 py-2 rounded-lg font-medium transition text-sm disabled:opacity-50';
+  btn.title = pe ? '다시 누르면 문항·정답을 서버에 다시 올립니다.' : '지금 보이는 문제를 시험지로 등록해 QR을 붙입니다.';
+}
+let tbPendStu = null;
+function tbRegister() {
+  const qs = tbPicked().map(p => p.q);
+  if (!qs.length) { toast('등록할 문제가 없습니다.'); return; }
+  const id = tbExamId(), cid = $('tb-cls').value;
+  let e = stuDB.exams.find(y => y.id === id), isNew = !e;
+  if (!e) { e = {id, at: Date.now()}; stuDB.exams.push(e); }
+  const prev = e.classId;
+  if (cid && CL().some(c => c.id === cid)) e.classId = cid; else delete e.classId;
+  if (e.classId !== prev) delete e.studentIds;
+  if (isNew && e.classId && tbPendStu) e.studentIds = tbPendStu;
+  tbPendStu = null;
+  e.name = tbName(); e.questions = JSON.parse(JSON.stringify(qs.map(({_moreImg, ...q}) => q))); e.tb = true;
+  stuSave();
+  if (sbOn() && stuDB.pin) sbPushExam(e).catch(() => toast('서버에 올리지 못했습니다. 인터넷 연결을 확인하세요.'));
+  renderTbook();
+  toast(!sbReady() ? '시험지로 등록했습니다. QR은 Supabase 연결 설정 뒤에 표시됩니다.' : (isNew ? '시험지로 등록했습니다. ' : '문항·정답을 다시 올렸습니다. ') + `시험지 코드 ${exCode(id)}`);
+}
+function tbSetClass(cid) {
+  const e = tbExam();
+  if (!e) { tbPendStu = null; stuPickUI('tb-stu-box', cid, null, 'tb'); return; }
+  if (cid) e.classId = cid; else delete e.classId;
+  delete e.studentIds;
+  stuSave(); sbPushExamClass(e); renderTbook();
+  const c = CL().find(y => y.id === cid); toast(c ? `"${c.name}" 수업에 넣었습니다. 이 수업 학생만 볼 수 있습니다.` : '수업에서 뺐습니다.');
+}
+function tbSetStudents(ids) {
+  const e = tbExam();
+  if (!e) { tbPendStu = ids; stuPickUI('tb-stu-box', $('tb-cls').value, ids, 'tb'); toast('QR 시험지로 등록하면 고른 학생에게만 보입니다.'); return; }
+  if (!e.classId) return;
+  if (ids) e.studentIds = ids; else delete e.studentIds;
+  stuSave(); sbPushExamClass(e); renderTbook();
+  toast(ids ? `고른 학생 ${ids.length}명만 이 시험지를 볼 수 있습니다.` : '수업 학생 전체가 이 시험지를 볼 수 있습니다.');
+}
+function tbDownload() {
+  const qs = tbPicked().map(p => p.q); if (!qs.length) { toast('내려받을 문제가 없습니다.'); return; }
+  const pe = tbExam();
+  exportHwpx(qs, tbName(), pe ? pe.id : null, {tpl: tbTpl(), ans: $('tb-answers').checked, gap: 0, extra: []});
+}
+async function tbRemove() {
+  const b = tbCur(); if (!b || !confirm(`"${b.key}" 교재를 목록에서 지울까요?\n(교재 파일과 이미 등록한 QR 시험지는 그대로 남습니다)`)) return;
+  tbBooks = tbBooks.filter(x => x !== b); await tbSave(); tbOff = new Set(); renderTbook(true);
 }
 
 /* ===== 학생 ===== */
@@ -3296,7 +3512,7 @@ function stuPickUI(boxId, cid, ids, kind) {
     const sel = ones.filter(x => x.checked).map(x => x.value);
     if (!sel.length) { toast('학생을 한 명 이상 고르세요.'); return; }
     const v = sel.length === mem.length ? null : sel;
-    kind === 'past' ? pastSetStudents(v) : pvSetStudents(v);
+    kind === 'past' ? pastSetStudents(v) : kind === 'tb' ? tbSetStudents(v) : pvSetStudents(v);
   };
 }
 function stuOpen(sid) { switchTab('stu'); stuGo('detail', sid); }
