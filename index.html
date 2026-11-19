@@ -2339,7 +2339,7 @@ function tbQ(b, u, k, q) {
   if (box) t += '\n' + (/^ㄱ\./.test(box) ? '<보기> ' + box.replace(/\n/g, ' ') : '<자료> ' + box);
   const ch = (q.choices || []).map(String).filter(s => s.trim()).map((s, i) => /^[①②③④⑤]/.test(s) ? s : `${circ(i + 1)} ${s}`);
   let a = String(q.answer ?? '').trim();
-  if (/^[1-5]$/.test(a)) a = circ(+a);
+  if (ch.length && /^[1-5]$/.test(a)) a = circ(+a);
   else if (ch.length && a && !/^[①②③④⑤]/.test(a)) { const j = ch.findIndex(c => tbNorm(c) === tbNorm(a)); if (j >= 0) a = circ(j + 1); }
   const r = {question: t, choices: ch, answer: a, explanation: tbText(q.expl), difficulty: TB_DIF[k] || '중', grade: meta.grade,
     unit: meta.subj ? `[${meta.subj}] ${b.subtitle || u.title}` : (b.subtitle || u.title), sub: u.title, source: q.src || `${b.title} ${u.title}`};
@@ -2428,7 +2428,7 @@ function renderTbook(resetSel) {
   ls.value = [...ls.options].some(o => o.value === lv) ? lv : '';
   const all = tbAll(), ed = $('tb-pick').checked, qs = all.filter(p => !tbOff.has(p.id)), ans = $('tb-answers').checked, tpl = tbTpl(), pe = tbExam();
   const noCh = qs.filter(p => !p.q.choices.length).length, more = qs.filter(p => p.q._moreImg).length;
-  $('tb-note').textContent = [noCh ? `선택지 없는 문제 ${noCh}개는 학생 화면에서 자동 채점되지 않습니다(단답·서술형).` : '', more ? `그림이 2개 이상인 문제 ${more}개는 첫 그림만 들어갑니다.` : ''].filter(Boolean).join(' ');
+  $('tb-note').textContent = [noCh ? `선택지 없는 문제 ${noCh}개: 짧은 답(단답형)은 학생이 쓴 글을 자동 채점하고, 긴 답(서술형)은 학생이 모범 답안을 보고 스스로 채점합니다.` : '', more ? `그림이 2개 이상인 문제 ${more}개는 첫 그림만 들어갑니다.` : ''].filter(Boolean).join(' ');
   tbRegUI(b, pe); setTimeout(drawQR, 0);
   const area = $('tb-area'); area.dataset.tpl = tpl;
   const view = ed ? all : qs; let no = 0;
@@ -2502,6 +2502,32 @@ const stuSave = () => { const r = idbSet(SK, stuDB).catch(() => toast('브라우
 const uid = p => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
 const numAns = a => { const t = String(a ?? '').trim(), k = '①②③④⑤'.indexOf(t[0]); return k >= 0 ? k + 1 : (parseInt(t) || 0); };
 const circ = n => '①②③④⑤'[n-1] || '';
+/* 문항 채점 방식: 0 객관식(①~⑤) · 1 단답형(글을 정답과 비교해 자동) · 2 서술형(모범 답안 보고 학생이 O·X)
+   선택지가 있거나 정답이 ①~⑤ 하나면 객관식, 짧은 한 덩어리 정답이면 단답형, 길거나 여러 칸(❶❷, (1)(2))이면 서술형 */
+function qKind(q) {
+  const a = String(q.answer ?? '').trim();
+  if ((q.choices || []).length || /^[①②③④⑤]$/.test(a)) return 0;
+  if (q.type === '서술형' || !a) return 2;
+  return a.length <= 30 && !/\n|[❶❷❸❹❺①②③④⑤]|\(\d+\)|^\d+\)|\s\d+\)/.test(a) ? 1 : 2;
+}
+/* 단답형 정답 여러 개: '마이토콘드리아 / 미토콘드리아' 또는 '|'로 나눔 (m/s 같은 붙은 / 는 그대로) */
+const ansList = a => String(a ?? '').split(/\s+\/\s+|\s*\|\s*/).map(s => s.trim()).filter(Boolean);
+const qKey = q => qKind(q) === 0 ? numAns(q.answer) : 0;
+/* 채점 결과 [1 맞음 · 0 틀림 · -1 채점 안 함]: 객관식은 이 기기 정답으로, 단답·서술형은 서버 채점(r.mk / r.rmk) */
+function resMarks(e, r, retry) {
+  return e.questions.map((q, i) => {
+    if (qKind(q) === 0) { const k = numAns(q.answer); if (!k) return -1; const a = (retry ? r.retry || [] : r.answers || [])[i] || 0; return a === k ? 1 : 0; }
+    const m = retry ? r.rmk : r.mk; return m && m[i] != null ? +m[i] : -1;
+  });
+}
+/* 학생 답 표시: 객관식 ①, 단답형 글, 서술형은 자기 채점 */
+function resAnsT(e, r, i, retry) {
+  const q = e.questions[i], k = qKind(q);
+  if (k === 0) { const a = (retry ? r.retry || [] : r.answers || [])[i] || 0; return a ? circ(a) : '-'; }
+  if (k === 1) { const t = ((retry ? r.rtxt : r.txt) || [])[i]; return t ? t : '-'; }
+  const s = (r.self || [])[i]; return s === 1 ? '스스로 O' : s === 0 ? '스스로 X' : '미채점';
+}
+const qAnsT = q => { const k = qKind(q); return k === 0 ? (circ(numAns(q.answer)) || '-') : (String(q.answer ?? '').trim() || '-'); };
 /* 서버에 올리는 문항 정보: 글만 (그림 제외) */
 const qInfo = qs => qs.map(q => ({q: q.question || '', ch: q.choices || [], exp: q.explanation || '', unit: q.unit || '', sub: q.sub || '', lv: dif(q), type: q.type || '', img: !!q.image, std: (stdOf(q) || [])[0] || ''}));
 function saveExamRecord() {
@@ -2512,16 +2538,24 @@ function saveExamRecord() {
   if (sbOn() && stuDB.pin) sbPushExam(e).catch(() => {});
 }
 /* 시험지(정답·문항 정보)를 서버에 올리기. 성공하면 infoSent 표시 */
+let sbNoV2 = false;   // 서버에 update10(sb_upsert_exam2)이 없으면 이번 접속 동안 예전 방식으로만
 async function sbPushExam(e) {
-  const a = {p: stuDB.pin, c: exCode(e.id), nm: e.name, cnt: e.questions.length, k: e.questions.map(q => numAns(q.answer))};
-  try { await sbCall('sb_upsert_exam', {...a, info: qInfo(e.questions)}); e.infoSent = true; }
+  const kinds = e.questions.map(qKind);
+  const a = {p: stuDB.pin, c: exCode(e.id), nm: e.name, cnt: e.questions.length, k: e.questions.map(qKey)};
+  if (!sbNoV2) {
+    const tk = e.questions.map((q, i) => kinds[i] === 1 ? ansList(q.answer) : kinds[i] === 2 ? (String(q.answer ?? '').trim() ? [String(q.answer).trim()] : []) : null);
+    try { await sbCall('sb_upsert_exam2', {...a, info: qInfo(e.questions), qt: kinds, tk}); e.infoSent = 2; if (e.classId) sbPushExamClass(e); return; }
+    catch(x) { if (/PGRST202|Could not find the function/i.test(String(x.message || x))) sbNoV2 = true; else throw x; }
+  }
+  try { await sbCall('sb_upsert_exam', {...a, info: qInfo(e.questions)}); e.infoSent = e.infoSent || 1; }
   catch(x) { await sbCall('sb_upsert_exam', a); }
   if (e.classId) sbPushExamClass(e);
 }
-/* 문항 정보 기능 이전에 만든 시험지도 한 번씩 서버에 다시 올림 (학생 화면 해설·단원용) */
+/* 문항 정보 기능 이전에 만든 시험지도 한 번씩 서버에 다시 올림 (학생 화면 해설·단원용, 단답·서술형 문항이 있으면 유형·정답 글도) */
 async function sbPushOldExams() {
   let n = 0;
-  for (const e of stuDB.exams) if (!e.infoSent) { try { await sbPushExam(e); if (e.infoSent) n++; } catch(x) {} }
+  const need = e => !e.infoSent || (e.infoSent !== 2 && !sbNoV2 && e.questions.some(q => qKind(q) !== 0));
+  for (const e of stuDB.exams) if (need(e)) { try { await sbPushExam(e); if (e.infoSent) n++; } catch(x) {} }
   if (n) stuSave();
   return n;
 }
@@ -2603,7 +2637,7 @@ function renderStu() {
       const exs = clsExams(cl.id);
       b.innerHTML = head + `<h3 class="font-semibold mb-3">${esc(cl.name)} 수업에서 낸 시험지 (${exs.length})</h3><div class="space-y-2">${exs.map(e => {
         const r = stuDB.results.find(x => x.studentId === a && x.examId === e.id);
-        const ok = r ? e.questions.filter((q, i) => r.answers[i] && r.answers[i] === numAns(q.answer)).length : 0;
+        const ok = r ? resMarks(e, r).filter(v => v === 1).length : 0;
         return `<div class="flex items-center gap-3 border rounded-xl px-4 py-3 flex-wrap"><div class="flex-1 min-w-[12rem]"><div class="font-semibold">${esc(e.name)}</div><div class="text-xs text-gray-500">${new Date(e.at).toLocaleDateString('ko-KR')} · ${e.questions.length}문항</div></div>
           ${r ? `<span class="font-semibold ${ok === e.questions.length ? 'text-emerald-600' : 'text-gray-800'}">${ok}/${e.questions.length}</span>` : '<span class="text-sm text-red-500">미제출</span>'}
           <button onclick="exOpen('${e.id}')" class="stu-back">문제 보기</button><button onclick="stuGo('entry','${a}','${e.id}')" class="bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-semibold"><i data-lucide="pencil"></i>답 ${r ? '고치기' : '입력'}</button></div>`; }).join('') || '<p class="text-gray-400 text-center py-10">이 수업에서 아직 낸 시험지가 없습니다.</p>'}</div>`;
@@ -2616,9 +2650,10 @@ function renderStu() {
         const e = stuDB.exams.find(x => x.id === r.examId); if (!e) return '';
         let ok = 0, ok2 = 0;
         const hasR = Array.isArray(r.retry);
-        const rows = e.questions.map((q, i) => { const k = numAns(q.answer), st = r.answers[i] || 0, good = st && st === k; if (good) ok++;
-          const ra = hasR ? r.retry[i] || 0 : 0, rg = ra && ra === k; if (rg) ok2++;
-          return `<tr class="${good ? '' : 'bg-red-50'}"><td>${i+1}</td><td class="text-left">${esc(q.unit)}</td><td>${dif(q)}</td><td>${circ(k) || esc(q.answer)}</td><td>${st ? circ(st) : '-'}</td><td class="font-semibold ${good ? 'text-emerald-600' : 'text-red-500'}">${good ? 'O' : 'X'}</td>${hasR ? `<td>${good ? '' : ra ? circ(ra) : '-'}</td><td class="font-semibold ${rg ? 'text-emerald-600' : 'text-red-500'}">${good ? '' : rg ? 'O' : 'X'}</td>` : ''}</tr>`; }).join('');
+        const mk = resMarks(e, r), rmk = hasR ? resMarks(e, r, true) : [], o0 = sbNo0(e.name);
+        const rows = e.questions.map((q, i) => { const m = mk[i], good = m === 1; if (good) ok++;
+          const re = hasR && m === 0 && qKind(q) !== 2, rg = re && rmk[i] === 1; if (rg) ok2++;
+          return `<tr class="${m === 0 ? 'bg-red-50' : ''}"><td>${i+1+o0}</td><td class="text-left">${esc(q.unit)}</td><td>${dif(q)}</td><td class="text-left">${esc(qAnsT(q))}</td><td>${esc(resAnsT(e, r, i))}</td><td class="font-semibold ${good ? 'text-emerald-600' : 'text-red-500'}">${m === 1 ? 'O' : m === 0 ? 'X' : '-'}</td>${hasR ? `<td>${re ? esc(resAnsT(e, r, i, true)) : ''}</td><td class="font-semibold ${rg ? 'text-emerald-600' : 'text-red-500'}">${re ? (rg ? 'O' : 'X') : ''}</td>` : ''}</tr>`; }).join('');
         return `<div class="border rounded-xl p-4 space-y-3"><div class="flex justify-between flex-wrap gap-2"><b>${esc(e.name)}</b><span class="text-sm text-gray-500">${new Date(r.at).toLocaleDateString('ko-KR')} · ${ok}/${e.questions.length}${hasR ? ` → 다시 풀기 후 ${ok2}/${e.questions.length}` : ''}</span></div>
           <table class="stu-tbl"><thead><tr><th>번호</th><th>단원</th><th>난이도</th><th>정답</th><th>학생 답</th><th>정오</th>${hasR ? '<th>다시 푼 답</th><th>정오</th>' : ''}</tr></thead><tbody>${rows}</tbody></table>
           <button onclick="stuVariant('${e.id}')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg"><i data-lucide="refresh-cw"></i>이 시험지의 변형문제 출제하기</button></div>`; }).join('');
@@ -2708,7 +2743,7 @@ function rpVariant(sid) {
   stuDB.results.filter(r => r.studentId === sid && r.at >= f && r.at < t).forEach(r => {
     const e = stuDB.exams.find(x => x.id === r.examId);
     const ok = !rpCls || (rpCls === '-' ? !(e && e.classId && CL().some(c => c.id === e.classId)) : e && e.classId === rpCls);
-    if (e && ok) e.questions.forEach((q, i) => { const k = numAns(q.answer); if (k && r.answers[i] !== k) wrong.push(q); });
+    if (e && ok) { const m = resMarks(e, r); e.questions.forEach((q, i) => { if (m[i] === 0) wrong.push(q); }); }
   });
   if (!wrong.length) { toast(rpCls ? '이 기간·수업에 틀린 문제가 없습니다.' : '이 기간에 틀린 문제가 없습니다.'); return; }
   const cn = rpCls && rpCls !== '-' ? (CL().find(c => c.id === rpCls) || {}).name : '';
@@ -2720,10 +2755,11 @@ function rpVariant(sid) {
 function teacherReportItems(sid) {
   return stuDB.results.filter(r => r.studentId === sid).map(r => {
     const e = stuDB.exams.find(x => x.id === r.examId); if (!e) return null;
-    const key = e.questions.map(q => numAns(q.answer)), sc = a => key.filter((k, i) => k && (a || [])[i] === k).length;
-    const all = stuDB.results.filter(x => x.examId === e.id), mine = sc(r.answers);
-    return {name: e.name, at: r.at, cls: e.classId || '', qs: qInfo(e.questions).map((q, i) => ({...q, ans: key[i]})), answers: r.answers || [], retry: r.retry || null,
-      rank: 1 + all.filter(x => sc(x.answers) > mine).length, count: all.length};
+    const sc = x => resMarks(e, x).filter(v => v === 1).length, hasR = Array.isArray(r.retry);
+    const all = stuDB.results.filter(x => x.examId === e.id), mine = sc(r), idx = e.questions.map((q, i) => i);
+    return {name: e.name, at: r.at, cls: e.classId || '', qs: qInfo(e.questions).map((q, i) => ({...q, kd: qKind(e.questions[i]), ansT: qAnsT(e.questions[i])})),
+      mk: resMarks(e, r), myT: idx.map(i => resAnsT(e, r, i)), rmk: hasR ? resMarks(e, r, true) : null, rT: hasR ? idx.map(i => resAnsT(e, r, i, true)) : null,
+      rank: 1 + all.filter(x => sc(x) > mine).length, count: all.length};
   }).filter(Boolean);
 }
 /* 보고서 수업 탭: items[].cls(수업 id, 없으면 '') · names = {id: 이름} · cur = 고른 수업('' 전체, '-' 수업 없음) */
@@ -2748,18 +2784,19 @@ function buildReport(all, o) {
   let h = `<div class="rp"><div class="rp-head"><div><div class="rp-title">학습 보고서</div><div class="rp-who">${esc(o.who)}</div></div><div class="rp-meta">${period}<br>${d(Date.now())} 출력</div></div>`;
   if (!items.length) return h + '<p class="rp-empty">이 기간에 푼 시험지가 없습니다.</p></div>';
   const rec = [];
-  items.forEach(x => x.qs.forEach((q, i) => { if (q.ans) rec.push({...q, ok: x.answers[i] === q.ans, my: x.answers[i] || 0, exam: x.name, no: i + 1}); }));
+  const no0 = x => sbNo0(x.name), sOf = x => x.mk.filter(v => v === 1).length, mT = (m, blank) => m === 1 ? 'O' : m === 0 ? 'X' : blank;
+  items.forEach(x => x.qs.forEach((q, i) => { if (x.mk[i] >= 0) rec.push({...q, ok: x.mk[i] === 1, my: x.myT[i], exam: x.name, no: i + 1 + no0(x)}); }));
   const okN = rec.filter(r => r.ok).length;
   h += `<div class="rp-sum"><div><b>${items.length}</b>푼 시험지</div><div><b>${rec.length}</b>채점한 문항</div><div><b>${rec.length ? Math.round(okN / rec.length * 100) : 0}%</b>정답률</div><div><b>${rec.length - okN}</b>틀린 문항</div></div>`;
   // (4) 등수
   h += `<h3 class="rp-h">시험지별 점수와 등수</h3><table class="stu-tbl rp-rank"><thead><tr><th class="tl">시험지</th><th>날짜</th><th>점수</th><th>등수</th></tr></thead><tbody>` +
-    items.map(x => { const s = x.qs.filter((q, i) => q.ans && x.answers[i] === q.ans).length;
+    items.map(x => { const s = sOf(x);
       return `<tr><td class="tl">${esc(x.name)}</td><td>${d(x.at)}</td><td>${s}/${x.qs.length}</td><td>${x.count ? `<b>${x.rank}등</b> / ${x.count}명` : '-'}</td></tr>`; }).join('') + '</tbody></table>';
   // (1) 정오표
   h += `<h3 class="rp-h">시험지별 정오표</h3>` + items.map(x => {
-    const hasR = Array.isArray(x.retry), s = x.qs.filter((q, i) => q.ans && x.answers[i] === q.ans).length;
-    const rows = x.qs.map((q, i) => { const a = x.answers[i] || 0, good = q.ans && a === q.ans, ra = hasR ? x.retry[i] || 0 : 0, rg = q.ans && ra === q.ans;
-      return `<tr class="${good ? '' : 'rp-x'}"><td>${i+1}</td><td class="tl">${esc(q.sub || q.unit)}</td><td>${esc(q.lv)}</td><td>${circ(q.ans) || '-'}</td><td>${a ? circ(a) : '-'}</td><td class="${good ? 'ok' : 'no'}">${good ? 'O' : 'X'}</td>${hasR ? `<td>${good ? '' : ra ? circ(ra) : '-'}</td><td class="${rg ? 'ok' : 'no'}">${good ? '' : rg ? 'O' : 'X'}</td>` : ''}</tr>`; }).join('');
+    const hasR = Array.isArray(x.rmk), s = sOf(x);
+    const rows = x.qs.map((q, i) => { const m = x.mk[i], good = m === 1, re = hasR && m === 0 && x.rmk[i] >= 0 && x.rT, rg = re && x.rmk[i] === 1;
+      return `<tr class="${m === 0 ? 'rp-x' : ''}"><td>${i+1+no0(x)}</td><td class="tl">${esc(q.sub || q.unit)}</td><td>${esc(q.lv)}</td><td class="tl" style="max-width:12rem">${esc(q.ansT || '-')}</td><td>${esc(x.myT[i] || '-')}</td><td class="${good ? 'ok' : m === 0 ? 'no' : ''}">${mT(m, '-')}</td>${hasR ? `<td>${re ? esc(x.rT[i] || '-') : ''}</td><td class="${rg ? 'ok' : 'no'}">${re ? mT(x.rmk[i], '') : ''}</td>` : ''}</tr>`; }).join('');
     return `<div class="rp-exam"><div class="rp-exam-h"><b>${esc(x.name)}</b><span>${d(x.at)} · ${s}/${x.qs.length} · ${x.count}명 중 ${x.rank}등</span></div>
       <table class="stu-tbl"><thead><tr><th>번호</th><th class="tl">단원</th><th>난이도</th><th>정답</th><th>처음 답</th><th>정오</th>${hasR ? '<th>다시 푼 답</th><th>정오</th>' : ''}</tr></thead><tbody>${rows}</tbody></table></div>`; }).join('');
   // (2) 틀린 유형
@@ -2776,11 +2813,11 @@ function buildReport(all, o) {
       <div class="rp-q-exp"><b>해설</b> ${fx(w.exp) || (noInfo(w) ? '이 시험지는 아직 문제·해설이 올라오지 않았습니다.' : '해설이 없습니다.')}</div></div>`;
   const g = {}; rec.filter(r => !r.ok).forEach(r => { const k = noInfo(r) ? '문제 정보가 아직 없는 시험지' : r.sub ? `${r.unit} › ${r.sub}` : (r.unit || '단원 미분류'); (g[k] = g[k] || []).push(r); });
   h += `<div class="rp-break"></div><h3 class="rp-h">틀린 문제 개념 정리</h3>` + (Object.keys(g).length ? Object.entries(g).map(([k, ws]) =>
-    `<div class="rp-grp"><div class="rp-grp-h">${esc(k)}<span>${ws.length}문항</span></div>${ws.map(w => card(w, `${esc(w.exam)} ${w.no}번 · 내 답 ${w.my ? circ(w.my) : '없음'} · 정답 ${circ(w.ans)}`)).join('')}<div class="rp-memo">나의 정리</div></div>`).join('') : '<p class="rp-empty">틀린 문제가 없습니다.</p>');
+    `<div class="rp-grp"><div class="rp-grp-h">${esc(k)}<span>${ws.length}문항</span></div>${ws.map(w => card(w, `${esc(w.exam)} ${w.no}번 · 내 답 ${w.my && w.my !== '-' ? esc(w.my) : '없음'} · ${w.kd === 2 ? '모범 답안' : '정답'} ${esc(w.ansT || '-')}`)).join('')}<div class="rp-memo">나의 정리</div></div>`).join('') : '<p class="rp-empty">틀린 문제가 없습니다.</p>');
   // 전체 문제 해설: 맞은 문제·틀린 문제 모두 (학생 보고서)
   if (o.allExp) h += `<div class="rp-break"></div><h3 class="rp-h">전체 문제 해설</h3>` + items.map(x =>
-    `<div class="rp-grp"><div class="rp-grp-h">${esc(x.name)}<span>${d(x.at)}</span></div>${x.qs.map((q, i) => { const a = x.answers[i] || 0, ok = q.ans && a === q.ans;
-      return card(q, `${i+1}번 · <b class="${ok ? 'ok' : 'no'}">${ok ? 'O' : 'X'}</b> · 내 답 ${a ? circ(a) : '없음'} · 정답 ${circ(q.ans) || '-'}${q.sub || q.unit ? ` · ${esc(q.sub || q.unit)}` : ''}${q.std ? ` · 성취기준 [${esc(q.std)}]` : ''}`); }).join('')}</div>`).join('');
+    `<div class="rp-grp"><div class="rp-grp-h">${esc(x.name)}<span>${d(x.at)}</span></div>${x.qs.map((q, i) => { const m = x.mk[i], a = x.myT[i];
+      return card(q, `${i+1+no0(x)}번 · <b class="${m === 1 ? 'ok' : 'no'}">${mT(m, '-')}</b> · 내 답 ${a && a !== '-' ? esc(a) : '없음'} · ${q.kd === 2 ? '모범 답안' : '정답'} ${esc(q.ansT || '-')}${q.sub || q.unit ? ` · ${esc(q.sub || q.unit)}` : ''}${q.std ? ` · 성취기준 [${esc(q.std)}]` : ''}`); }).join('')}</div>`).join('');
   return h + '</div>';
 }
 
@@ -3066,16 +3103,24 @@ async function syncSB() {
   if (!sbOn() || !stuDB.pin) return;
   const st = $('sb-status');
   try {
-    let rows; try { rows = await sbCall('sb_get_results2', {p: stuDB.pin}); } catch(e) { rows = await sbCall('sb_get_results', {p: stuDB.pin}); }
+    let rows; try { rows = await sbCall('sb_get_results3', {p: stuDB.pin}); } catch(e) { try { rows = await sbCall('sb_get_results2', {p: stuDB.pin}); } catch(e2) { rows = await sbCall('sb_get_results', {p: stuDB.pin}); } }
     let n = 0;
     (rows || []).forEach(r => {
       const ex = stuDB.exams.find(e => exCode(e.id) === r.exam_code), s = stuDB.students.find(x => x.id === r.student_id);
       if (!ex || !s) return;
       const ans = ex.questions.map((q, i) => +(r.answers || [])[i] || 0), old = stuDB.results.find(x => x.studentId === s.id && x.examId === ex.id);
       const retry = Array.isArray(r.retry_answers) ? ex.questions.map((q, i) => +r.retry_answers[i] || 0) : null;
-      if (old && old.answers.join() === ans.join() && String(old.retry || '') === String(retry || '')) return;
+      /* 단답·서술형 (update10 이후): 학생 글 답, 자기 채점, 서버 채점 */
+      const ext = {};
+      if (Array.isArray(r.text_answers)) ext.txt = r.text_answers;
+      if (Array.isArray(r.retry_text)) ext.rtxt = r.retry_text;
+      if (Array.isArray(r.self_marks)) ext.self = r.self_marks.map(v => v == null ? null : +v);
+      if (Array.isArray(r.marks)) ext.mk = r.marks.map(v => v == null ? null : +v);
+      if (Array.isArray(r.retry_marks)) ext.rmk = r.retry_marks.map(v => v == null ? null : +v);
+      const sig = x => JSON.stringify([x.txt, x.rtxt, x.self, x.mk, x.rmk]);
+      if (old && old.answers.join() === ans.join() && String(old.retry || '') === String(retry || '') && sig(old) === sig(ext)) return;
       stuDB.results = stuDB.results.filter(x => x !== old);
-      stuDB.results.push({studentId: s.id, examId: ex.id, answers: ans, retry, at: Date.parse(r.submitted_at) || Date.now()}); n++;
+      stuDB.results.push({studentId: s.id, examId: ex.id, answers: ans, retry, ...ext, at: Date.parse(r.submitted_at) || Date.now()}); n++;
     });
     try {
       (await sbCall('sb_accounts', {p: stuDB.pin}) || []).forEach(x => {
@@ -3111,11 +3156,13 @@ function sbFail(e) {
 /* 제출 확인 창: 고른 답을 한눈에 보여 주고 확인 후 제출 */
 function sbConfirm(title, note, items, okLabel) {
   return new Promise(res => {
-    const blank = items.filter(x => !x.a).length, m = document.createElement('div');
+    const has = x => x.skip || (x.t !== undefined ? !!String(x.t).trim() : !!x.a);
+    const show = x => x.skip ? '서술' : x.t !== undefined ? (String(x.t).trim() ? esc(String(x.t).trim().slice(0, 8)) : '—') : (x.a ? circ(x.a) : '—');
+    const blank = items.filter(x => !has(x)).length, m = document.createElement('div');
     m.className = 'sb-modal';
     m.innerHTML = `<div class="sb-sheet" role="dialog" aria-modal="true"><h2 class="text-lg font-semibold">${title}</h2><p class="text-sm text-gray-500 mt-1">${note}</p>
-      ${blank ? `<p class="text-sm font-semibold text-red-600 mt-2">답을 고르지 않은 문항이 ${blank}개 있습니다.</p>` : ''}
-      <div class="sb-grid">${items.map(x => `<div class="${x.a ? '' : 'blank'}">${x.no}번<b>${x.a ? circ(x.a) : '—'}</b></div>`).join('')}</div>
+      ${blank ? `<p class="text-sm font-semibold text-red-600 mt-2">답을 고르거나 쓰지 않은 문항이 ${blank}개 있습니다.</p>` : ''}
+      <div class="sb-grid">${items.map(x => `<div class="${has(x) ? '' : 'blank'}">${x.no}번<b style="font-size:${x.t !== undefined && !x.skip ? '12px' : ''}">${show(x)}</b></div>`).join('')}</div>
       <div class="flex gap-2"><button class="flex-1 sb-ghost" data-r="0">다시 확인</button><button class="flex-1 sb-primary" data-r="1">${okLabel}</button></div></div>`;
     m.querySelectorAll('button').forEach(b => b.onclick = () => { m.remove(); res(b.dataset.r === '1'); });
     m.onclick = e => { if (e.target === m) { m.remove(); res(false); } };
@@ -3219,47 +3266,70 @@ function sbBindOpts(row, arr, i) {
   });
 }
 function sbAnswer(code, st) {
-  const R = sbR(), n = st.n, ans = Array(n).fill(0), o = sbNo0(st.name);
+  const R = sbR(), n = st.n, ans = Array(n).fill(0), txt = Array(n).fill(''), o = sbNo0(st.name);
+  const kd = i => +((st.types || [])[i] || 0), anyT = (st.types || []).some(x => +x > 0);
+  const cell = i => kd(i) === 1 ? `<input type="text" class="sb-txt flex-1 min-w-0 p-2 border rounded-lg text-base" maxlength="300" placeholder="답을 쓰세요" data-i="${i}">`
+    : kd(i) === 2 ? '<span class="flex-1 text-xs text-gray-500 leading-snug">서술형 · 교재에 답을 쓰세요.<br>제출하면 모범 답안을 보고 스스로 채점합니다.</span>' : sbOpts(0);
   R.className = 'max-w-md mx-auto p-4 space-y-4';
-  R.innerHTML = sbTop() + `<div><h1 class="text-xl font-semibold">${esc(st.name)}</h1><p class="text-sm text-gray-500">${n}문항 · 답을 모두 고른 뒤 제출하세요. 다시 누르면 선택이 지워집니다.</p></div>
-    <div id="sb-rows" class="bg-white rounded-xl border p-3 space-y-1.5">${Array.from({length: n}, (_, i) => `<div class="flex items-center gap-2" data-i="${i}"><span class="w-10 font-semibold text-sm">${i+1+o}번</span>${sbOpts(0)}</div>`).join('')}</div>
+  R.innerHTML = sbTop() + `<div><h1 class="text-xl font-semibold">${esc(st.name)}</h1><p class="text-sm text-gray-500">${n}문항 · 답을 모두 ${anyT ? '고르거나 쓴' : '고른'} 뒤 제출하세요. ${anyT ? '' : '다시 누르면 선택이 지워집니다.'}</p></div>
+    <div id="sb-rows" class="bg-white rounded-xl border p-3 space-y-1.5">${Array.from({length: n}, (_, i) => `<div class="flex items-center gap-2" data-i="${i}"><span class="w-10 shrink-0 font-semibold text-sm">${i+1+o}번</span>${cell(i)}</div>`).join('')}</div>
     <button id="sb-go" class="w-full sb-primary">제출하기</button><a href="?me=1" class="block text-center underline text-sm text-gray-500">내 학습 페이지</a>`;
   sbBindTop();
-  [...$('sb-rows').children].forEach((row, i) => sbBindOpts(row, ans, i));
+  [...$('sb-rows').children].forEach((row, i) => { if (kd(i) === 0) sbBindOpts(row, ans, i); });
+  R.querySelectorAll('.sb-txt').forEach(inp => inp.oninput = () => { txt[+inp.dataset.i] = inp.value; });
   $('sb-go').onclick = async () => {
-    if (!await sbConfirm('답안을 제출할까요?', '처음 제출한 답으로 점수와 등수가 정해집니다. 제출 후 틀린 문제는 한 번만 다시 풀 수 있습니다.', ans.map((a, i) => ({no: i + 1 + o, a})), '제출하기')) return;
-    try { sbResult(code, await sbCall('sb_submit2', {t: tokGet(), c: code, ans}), '제출했습니다.'); } catch(e) { sbFail(e); }
+    const items = ans.map((a, i) => kd(i) === 2 ? {no: i + 1 + o, skip: true} : kd(i) === 1 ? {no: i + 1 + o, t: txt[i]} : {no: i + 1 + o, a});
+    if (!await sbConfirm('답안을 제출할까요?', '처음 제출한 답으로 점수와 등수가 정해집니다. 제출 후 틀린 문제는 한 번만 다시 풀 수 있습니다.', items, '제출하기')) return;
+    try { sbResult(code, anyT ? await sbCall('sb_submit3', {t: tokGet(), c: code, ans, txt: txt.map(s => s.trim())}) : await sbCall('sb_submit2', {t: tokGet(), c: code, ans}), '제출했습니다.'); } catch(e) { sbFail(e); }
   };
 }
 /* 제출 결과: O·X를 누르면 해설, 틀린 문제는 한 번만 다시 풀기 */
 function sbResult(code, st, flash, retrying) {
-  const R = sbR(), n = st.n, mk = st.marks || [], a1 = st.answers || [], hasR = Array.isArray(st.retry), rm = st.retry_marks || [], exp = st.exp || [];
+  const R = sbR(), n = st.n, mk = st.marks || [], a1 = st.answers || [], t1 = st.text_answers || [], hasR = Array.isArray(st.retry), rm = st.retry_marks || [], rt = st.retry_text || [];
+  const exp = st.exp || [], model = st.model || [], self = st.self || [], kd = i => +((st.types || [])[i] || 0), anyT = (st.types || []).some(x => +x > 0);
   const graded = mk.some(x => x >= 0), s1 = mk.filter(x => x === 1).length, s2 = rm.filter(x => x === 1).length;
-  const wrong = mk.map((m, i) => m === 0 ? i : -1).filter(i => i >= 0), re = Array(n).fill(0), o = sbNo0(st.name);
+  const wrong = mk.map((m, i) => m === 0 && kd(i) !== 2 ? i : -1).filter(i => i >= 0), re = Array(n).fill(0), ret = Array(n).fill(''), o = sbNo0(st.name);
+  const selfTodo = Array.from({length: n}, (_, i) => i).filter(i => kd(i) === 2 && self[i] == null);
   const badge = (m, a) => `<button type="button" class="sb-mark ${m === 1 ? 'o' : m === 0 ? 'x' : ''}" title="해설 보기">${m === 1 ? 'O' : m === 0 ? 'X' : '-'}</button>`;
+  const none = '<span class="text-gray-400 text-sm">답 없음</span>';
+  const shown = (i, retry) => { if (kd(i) === 1) { const t = (retry ? rt : t1)[i]; return t ? `<span class="text-base">${esc(t)}</span>` : none; } const a = ((retry ? st.retry : a1) || [])[i] || 0; return a ? circ(a) : none; };
+  const modelT = i => { const v = model[i]; return Array.isArray(v) && v.length ? v.map(esc).join(' / ') : ''; };
   R.className = 'max-w-md mx-auto p-4 space-y-4';
   R.innerHTML = sbTop() + `${flash ? `<p class="text-center font-semibold text-emerald-700 bg-emerald-50 rounded-lg py-2">${flash}</p>` : ''}
-    <div><h1 class="text-xl font-semibold">${esc(st.name)}</h1><p class="text-sm text-gray-600 mt-1">${graded ? `처음 제출 <b class="text-lg text-gray-900">${s1} / ${n}</b>${hasR ? ` → 다시 풀기 후 <b class="text-lg text-gray-900">${s2} / ${n}</b>` : ''}` : '채점 정보가 아직 없습니다. 선생님께 문의하세요.'}</p>
-    <p class="text-xs text-gray-400 mt-1">${retrying ? '틀린 문제의 답을 다시 고르세요.' : 'O·X를 누르면 해설을 볼 수 있습니다.'}</p></div>
+    <div><h1 class="text-xl font-semibold">${esc(st.name)}</h1><p class="text-sm text-gray-600 mt-1">${graded || selfTodo.length ? `처음 제출 <b class="text-lg text-gray-900">${s1} / ${n}</b>${hasR ? ` → 다시 풀기 후 <b class="text-lg text-gray-900">${s2} / ${n}</b>` : ''}` : '채점 정보가 아직 없습니다. 선생님께 문의하세요.'}</p>
+    ${selfTodo.length && !retrying ? `<p class="text-sm font-semibold text-amber-700 mt-1">서술형 ${selfTodo.length}문항: 모범 답안과 내 답을 비교해 [맞음]·[틀림]을 눌러 스스로 채점하세요. 한 번 고르면 바꿀 수 없습니다.</p>` : ''}
+    <p class="text-xs text-gray-400 mt-1">${retrying ? '틀린 문제의 답을 다시 고르거나 쓰세요.' : 'O·X를 누르면 해설을 볼 수 있습니다.'}</p></div>
     <div id="sb-rows" class="bg-white rounded-xl border p-3 space-y-1">${Array.from({length: n}, (_, i) => {
-      const m = mk[i], a = a1[i] || 0, again = hasR && m === 0, ra = again ? st.retry[i] || 0 : 0;
-      const line = retrying && m === 0 ? `<span class="text-xs text-gray-400 w-8">${a ? circ(a) : '-'}</span>${sbOpts(0)}`
-        : `<span class="flex-1 text-lg">${a ? circ(a) : '<span class="text-gray-400 text-sm">답 없음</span>'}${again ? ` <span class="text-sm text-gray-500">→ 다시 푼 답 ${ra ? circ(ra) : '없음'} <b class="${rm[i] === 1 ? 'text-emerald-600' : 'text-red-500'}">${rm[i] === 1 ? 'O' : 'X'}</b></span>` : ''}</span>`;
-      return `<div data-i="${i}"><div class="flex items-center gap-2"><span class="w-10 font-semibold text-sm">${i+1+o}번</span>${line}${badge(m, a)}</div><div class="sb-exp hidden">${exp[i] ? esc(exp[i]) : '해설이 없습니다.'}</div></div>`; }).join('')}</div>
+      const m = mk[i], k = kd(i), again = hasR && m === 0 && k !== 2, todo = k === 2 && self[i] == null;
+      let line;
+      if (k === 2) line = todo ? `<span class="flex-1 text-sm text-gray-600">서술형</span><button type="button" class="sb-self px-3 py-1.5 rounded-lg text-sm font-semibold bg-emerald-600 text-white" data-v="1">맞음</button><button type="button" class="sb-self px-3 py-1.5 rounded-lg text-sm font-semibold bg-red-500 text-white" data-v="0">틀림</button>`
+        : `<span class="flex-1 text-sm text-gray-600">서술형 · 스스로 채점</span>`;
+      else if (retrying && m === 0) line = k === 1 ? `<span class="text-xs text-gray-400 max-w-[5rem] truncate">${t1[i] ? esc(t1[i]) : '-'}</span><input type="text" class="sb-rtxt flex-1 min-w-0 p-2 border rounded-lg text-base" maxlength="300" placeholder="다시 쓰기" data-i="${i}">`
+        : `<span class="text-xs text-gray-400 w-8">${a1[i] ? circ(a1[i]) : '-'}</span>${sbOpts(0)}`;
+      else line = `<span class="flex-1 text-lg min-w-0 break-words">${shown(i)}${again ? ` <span class="text-sm text-gray-500">→ 다시 푼 답 ${shown(i, true)} <b class="${rm[i] === 1 ? 'text-emerald-600' : 'text-red-500'}">${rm[i] === 1 ? 'O' : 'X'}</b></span>` : ''}</span>`;
+      const md = modelT(i), body = (md ? `<div class="mb-1"><b>${k === 2 ? '모범 답안' : '정답'}</b> ${md}</div>` : '') + (exp[i] ? esc(exp[i]) : md ? '' : '해설이 없습니다.');
+      return `<div data-i="${i}"><div class="flex items-center gap-2"><span class="w-10 shrink-0 font-semibold text-sm">${i+1+o}번</span>${line}${todo ? '' : badge(m)}</div><div class="sb-exp${todo ? '' : ' hidden'}">${body}</div></div>`; }).join('')}</div>
     <div id="sb-act" class="space-y-2"></div>${retrying ? '' : '<button id="sb-ask" class="w-full sb-ghost"><i data-lucide="message-circle"></i>이 시험지에 대해 선생님께 질문</button>'}<a href="?me=1" class="block text-center underline text-sm text-gray-500">내 학습 페이지</a>`;
   sbBindTop();
   if ($('sb-ask')) $('sb-ask').onclick = () => sbChat(`[${st.name}] 번 문제 질문: `, () => sbResult(code, st));
   [...$('sb-rows').children].forEach((row, i) => {
-    row.querySelector('.sb-mark').onclick = () => row.querySelector('.sb-exp').classList.toggle('hidden');
-    if (retrying && mk[i] === 0) sbBindOpts(row.firstElementChild, re, i);
+    const mb = row.querySelector('.sb-mark'); if (mb) mb.onclick = () => row.querySelector('.sb-exp').classList.toggle('hidden');
+    if (retrying && mk[i] === 0 && kd(i) === 0) sbBindOpts(row.firstElementChild, re, i);
+    const ri = row.querySelector('.sb-rtxt'); if (ri) ri.oninput = () => { ret[i] = ri.value; };
+    row.querySelectorAll('.sb-self').forEach(b => b.onclick = async () => {
+      const v = +b.dataset.v;
+      if (!confirm(`${i + 1 + o}번을 ${v ? '맞음(O)' : '틀림(X)'}으로 채점할까요?\n한 번 고르면 바꿀 수 없습니다.`)) return;
+      try { sbResult(code, await sbCall('sb_self_mark', {t: tokGet(), c: code, i: i + 1, v}), `${i + 1 + o}번을 채점했습니다.`); } catch(e) { sbFail(e); }
+    });
   });
   const act = $('sb-act');
   if (retrying) {
     act.innerHTML = '<button id="sb-re" class="w-full sb-primary">다시 제출하기</button><button id="sb-cancel" class="w-full sb-ghost">취소</button>';
     $('sb-cancel').onclick = () => sbResult(code, st);
     $('sb-re').onclick = async () => {
-      if (!await sbConfirm('다시 푼 답을 제출할까요?', '다시 풀기는 한 번만 할 수 있습니다. 점수와 등수는 처음 제출 기준 그대로입니다.', wrong.map(i => ({no: i + 1, a: re[i]})), '다시 제출하기')) return;
-      try { sbResult(code, await sbCall('sb_retry', {t: tokGet(), c: code, ans: a1.map((a, i) => mk[i] === 0 ? re[i] : a)}), '다시 푼 답을 제출했습니다.'); } catch(e) { sbFail(e); }
+      if (!await sbConfirm('다시 푼 답을 제출할까요?', '다시 풀기는 한 번만 할 수 있습니다. 점수와 등수는 처음 제출 기준 그대로입니다.', wrong.map(i => kd(i) === 1 ? {no: i + 1 + o, t: ret[i]} : {no: i + 1 + o, a: re[i]}), '다시 제출하기')) return;
+      const ans = a1.map((a, i) => mk[i] === 0 && kd(i) === 0 ? re[i] : a);
+      try { sbResult(code, anyT ? await sbCall('sb_retry3', {t: tokGet(), c: code, ans, txt: Array.from({length: n}, (_, i) => mk[i] === 0 && kd(i) === 1 ? ret[i].trim() : t1[i] || '')}) : await sbCall('sb_retry', {t: tokGet(), c: code, ans}), '다시 푼 답을 제출했습니다.'); } catch(e) { sbFail(e); }
     };
   } else if (graded && !hasR && wrong.length) {
     act.innerHTML = `<button id="sb-again" class="w-full sb-primary">틀린 ${wrong.length}문제 다시 풀기 (한 번만 가능)</button>`;
@@ -3309,8 +3379,17 @@ async function sbMyPage() {
   let rows; try { rows = await sbCall('sb_my_report', {t: tokGet()}); } catch(e) { return sbFail(e); }
   try { sbClasses = await sbCall('sb_my_classes', {t: tokGet()}) || []; } catch(e) { sbClasses = null; }
   let unread = 0; try { unread = await sbCall('sb_msg_unread', {t: tokGet()}) || 0; } catch(e) { unread = -1; }
-  const items = (rows || []).map(x => ({name: x.name, code: x.code, at: Date.parse(x.at), answers: x.answers || [], retry: x.retry, rank: x.rank, count: x.count,
-    qs: (x.info || Array.from({length: x.n}, () => ({}))).map((q, i) => ({q: q.q || '', ch: q.ch || [], exp: q.exp || '', unit: q.unit || '', sub: q.sub || '', lv: q.lv || '', type: q.type || '', img: q.img, std: q.std || '', ans: (x.key || [])[i] || 0}))}));
+  const items = (rows || []).map(x => {
+    const n = x.n, ty = x.types || [], kd = i => +(ty[i] || 0), key = x.key || [], a1 = x.answers || [], hasR = Array.isArray(x.retry), ix = Array.from({length: n}, (_, i) => i);
+    const mOld = arr => ix.map(i => key[i] ? (+(arr || [])[i] === +key[i] ? 1 : 0) : -1);
+    const mk = Array.isArray(x.marks) ? ix.map(i => x.marks[i] == null ? -1 : +x.marks[i]) : mOld(a1);
+    const rmk = !hasR ? null : Array.isArray(x.retry_marks) ? ix.map(i => x.retry_marks[i] == null ? -1 : +x.retry_marks[i]) : mOld(x.retry);
+    const my = (arr, txt, m) => ix.map(i => kd(i) === 1 ? ((txt || [])[i] || '-') : kd(i) === 2 ? (m[i] === 1 ? '스스로 O' : m[i] === 0 ? '스스로 X' : '미채점') : ((arr || [])[i] ? circ(+arr[i]) : '-'));
+    const model = i => { const v = (x.model || [])[i]; return Array.isArray(v) ? v.join(' / ') : (v || ''); };
+    return {name: x.name, code: x.code, at: Date.parse(x.at), rank: x.rank, count: x.count, mk, rmk, myT: my(a1, x.text_answers, mk), rT: hasR ? my(x.retry, x.retry_text, rmk) : null,
+      qs: (x.info || Array.from({length: n}, () => ({}))).map((q, i) => ({q: q.q || '', ch: q.ch || [], exp: q.exp || '', unit: q.unit || '', sub: q.sub || '', lv: q.lv || '', type: q.type || '', img: q.img, std: q.std || '',
+        kd: kd(i), ansT: kd(i) ? model(i) || '-' : (key[i] ? circ(+key[i]) : '-')}))};
+  });
   let from = '', to = '';
   const cls = sbClasses || [];
   R.innerHTML = sbTop() + (unread >= 0 ? `<button id="sb-chat" class="no-print w-full sb-chat-btn"><i data-lucide="message-circle"></i>선생님께 질문하기${unread ? `<span class="msg-un">${unread}</span><span class="text-xs font-normal">새 답장</span>` : ''}</button>${ntfOK() ? `<div class="no-print flex justify-end" style="margin-top:6px">${ntfBtn()}</div>` : ''}` : '') +
@@ -3357,16 +3436,16 @@ function exSub(id, pre = 'ex-sub-') {
   if (!box.classList.contains('hidden')) { box.classList.add('hidden'); return; }
   const rs = stuDB.results.filter(r => r.examId === id).map(r => ({r, s: stuDB.students.find(x => x.id === r.studentId)})).filter(o => o.s)
     .sort((a, b) => a.s.grade.localeCompare(b.s.grade, 'ko') || a.s.name.localeCompare(b.s.name, 'ko'));
-  const key = e.questions.map(q => numAns(q.answer));
-  const head = e.questions.map((q, i) => `<th>${i+1}</th>`).join('');
-  const keyRow = `<tr class="bg-gray-100 font-semibold"><td colspan="2" class="text-left">정답</td>${key.map(k => `<td>${circ(k) || '-'}</td>`).join('')}<td></td></tr>`;
+  const o0 = sbNo0(e.name), cut = t => t.length > 8 ? t.slice(0, 8) + '…' : t;
+  const head = e.questions.map((q, i) => `<th>${i+1+o0}</th>`).join('');
+  const keyRow = `<tr class="bg-gray-100 font-semibold"><td colspan="2" class="text-left">정답</td>${e.questions.map(q => { const k = qKind(q), t = qAnsT(q);
+    return `<td title="${esc(t)}">${k === 2 ? '서술' : esc(k === 1 ? cut(t) : t)}</td>`; }).join('')}<td></td></tr>`;
   // 점수(맞은 개수)와 등수 — 같은 점수는 같은 등수
-  const okOf = r => e.questions.reduce((n, q, i) => { const st = +(r.answers || [])[i] || 0; return n + (st && st === key[i] ? 1 : 0); }, 0);
-  rs.forEach(o => o.ok = okOf(o.r));
+  rs.forEach(o => { o.mk = resMarks(e, o.r); o.ok = o.mk.filter(v => v === 1).length; });
   rs.forEach(o => o.rank = 1 + rs.filter(x => x.ok > o.ok).length);
-  const rows = rs.map(({r, s, ok, rank}) => {
-    const tds = e.questions.map((q, i) => { const st = +(r.answers || [])[i] || 0, good = st && st === key[i];
-      return `<td class="${good ? '' : 'bg-red-50 text-red-500 font-semibold'}">${st ? circ(st) : '-'}</td>`; }).join('');
+  const rows = rs.map(({r, s, ok, rank, mk}) => {
+    const tds = e.questions.map((q, i) => { const t = resAnsT(e, r, i), k = qKind(q);
+      return `<td title="${esc(t)}" class="${mk[i] === 0 ? 'bg-red-50 text-red-500 font-semibold' : ''}">${esc(k === 2 ? (mk[i] === 1 ? 'O' : mk[i] === 0 ? 'X' : '미채점') : k === 1 ? cut(t) : t)}</td>`; }).join('');
     return `<tr><td class="text-left">${s.grade}</td><td class="text-left whitespace-nowrap">${esc(s.name)}</td>${tds}<td class="font-semibold">${ok}/${e.questions.length}</td><td class="font-semibold whitespace-nowrap">${rank}등<span class="text-xs text-gray-400 font-normal"> /${rs.length}</span></td></tr>`; }).join('');
   box.innerHTML = rs.length ? `<div class="overflow-x-auto border rounded-xl mt-2 p-2"><table class="stu-tbl"><thead><tr><th>학년</th><th>이름</th>${head}<th>점수</th><th>등수</th></tr></thead><tbody>${keyRow.replace('<td></td></tr>', '<td></td><td></td></tr>')}${rows}</tbody></table></div>`
     : '<p class="text-center text-gray-400 py-4 text-sm">아직 제출한 학생이 없습니다.</p>';
