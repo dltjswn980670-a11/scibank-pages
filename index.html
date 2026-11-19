@@ -583,6 +583,7 @@ footer{padding:24px 0!important}
         <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition text-sm"><i data-lucide="printer"></i>인쇄</button>
         <button onclick="tbDownload()" class="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded-lg font-medium transition text-sm"><i data-lucide="download"></i>다운로드 (.hwpx)</button>
         <span class="flex items-center gap-2"><select id="tb-cls" onchange="tbSetClass(this.value)" class="border rounded-lg p-2 text-sm" title="QR 시험지의 수업"></select><span id="tb-stu-box"></span><button id="tb-reg" onclick="tbRegister()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition text-sm"><i data-lucide="qr-code"></i>QR 시험지로 등록</button></span>
+        <button onclick="tbRegisterAll()" class="bg-white hover:bg-gray-50 border px-4 py-2 rounded-lg font-medium transition text-sm" title="교재편집기에서 'Sci-Bank QR 넣기'로 만든 교재의 QR이 바로 열리도록 모든 단원·단계를 등록합니다"><i data-lucide="qr-code"></i>교재 전 단계 한 번에 QR 등록</button>
       </div>
       <div class="flex items-center gap-4 flex-wrap text-sm">
         <span class="font-semibold text-gray-600">시험지 틀</span>
@@ -2289,7 +2290,7 @@ const tbReady = (async () => { try { const a = await idbGet(TBK); if (Array.isAr
 const tbSave = () => idbSet(TBK, tbBooks).catch(() => toast('교재를 브라우저에 저장하지 못했습니다.'));
 function tbAdd(fname, d) {
   const key = String(fname).replace(/\.json$/i, '');
-  const b = {key, title: d.title || key, subtitle: d.subtitle || '', lvNames: d.lvNames || {}, at: Date.now(),
+  const b = {key, title: d.title || key, t0: d.title || '', subtitle: d.subtitle || '', lvNames: d.lvNames || {}, at: Date.now(),
     units: (d.units || []).map(u => ({title: u.title || '', sets: u.sets || {}}))};
   const i = tbBooks.findIndex(x => x.key === key);
   if (i >= 0) tbBooks[i] = b; else tbBooks.push(b);
@@ -2357,16 +2358,53 @@ function tbAll() {
   return out;
 }
 const tbPicked = () => tbAll().filter(p => !tbOff.has(p.id));
+/* 교재 속 번호: 단원 마무리는 01부터, 나머지 단계는 앞 단계에 이어서 (교재편집기 qOffset과 같음) */
+const tbOffset = (u, k) => { if (k === 'm') return 0; let n = 0; for (const x of Object.keys(TB_LV)) { if (x === k) break; n += (u.sets[x] || []).length; } return n; };
+/* 단계 하나 전체를 등록할 때 이름 끝에 '(09~20번)' → 학생 화면 번호도 교재 번호로 */
+function tbStageName(b, ui, k) {
+  const u = b.units[ui], n = (u.sets[k] || []).length, o = tbOffset(u, k), p = x => String(x).padStart(2, '0');
+  return `${b.subtitle || b.title} · ${p(ui + 1)} ${u.title} · ${tbLvName(b, k)} (${p(o + 1)}~${p(o + n)}번)`;
+}
 function tbName() {
   const b = tbCur(); if (!b) return '';
   const u = $('tb-unit').value, lv = $('tb-lv').value;
+  if (u !== '' && lv && !tbOff.size) return tbStageName(b, +u, lv);
   return [b.subtitle || b.title, u === '' ? '전체 단원' : `${String(+u + 1).padStart(2, '0')} ${b.units[+u].title}`, lv ? tbLvName(b, lv) : '전체 단계'].join(' · ') + (tbOff.size ? ` (${tbPicked().length}문항)` : '');
+}
+/* 시험지 id: 교재 제목|부제|단원 번호(0부터)|단계|뺀 문제 → 교재편집기도 같은 식으로 QR 주소를 만듦 */
+function tbIdOf(b, ui, lv, off = '') {
+  const s = [b.t0 ?? b.title, b.subtitle || '', ui, lv, off].join('|');
+  let h = 2166136261; for (const ch of s) { h ^= ch.codePointAt(0); h = Math.imul(h, 16777619) >>> 0; }
+  return 'tb' + h.toString(36).padStart(7, '0');
 }
 function tbExamId() {
   const b = tbCur(); if (!b) return '';
-  const s = [b.key, $('tb-unit').value, $('tb-lv').value, [...tbOff].sort().join(',')].join('|');
-  let h = 2166136261; for (const ch of s) { h ^= ch.codePointAt(0); h = Math.imul(h, 16777619) >>> 0; }
-  return 'tb' + h.toString(36).padStart(7, '0');
+  return tbIdOf(b, $('tb-unit').value, $('tb-lv').value, [...tbOff].sort().join(','));
+}
+/* 이 교재의 모든 단원·단계를 한 번에 QR 시험지로 (교재편집기에서 'QR 넣기'로 만든 교재와 짝) */
+async function tbRegisterAll() {
+  const b = tbCur(); if (!b) { toast('교재를 고르세요.'); return; }
+  const list = [];
+  b.units.forEach((u, ui) => Object.keys(TB_LV).forEach(k => { if ((u.sets[k] || []).length) list.push([ui, k]); }));
+  if (!list.length) { toast('등록할 문제가 없습니다.'); return; }
+  const cid = $('tb-cls').value, cls = cid && CL().find(c => c.id === cid);
+  if (!confirm(`"${b.subtitle || b.title}"의 단원·단계 ${list.length}개를 QR 시험지로 한 번에 등록할까요?` + (cls ? `\n수업: ${cls.name}` : '\n(수업 없음 — 위에서 수업을 먼저 고를 수 있습니다)'))) return;
+  let nNew = 0; const push = [];
+  for (const [ui, k] of list) {
+    const u = b.units[ui], id = tbIdOf(b, String(ui), k);
+    let e = stuDB.exams.find(y => y.id === id);
+    if (!e) { e = {id, at: Date.now()}; stuDB.exams.push(e); nNew++; }
+    if (cls) { if (e.classId !== cid) delete e.studentIds; e.classId = cid; }
+    e.name = tbStageName(b, ui, k);
+    e.questions = (u.sets[k] || []).map(q => { const {_moreImg, ...r} = tbQ(b, u, k, q); return r; });
+    e.tb = true; push.push(e);
+  }
+  stuSave(); renderTbook();
+  if (!(sbOn() && stuDB.pin)) { toast(`시험지 ${list.length}개를 만들었습니다 (새로 ${nNew}개).\n선생님 로그인 뒤 다시 누르면 서버에 올라갑니다.`); return; }
+  let ok = 0, bad = 0;
+  for (const [i, e] of push.entries()) { impProg(`서버에 올리는 중… ${i + 1}/${push.length}`); try { await sbPushExam(e); ok++; } catch(x) { bad++; } }
+  impProg();
+  toast(`QR 시험지 ${ok}개를 등록했습니다 (새로 ${nNew}개)` + (bad ? `\n올리지 못한 것 ${bad}개 — 다시 누르세요.` : ''));
 }
 const tbExam = () => { const id = tbExamId(); return id ? stuDB.exams.find(e => e.id === id) || null : null; };
 const tbTpl = () => (document.querySelector('input[name=tb-tpl]:checked') || {}).value || '1';
@@ -3171,6 +3209,8 @@ async function sbExam(code) {
   if (!st) { sbR().innerHTML = sbTop() + '<p class="text-center text-gray-500 py-10">시험지를 찾을 수 없습니다. 시험지 코드를 확인하세요.</p><a href="?me=1" class="block text-center underline text-sm">내 학습 페이지로</a>'; sbBindTop(); return; }
   st.submitted ? sbResult(code, st) : sbAnswer(code, st);
 }
+/* 교재 단계 시험지는 이름 끝 '(09~20번)'의 첫 번호부터 번호를 붙임 */
+const sbNo0 = name => { const m = /\((\d+)~\d+번\)\s*$/.exec(name || ''); return m ? +m[1] - 1 : 0; };
 const sbOpts = (sel) => [1,2,3,4,5].map(k => `<button type="button" data-k="${k}" class="sb-opt${sel === k ? ' on' : ''}">${circ(k)}</button>`).join('');
 function sbBindOpts(row, arr, i) {
   row.querySelectorAll('.sb-opt').forEach(bt => bt.onclick = () => {
@@ -3179,15 +3219,15 @@ function sbBindOpts(row, arr, i) {
   });
 }
 function sbAnswer(code, st) {
-  const R = sbR(), n = st.n, ans = Array(n).fill(0);
+  const R = sbR(), n = st.n, ans = Array(n).fill(0), o = sbNo0(st.name);
   R.className = 'max-w-md mx-auto p-4 space-y-4';
   R.innerHTML = sbTop() + `<div><h1 class="text-xl font-semibold">${esc(st.name)}</h1><p class="text-sm text-gray-500">${n}문항 · 답을 모두 고른 뒤 제출하세요. 다시 누르면 선택이 지워집니다.</p></div>
-    <div id="sb-rows" class="bg-white rounded-xl border p-3 space-y-1.5">${Array.from({length: n}, (_, i) => `<div class="flex items-center gap-2" data-i="${i}"><span class="w-10 font-semibold text-sm">${i+1}번</span>${sbOpts(0)}</div>`).join('')}</div>
+    <div id="sb-rows" class="bg-white rounded-xl border p-3 space-y-1.5">${Array.from({length: n}, (_, i) => `<div class="flex items-center gap-2" data-i="${i}"><span class="w-10 font-semibold text-sm">${i+1+o}번</span>${sbOpts(0)}</div>`).join('')}</div>
     <button id="sb-go" class="w-full sb-primary">제출하기</button><a href="?me=1" class="block text-center underline text-sm text-gray-500">내 학습 페이지</a>`;
   sbBindTop();
   [...$('sb-rows').children].forEach((row, i) => sbBindOpts(row, ans, i));
   $('sb-go').onclick = async () => {
-    if (!await sbConfirm('답안을 제출할까요?', '처음 제출한 답으로 점수와 등수가 정해집니다. 제출 후 틀린 문제는 한 번만 다시 풀 수 있습니다.', ans.map((a, i) => ({no: i + 1, a})), '제출하기')) return;
+    if (!await sbConfirm('답안을 제출할까요?', '처음 제출한 답으로 점수와 등수가 정해집니다. 제출 후 틀린 문제는 한 번만 다시 풀 수 있습니다.', ans.map((a, i) => ({no: i + 1 + o, a})), '제출하기')) return;
     try { sbResult(code, await sbCall('sb_submit2', {t: tokGet(), c: code, ans}), '제출했습니다.'); } catch(e) { sbFail(e); }
   };
 }
@@ -3195,7 +3235,7 @@ function sbAnswer(code, st) {
 function sbResult(code, st, flash, retrying) {
   const R = sbR(), n = st.n, mk = st.marks || [], a1 = st.answers || [], hasR = Array.isArray(st.retry), rm = st.retry_marks || [], exp = st.exp || [];
   const graded = mk.some(x => x >= 0), s1 = mk.filter(x => x === 1).length, s2 = rm.filter(x => x === 1).length;
-  const wrong = mk.map((m, i) => m === 0 ? i : -1).filter(i => i >= 0), re = Array(n).fill(0);
+  const wrong = mk.map((m, i) => m === 0 ? i : -1).filter(i => i >= 0), re = Array(n).fill(0), o = sbNo0(st.name);
   const badge = (m, a) => `<button type="button" class="sb-mark ${m === 1 ? 'o' : m === 0 ? 'x' : ''}" title="해설 보기">${m === 1 ? 'O' : m === 0 ? 'X' : '-'}</button>`;
   R.className = 'max-w-md mx-auto p-4 space-y-4';
   R.innerHTML = sbTop() + `${flash ? `<p class="text-center font-semibold text-emerald-700 bg-emerald-50 rounded-lg py-2">${flash}</p>` : ''}
@@ -3205,7 +3245,7 @@ function sbResult(code, st, flash, retrying) {
       const m = mk[i], a = a1[i] || 0, again = hasR && m === 0, ra = again ? st.retry[i] || 0 : 0;
       const line = retrying && m === 0 ? `<span class="text-xs text-gray-400 w-8">${a ? circ(a) : '-'}</span>${sbOpts(0)}`
         : `<span class="flex-1 text-lg">${a ? circ(a) : '<span class="text-gray-400 text-sm">답 없음</span>'}${again ? ` <span class="text-sm text-gray-500">→ 다시 푼 답 ${ra ? circ(ra) : '없음'} <b class="${rm[i] === 1 ? 'text-emerald-600' : 'text-red-500'}">${rm[i] === 1 ? 'O' : 'X'}</b></span>` : ''}</span>`;
-      return `<div data-i="${i}"><div class="flex items-center gap-2"><span class="w-10 font-semibold text-sm">${i+1}번</span>${line}${badge(m, a)}</div><div class="sb-exp hidden">${exp[i] ? esc(exp[i]) : '해설이 없습니다.'}</div></div>`; }).join('')}</div>
+      return `<div data-i="${i}"><div class="flex items-center gap-2"><span class="w-10 font-semibold text-sm">${i+1+o}번</span>${line}${badge(m, a)}</div><div class="sb-exp hidden">${exp[i] ? esc(exp[i]) : '해설이 없습니다.'}</div></div>`; }).join('')}</div>
     <div id="sb-act" class="space-y-2"></div>${retrying ? '' : '<button id="sb-ask" class="w-full sb-ghost"><i data-lucide="message-circle"></i>이 시험지에 대해 선생님께 질문</button>'}<a href="?me=1" class="block text-center underline text-sm text-gray-500">내 학습 페이지</a>`;
   sbBindTop();
   if ($('sb-ask')) $('sb-ask').onclick = () => sbChat(`[${st.name}] 번 문제 질문: `, () => sbResult(code, st));
