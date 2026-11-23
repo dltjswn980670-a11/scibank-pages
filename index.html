@@ -137,8 +137,8 @@ footer{background:transparent!important;border:0!important;color:#9AA3B0!importa
 .pv-n2{text-align:center;margin-bottom:14px;position:relative}.pv-n2q{position:absolute;right:0;top:-6px}.pv-n2t{font-size:1.5rem;margin:2px 0 8px}.pv-n2r{display:grid;grid-template-columns:1fr 1fr 1fr;border:1px solid #000;font-size:.72rem}.pv-n2r span{padding:3px 8px;border-left:1px solid #000;text-align:left}.pv-n2r span:first-child{border-left:0}.pv-n2r span:nth-child(2){text-align:center}.pv-n2r span:last-child{text-align:right}
 .pv-n3{margin-bottom:14px;border-bottom:1.5px solid #000;padding-bottom:10px}.pv-n3y{text-align:center;font-size:.95rem}.pv-n3m{display:flex;align-items:center;gap:12px;margin:4px 0 8px}.pv-n3o{border:1px solid #000;border-radius:999px;padding:2px 12px;font-size:.75rem;white-space:nowrap}.pv-n3t{flex:1;text-align:center;font-size:1.8rem;font-weight:600}.pv-n3t small{font-size:1.1rem;font-weight:500}.pv-n3q{width:70px;display:flex;justify-content:flex-end}.pv-n3r{display:flex;gap:0;font-size:.75rem;max-width:70%}.pv-n3r span{border:1px solid #000;padding:3px 8px;margin-left:-1px}
 .frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;font-size:.78em;line-height:1.15;margin:0 2px;text-indent:0}.frac>span{text-indent:0}.frac>span:last-child{border-top:1px solid currentColor;padding:0 2px}
-.qtbl{border-collapse:collapse;margin:8px auto;font-size:14px}.qtbl td{border:1px solid #222;padding:3px 12px;text-align:center}
-.qimg{text-align:center;margin:4px 0}.qimg img{display:inline-block;margin-left:auto;margin-right:auto}
+.qtbl{border-collapse:collapse;margin:8px 0;font-size:14px;width:100%}.qtbl td{border:1px solid #222;padding:3px 12px;text-align:center}
+.qimg{text-align:center;margin:8px 0;border:1px solid transparent}.qimg img{display:block;width:100%;max-height:18rem;object-fit:contain;margin:0 auto}
 .pv-box{border:1px solid #000;display:inline-block;font-size:.75rem;padding:6px 10px;margin-bottom:12px}
 .pv-h3{margin-bottom:14px}.pv-h3a{text-align:center;font-weight:700;font-size:1.05rem}.pv-h3b{text-align:center;font-size:1.9rem;margin:6px 0 10px}.pv-h3c{display:flex;gap:10px;font-size:.8rem;border-bottom:1px solid #000;padding-bottom:12px}.pv-h3c span{border:1px solid #000;padding:3px 10px;flex:1}
 .pvgap{outline:none;cursor:text;position:relative;min-height:14px;border-radius:6px}
@@ -1319,7 +1319,7 @@ function bvDraw() {
   const p = bvPages[bvPg];
   $('bv-pg-t').textContent = p ? `${bvBook} · ${p.nm} (${bvPg + 1}/${bvPages.length})` : '';
   $('bv-page').innerHTML = p ? p.items.map((it, j) => { const q = it.q, no = bvNo(q) || j + 1, on = bvCart.has(bvKey(it.r));
-    const body = q.imageOnly ? (q.image ? `<img src="${esc(q.image)}" loading="lazy">` : fx(q.question)) : fmtQ(q.question, no, q.image ? `<img src="${esc(q.image)}" class="my-2 max-h-72" loading="lazy">` : '') + (q.choices || []).map(c => `<p class="ml-4 text-sm">${fx(c)}</p>`).join('');
+    const body = q.imageOnly ? (q.image ? `<img src="${esc(q.image)}" loading="lazy">` : fx(q.question)) : fmtQ(q.question, no, q.image ? `<img src="${esc(q.image)}" class="my-2 max-h-72" loading="lazy">` : '') + chHtml(q.choices);
     return `<div class="bv-q ${on ? 'on' : ''}" data-j="${j}" onclick="bvToggle(${j})" title="눌러서 담기/빼기"><div class="flex items-center gap-2 text-xs text-gray-500 mb-1"><input type="checkbox" ${on ? 'checked' : ''} tabindex="-1" class="accent-indigo-600 pointer-events-none">${q.imageOnly ? no + '번' : ''}<span class="ml-auto">${esc(uName(q.unit))} · ${esc(dif(q))}</span></div>${body}</div>`; }).join('')
     : '<p class="text-sm text-gray-400">쪽이 없습니다.</p>';
   if (window.lucide) lucide.createIcons();
@@ -1620,7 +1620,7 @@ function renderPreview() {
   $('pv-gap-v').textContent = gap + 'px'; $('pv-paper').dataset.tpl = tpl; setTimeout(drawQR, 0); saveDraft(); pvClsOptions();
   if (document.activeElement !== $('pv-name')) $('pv-name').value = examName();
   const qs = currentQuestions, tok = ++pvTok, P = $('pv-paper');
-  const items = qs.map((q, i) => `<div class="pq">${i ? `<div class="pvgap" tabindex="0" data-i="${i}" onkeydown="pvKey(event,${i})" style="height:${Math.max(0, +gap + 24*(pvExtra[i]||0))}px"></div>` : ''}${q.imageOnly ? `<p class="font-semibold">${i+1}. </p>${q.image ? `<img src="${esc(q.image)}" data-rn="${i}" class="my-1 w-full">` : ''}` : fmtQ(q.question, i + 1, q.image ? `<img src="${esc(q.image)}" class="my-2 max-h-64">` : '')}${bareChoices(q) ? '' : (q.choices || []).map(c => `<p class="ml-4 text-sm">${fx(c)}</p>`).join('')}${pvStd ? `<div class="no-print text-right">${stdTag(q)}</div>` : ''}</div>`);
+  const items = qs.map((q, i) => `<div class="pq">${i ? `<div class="pvgap" tabindex="0" data-i="${i}" onkeydown="pvKey(event,${i})" style="height:${Math.max(0, +gap + 24*(pvExtra[i]||0))}px"></div>` : ''}${q.imageOnly ? `<p class="font-semibold">${i+1}. </p>${q.image ? `<img src="${esc(q.image)}" data-rn="${i}" class="my-1 w-full">` : ''}` : fmtQ(q.question, i + 1, q.image ? `<img src="${esc(q.image)}" class="my-2 max-h-64">` : '')}${bareChoices(q) ? '' : chHtml(q.choices)}${pvStd ? `<div class="no-print text-right">${stdTag(q)}</div>` : ''}</div>`);
   if (ans) items.push(`<div class="pq border-t pt-4 mt-8"><h3 class="font-semibold mb-2">[정답 및 해설]</h3>${qs.map((q, i) => `<p class="text-sm">${i+1}번 정답: ${fx(q.answer)} ${q.explanation ? '해설: ' + fx(q.explanation) : ''}</p>`).join('')}</div>`);
   /* 1) 보이지 않는 A4 쪽 하나에 모두 넣어 높이를 잰 뒤 2) 인쇄될 쪽마다 왼쪽 단 → 오른쪽 단 순서로 나눠 담음 */
   const M = document.createElement('div'); M.className = 'pv-page pv-measure';
@@ -1979,11 +1979,17 @@ const hxT = t => { t = sciFix(t); let o = '', p = 0; t.replace(HXRE, (m, sb, sp,
   if (p < t.length) o += `<hp:t>${X(t.slice(p).replace(/[-]/g, ''))}</hp:t>`; return o; };
 const hxP = (t, c, br) => `<hp:p id="0" paraPrIDRef="${c[0]}" styleIDRef="${c[1]}" pageBreak="${br?1:0}" columnBreak="0" merged="0"><hp:run charPrIDRef="${c[2]}">${t === '' ? '' : hxT(String(t))}</hp:run></hp:p>`;
 /* 표 (bf = 실선 테두리 borderFill id, 단 너비 안 가운데) */
-let hxTblN = 0;
+let hxTblN = 0; const HX_W = 27000;   // 표·글 상자·그림 공통 너비 (단 너비)
 function hxTbl(rows, c, bf) {
-  const id = 1700000000 + (++hxTblN), nc = rows[0].length, cw = Math.floor(Math.min(27000, nc * 7000) / nc), W = cw * nc, ch = 1700, H = ch * rows.length, M = 'left="400" right="400" top="141" bottom="141"';
+  const id = 1700000000 + (++hxTblN), nc = rows[0].length, cw = Math.floor(HX_W / nc), W = cw * nc, ch = 1700, H = ch * rows.length, M = 'left="400" right="400" top="141" bottom="141"';
   const cell = (s, r, k) => `<hp:tc name="" header="0" hasMargin="0" protect="0" editable="0" dirty="0" borderFillIDRef="${bf}"><hp:subList id="" textDirection="HORIZONTAL" lineWrap="BREAK" vertAlign="CENTER" linkListIDRef="0" linkListNextIDRef="0" textWidth="0" textHeight="0" hasTextRef="0" hasNumRef="0"><hp:p id="0" paraPrIDRef="${c[0]}" styleIDRef="${c[1]}" pageBreak="0" columnBreak="0" merged="0"><hp:run charPrIDRef="${c[2]}">${s ? hxT(s) : ''}</hp:run></hp:p></hp:subList><hp:cellAddr colAddr="${k}" rowAddr="${r}"/><hp:cellSpan colSpan="1" rowSpan="1"/><hp:cellSz width="${cw}" height="${ch}"/><hp:cellMargin ${M}/></hp:tc>`;
   return `<hp:p id="0" paraPrIDRef="${c[0]}" styleIDRef="${c[1]}" pageBreak="0" columnBreak="0" merged="0"><hp:run charPrIDRef="${c[2]}"><hp:tbl id="${id}" zOrder="0" numberingType="TABLE" textWrap="TOP_AND_BOTTOM" textFlow="BOTH_SIDES" lock="0" dropcapstyle="None" pageBreak="CELL" repeatHeader="1" rowCnt="${rows.length}" colCnt="${nc}" cellSpacing="0" borderFillIDRef="${bf}" noAdjust="0"><hp:sz width="${W}" widthRelTo="ABSOLUTE" height="${H}" heightRelTo="ABSOLUTE" protect="0"/><hp:pos treatAsChar="0" affectLSpacing="0" flowWithText="1" allowOverlap="0" holdAnchorAndSO="0" vertRelTo="PARA" horzRelTo="COLUMN" vertAlign="TOP" horzAlign="CENTER" vertOffset="0" horzOffset="0"/><hp:outMargin left="283" right="283" top="283" bottom="283"/><hp:inMargin ${M}/>${rows.map((r, ri) => `<hp:tr>${r.map((s, k) => cell(s, ri, k)).join('')}</hp:tr>`).join('')}</hp:tbl><hp:t/></hp:run></hp:p>`;
+}
+/* 글 상자 (<보기>·자료·실험 과정): 칸 하나짜리 표, 안에 문단 여러 개 */
+function hxBox(paras, c, bf) {
+  const id = 1700000000 + (++hxTblN), W = HX_W, H = Math.max(1, paras.length) * 1500 + 600, M = 'left="566" right="566" top="283" bottom="283"';
+  const ps = paras.map(s => `<hp:p id="0" paraPrIDRef="${c[0]}" styleIDRef="${c[1]}" pageBreak="0" columnBreak="0" merged="0"><hp:run charPrIDRef="${c[2]}">${s ? hxT(s) : ''}</hp:run></hp:p>`).join('');
+  return `<hp:p id="0" paraPrIDRef="${c[0]}" styleIDRef="${c[1]}" pageBreak="0" columnBreak="0" merged="0"><hp:run charPrIDRef="${c[2]}"><hp:tbl id="${id}" zOrder="0" numberingType="TABLE" textWrap="TOP_AND_BOTTOM" textFlow="BOTH_SIDES" lock="0" dropcapstyle="None" pageBreak="CELL" repeatHeader="0" rowCnt="1" colCnt="1" cellSpacing="0" borderFillIDRef="${bf}" noAdjust="0"><hp:sz width="${W}" widthRelTo="ABSOLUTE" height="${H}" heightRelTo="ABSOLUTE" protect="0"/><hp:pos treatAsChar="0" affectLSpacing="0" flowWithText="1" allowOverlap="0" holdAnchorAndSO="0" vertRelTo="PARA" horzRelTo="COLUMN" vertAlign="TOP" horzAlign="CENTER" vertOffset="0" horzOffset="0"/><hp:outMargin left="283" right="283" top="283" bottom="283"/><hp:inMargin ${M}/><hp:tr><hp:tc name="" header="0" hasMargin="0" protect="0" editable="0" dirty="0" borderFillIDRef="${bf}"><hp:subList id="" textDirection="HORIZONTAL" lineWrap="BREAK" vertAlign="TOP" linkListIDRef="0" linkListNextIDRef="0" textWidth="0" textHeight="0" hasTextRef="0" hasNumRef="0">${ps}</hp:subList><hp:cellAddr colAddr="0" rowAddr="0"/><hp:cellSpan colSpan="1" rowSpan="1"/><hp:cellSz width="${W}" height="${H}"/><hp:cellMargin ${M}/></hp:tc></hp:tr></hp:tbl><hp:t/></hp:run></hp:p>`;
 }
 function hxPic(n, w, h, c, fl) {
   return `<hp:p id="0" paraPrIDRef="${c[0]}" styleIDRef="${c[1]}" pageBreak="0" columnBreak="0" merged="0"><hp:run charPrIDRef="${c[2]}">${hxPicEl(n, w, h, fl)}</hp:run></hp:p>`;
@@ -2009,16 +2015,30 @@ async function buildHwpx(qs, dims, o) {
   const segs = (s, cfg, pre) => { let first = !!pre; return qSegs(s).map(g => { if (g.t === 'tbl') return bfN ? hxTbl(g.rows, BC, BF) : g.rows.map(r => hxP(r.join('   '), cfg)).join(''); const t = first ? pre + g.s : g.s; first = false; return hxP(t, cfg); }).join(''); };
   qs.forEach((q, i) => {
     if (i) { const n = Math.max(0, Math.round((o.gap + 24 * (((o.extra || pvExtra)[i]) || 0)) / 28)); for (let k = 0; k < n; k++) body += hxP('', BC); }
-    const [lead, ask] = q.imageOnly ? ['', ''] : askSplit(q.question);
-    if (!q._rn) body += segs(lead, QC(i), `${i+1}. `);
     const m = q.image && dims[i] && /^data:image\/(png|jpeg);base64,(.+)$/.exec(q.image);
-    if (m) {
-      const n = imgs.length + 1, ext = m[1] === 'jpeg' ? 'jpg' : 'png', s = Math.min(1, 28000 / (dims[i].w * 75), 20000 / (dims[i].h * 75));
+    const pic = () => {
+      // 그림은 표·<보기> 상자와 같은 너비 (너무 길면 높이에 맞춤)
+      const n = imgs.length + 1, ext = m[1] === 'jpeg' ? 'jpg' : 'png', s = q.imageOnly ? Math.min(1, 28000 / (dims[i].w * 75), 20000 / (dims[i].h * 75)) : Math.min(HX_W / (dims[i].w * 75), 18000 / (dims[i].h * 75));
       imgs.push({n, ext, mime: m[1], data: b64(m[2])});
-      body += hxPic(n, Math.round(dims[i].w * 75 * s), Math.round(dims[i].h * 75 * s), BC, q.imageOnly ? undefined : 'center');
+      return hxPic(n, Math.round(dims[i].w * 75 * s), Math.round(dims[i].h * 75 * s), BC, q.imageOnly ? undefined : 'center');
+    };
+    if (q.imageOnly) { if (!q._rn) body += hxP(`${i+1}. `, QC(i)); if (m) body += pic(); }
+    else {
+      // 문제예시.hwpx 순서: 발문 → 자료(상자·표·그림) → 묻는 문장 → <보기> → 선택지
+      let first = true;
+      qBlocks(q.question, !!m).forEach(b => {
+        if (b.t === 'img') body += pic();
+        else if (b.t === 'tbl') body += bfN ? hxTbl(b.rows, BC, BF) : b.rows.map(r => hxP(r.join('   '), BC)).join('');
+        else if (b.t === 'box') { const head = b.lab === '보기' ? ['\u3000'.repeat(11) + '< 보 기 >'] : b.lab === '자료' ? [] : [`[ ${b.lab} ]`];
+          const bul = b.lab === '자료' && b.items.length > 1 && !b.items.some(x => /^(\(\S{1,2}\)|\d+\.|[ㄱ-ㅎ]\.)\s|^[•▪·※○●\-]/.test(x));
+          const ps = head.concat(b.items.map(x => (bul ? '▪ ' : '') + x));
+          body += bfN ? hxBox(ps, BC, BF) : ps.map(s => hxP(s, BC)).join(''); }
+        else { body += segs(b.s, QC(i), first ? `${i+1}. ` : ''); first = false; }
+      });
     }
-    if (ask) body += segs(ask, QC(i));
-    if (!bareChoices(q)) (q.choices || []).forEach(c => body += hxP(c, CC));
+    if (!bareChoices(q)) { const cs = q.choices || [];
+      if (chShort(cs)) for (let k = 0; k < cs.length; k += 3) body += hxP(cs.slice(k, k + 3).join('　　　'), CC);
+      else cs.forEach(c => body += hxP(c, CC)); }
   });
   if (o.ans) {
     body += hxP('[정답 및 해설]', QC(0), true);
@@ -2100,23 +2120,66 @@ function renderPastSelects() {
   $('past-stats').textContent = `등록된 시험지 ${pastDB.length}개`;
   renderPast(pool[0]);
 }
-function fmtQ(t, no, img = '') {
-  t = String(t || '');
-  const MK = /<(보기|실험 과정|실험 결과|탐구 과정|자료|조건|가설)>\s*/g, ms = [...t.matchAll(MK)].filter(m => m[1] !== '보기' || /^ㄱ\./.test(t.slice(m.index + m[0].length)));
-  const [lead, ask] = askSplit(ms.length ? t.slice(0, ms[0].index).trim() : t);
-  const top = qHtml(`${no}. ${lead}`) + (img ? `<div class="qimg">${img}</div>` : '') + (ask ? qHtml(ask) : '');
-  if (!ms.length) return top;
-  const TAIL = /\s(옳은 것|옳지 않은|이에 대한|제시한|\(단,|이 실험|위 실험|다음 중)/;
-  let boxes = '', tail = '';
-  ms.forEach((m, i) => {
-    let body = t.slice(m.index + m[0].length, i + 1 < ms.length ? ms[i + 1].index : t.length).trim();
-    if (i === ms.length - 1) { const k = body.search(TAIL); if (k > 0) { tail = body.slice(k).trim(); body = body.slice(0, k).trim(); } }
-    const lab = m[1] === '보기' ? '보 기' : m[1];
-    const items = m[1] === '보기' ? body.split(/\s+(?=[ㄱ-ㅎ]\.\s)/) : body.split(/\n+|\s+(?=\d+\.\s|\([가-하]\)\s)/);
-    boxes += `<div style="border:1.5px solid #222;padding:10px 14px;margin:8px 0;font-size:14px;line-height:1.7"><div style="text-align:center;font-weight:bold;margin-bottom:4px">&lt; ${lab} &gt;</div>${items.filter(Boolean).map(x => `<div style="padding-left:1.4em;text-indent:-1.4em">${fx(x)}</div>`).join('')}</div>`;
-  });
-  return top + boxes + (tail ? qHtml(tail) : '');
+/* 문제 글 → 순서대로 나열한 덩어리 (문제예시.hwpx 순서: 발문 → 자료(글 상자·표·그림) → 묻는 문장 → <보기> → 선택지)
+   글 규칙: 줄 맨 앞 <보기>/<자료>/<실험 과정>… = 상자 시작, [그림] = 그림 자리, [표] a / b | c / d = 표.
+   [그림]이 없으면 그림은 묻는 문장 바로 앞 (묻는 문장이 없으면 첫 문단 뒤) */
+const QBOX = '보기|자료|조건|가설|(?:실험|탐구|활동)[^>]{0,10}?(?:과정|결과)|실험|탐구';
+const isAsk = s => /\?\s*(\(단[,，][^)]*\)\.?)?\s*(\[[\d.]+점\])?\s*$/.test(s) && !/^[ㄱ-ㅎ]\.\s/.test(s);
+function qBlocks(t, hasImg) {
+  const lines = String(t ?? '').split('\n'), out = []; let box = null, imgDone = false;
+  const MK = new RegExp(`^<(${QBOX})>\\s*(.*)$`);
+  const TAIL = /\s(?=(옳은 것|옳지 않은|이에 대한|제시한|이 실험|위 실험|다음 중|위 자료|이 자료)[^?]*\?)/;
+  const close = () => { if (box) { box.items = box.items.filter(s => s.trim()); out.push(box); box = null; } };
+  const para = s => { if (!s.trim()) return; qSegs(s).forEach(g => out.push(g.t === 'tbl' ? g : {t: 'p', s: g.s})); };
+  for (let raw of lines) {
+    const line = raw.trim();
+    const m = MK.exec(line);
+    if (m && (m[1] !== '보기' || !m[2] || /^[ㄱ-ㅎ]\.\s/.test(m[2]))) {
+      close(); box = {t: 'box', lab: m[1], items: []};
+      let body = m[2];
+      if (body) { const k = body.search(TAIL); let tail = ''; if (k > 0 && m[1] !== '보기') { tail = body.slice(k).trim(); body = body.slice(0, k).trim(); }
+        box.items.push(...(m[1] === '보기' ? body.split(/\s+(?=[ㄱ-ㅎ]\.\s)/) : body.split(/\s+(?=\(\S{1,2}\)\s)|\s+(?=\d+\.\s)/)));
+        if (tail) { close(); out.push({t: 'p', s: tail, ask: isAsk(tail)}); } }
+      continue;
+    }
+    if (line === '[그림]') { close(); if (hasImg && !imgDone) { out.push({t: 'img'}); imgDone = true; } continue; }
+    if (box) {
+      const inBox = box.lab === '보기' ? /^[ㄱ-ㅎ]\.\s/.test(line) || (line && !isAsk(line) && !/^\(단[,，]/.test(line) && box.items.length && !/^\[표\]/.test(line))
+        : line && !isAsk(line) && !/^\[표\]/.test(line);
+      if (inBox) { box.items.push(...(box.lab === '보기' ? line.split(/\s+(?=[ㄱ-ㅎ]\.\s)/) : [line])); continue; }
+      close();
+    }
+    if (!line) continue;
+    if (/^\(단[,，]/.test(line) && out.length && out[out.length - 1].ask) { out.push({t: 'p', s: line, ask: true}); continue; }
+    // 한 줄 안에 '지문. 묻는 문장?'이 붙어 있으면 나눔
+    const [lead, ask] = /^\[표\]/.test(line) ? [line, ''] : askSplit(line);
+    if (ask && isAsk(ask)) { para(lead); out.push({t: 'p', s: ask, ask: true}); }
+    else if (isAsk(line)) out.push({t: 'p', s: line, ask: true});
+    else para(line);
+  }
+  close();
+  if (hasImg && !imgDone) { let k = out.findIndex(b => b.ask); if (k < 0) k = Math.min(1, out.length); out.splice(k, 0, {t: 'img'}); }
+  return out;
 }
+const QBOX_CSS = 'border:1.3px solid #222;padding:8px 14px;margin:8px 0;font-size:14px;line-height:1.7';
+function fmtQ(t, no, img = '') {
+  let first = true;
+  return qBlocks(t, !!img).map(b => {
+    if (b.t === 'img') return `<div class="qimg">${img}</div>`;
+    if (b.t === 'tbl') return `<table class="qtbl">${b.rows.map(r => `<tr>${r.map(c => `<td>${fx(c)}</td>`).join('')}</tr>`).join('')}</table>`;
+    if (b.t === 'box') {
+      const head = b.lab === '보기' ? '<div style="text-align:center;font-weight:bold;margin-bottom:2px">&lt; 보 기 &gt;</div>' : b.lab === '자료' ? '' : `<div style="font-weight:bold;margin-bottom:2px">[ ${esc(b.lab)} ]</div>`;
+      const bul = b.lab === '자료' && b.items.length > 1 && !b.items.some(x => /^(\(\S{1,2}\)|\d+\.|[ㄱ-ㅎ]\.)\s|^[•▪·※○●\-]/.test(x));
+      return `<div style="${QBOX_CSS}">${head}${b.items.map(x => `<div style="padding-left:1.4em;text-indent:-1.4em">${bul ? '▪ ' : ''}${fx(x)}</div>`).join('')}</div>`;
+    }
+    const s = first ? `${no}. ${b.s}` : b.s; first = false;
+    return `<div class="font-semibold whitespace-pre-wrap">${fx(s)}</div>`;
+  }).join('');
+}
+/* 선택지: 짧으면 한 줄에 3개씩 (문제예시.hwpx처럼) */
+const chShort = cs => cs.length > 1 && cs.every(c => String(c).replace(/^[①-⑤]\s*/, '').length <= 12);
+const chHtml = cs => { cs = cs || []; if (!cs.length) return '';
+  return chShort(cs) ? `<div class="ml-4 text-sm grid grid-cols-3 gap-x-4">${cs.map(c => `<span>${fx(c)}</span>`).join('')}</div>` : cs.map(c => `<p class="ml-4 text-sm">${fx(c)}</p>`).join(''); };
 /* 지금 보이는 세트 번호 (0 = 원본) */
 const pastCur = x => pastMode === 'var' ? Math.min(Math.max(parseInt($('past-set').value) || 1, 1), (x.variants || []).length) : 0;
 function renderPast(x) {
@@ -2137,7 +2200,7 @@ function renderPast(x) {
   pastRegUI(x, pe); setTimeout(drawQR, 0);
   el.innerHTML = pvHead(tpl, qs.length, {qs: pastQs(x, qs), name: pastName(x, cur), id: pe ? pe.id : null}) + '<div class="pv-cols">' +
     (qs.length ? '' : '<p class="text-center text-gray-400 py-12 no-print">고른 단원에 해당하는 문항이 없습니다.</p>') +
-    qs.map((q, i) => `<div class="pq mb-6">${fmtQ(q.question, i+1, (q.image ? `<img src="${esc(q.image)}" class="my-2 max-h-64">` : '') + tools(q, on[i]))}${(q.choices || []).map(c => `<p class="ml-4 text-sm">${fx(c)}</p>`).join('')}</div>`).join('') + '</div>' +
+    qs.map((q, i) => `<div class="pq mb-6">${fmtQ(q.question, i+1, (q.image ? `<img src="${esc(q.image)}" class="my-2 max-h-64">` : '') + tools(q, on[i]))}${chHtml(q.choices)}</div>`).join('') + '</div>' +
     (ans ? `<div class="pq border-t pt-4 mt-8"><h3 class="font-semibold mb-2">[정답 및 해설]</h3>${qs.map((q, i) => `<p class="text-sm">${i+1}번 정답: ${fx(q.answer)} ${q.explanation ? '해설: ' + fx(q.explanation) : ''}</p>`).join('')}</div>` : '');
 }
 
@@ -2435,7 +2498,7 @@ function renderTbook(resetSel) {
   area.innerHTML = pvHead(tpl, qs.length, {qs: qs.map(p => p.q), name: tbName(), id: pe ? pe.id : null}) + '<div class="pv-cols">' +
     (view.length ? '' : '<p class="text-center text-gray-400 py-12 no-print">고른 단원·단계에 문제가 없습니다.</p>') +
     view.map(p => { const off = tbOff.has(p.id), q = p.q, n = off ? '–' : ++no;
-      return `<div class="pq mb-6 ${off ? 'opacity-40 no-print' : ''}">${ed ? `<label class="no-print text-xs text-gray-500 cursor-pointer"><input type="checkbox" ${off ? '' : 'checked'} onchange="tbToggle('${p.id}')" class="mr-1">넣기</label>` : ''}${fmtQ(q.question, n, q.image ? `<img src="${esc(q.image)}" class="my-2 max-h-64">` : '')}${q.choices.map(c => `<p class="ml-4 text-sm">${fx(c)}</p>`).join('')}</div>`; }).join('') + '</div>' +
+      return `<div class="pq mb-6 ${off ? 'opacity-40 no-print' : ''}">${ed ? `<label class="no-print text-xs text-gray-500 cursor-pointer"><input type="checkbox" ${off ? '' : 'checked'} onchange="tbToggle('${p.id}')" class="mr-1">넣기</label>` : ''}${fmtQ(q.question, n, q.image ? `<img src="${esc(q.image)}" class="my-2 max-h-64">` : '')}${chHtml(q.choices)}</div>`; }).join('') + '</div>' +
     (ans ? `<div class="pq border-t pt-4 mt-8"><h3 class="font-semibold mb-2">[정답 및 해설]</h3>${qs.map((p, i) => `<p class="text-sm">${i + 1}번 정답: ${fx(p.q.answer)} ${p.q.explanation ? '해설: ' + fx(p.q.explanation) : ''}</p>`).join('')}</div>` : '');
   if (window.lucide) lucide.createIcons();
 }
