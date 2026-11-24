@@ -1659,7 +1659,7 @@ function renderPreview() {
   return done;
 }
 let pvTok = 0;
-const TABS =['selector','book','bview','diff','preview','editor','past','var','stu','stuname','ex','cls','msg'];
+const TABS =['selector','book','bview','diff','preview','editor','past','var','stu','stuname','stuall','stuup','ex','cls','msg'];
 const SECTIONS = ['selector','book','bview','tbook','diff','preview','editor','past','stu','ex','cls','msg'];
 /* 상위 탭 → 하위 탭 [이동할 탭, 이름, 색] */
 const NAV = [
@@ -1667,7 +1667,7 @@ const NAV = [
   {name: '만든 시험지', sym: '시', c: 'ex', subs: [['ex', '', 'ex']]},
   {name: '기출', sym: '기', c: 'past', subs: [['past', '기출 문제', 'past'], ['var', '기출 변형 문제', 'var']]},
   {name: '수업', sym: '수', c: 'cls', subs: [['cls', '', 'cls']]},
-  {name: '학생', sym: '학', c: 'stu', subs: [['stu', '학년으로 검색', 'stu'], ['stuname', '이름으로 검색', 'stu']]}
+  {name: '학생', sym: '학', c: 'stu', subs: [['stu', '학년으로 검색', 'stu'], ['stuname', '이름으로 검색', 'stu'], ['stuall', '전체 명단', 'stu'], ['stuup', '학년 승급', 'stu']]}
 ];
 function renderNav(bt) {
   const g = NAV.find(n => n.subs.some(s => s[0] === bt));
@@ -1684,12 +1684,12 @@ function switchTab(t, fromHistory) {
   $('hero').style.display = 'none'; document.querySelector('header').classList.remove('hidden');
   let bt = t;
   if (t === 'past' || t === 'var') { pastMode = t === 'var' ? 'var' : 'orig'; t = 'past'; }
-  if (t === 'stuname') t = 'stu';
-  if (!['past', 'var', 'stu', 'stuname', 'ex', 'cls', 'msg', 'bview', 'tbook'].includes(bt)) bt = t === 'book' || (t !== 'selector' && src === 'book') ? 'book' : 'selector';
+  if (t === 'stuname' || t === 'stuall' || t === 'stuup') t = 'stu';
+  if (!['past', 'var', 'stu', 'stuname', 'stuall', 'stuup', 'ex', 'cls', 'msg', 'bview', 'tbook'].includes(bt)) bt = t === 'book' || (t !== 'selector' && src === 'book') ? 'book' : 'selector';
   SECTIONS.forEach(x => $('tab-'+x).classList.add('hidden'));
   $('tab-'+t).classList.remove('hidden');
   renderNav(bt);
-  document.body.dataset.tab = {selector: 'make', stuname: 'stu', bview: 'book', tbook: 'book'}[bt] || bt;
+  document.body.dataset.tab = {selector: 'make', stuname: 'stu', stuall: 'stu', stuup: 'stu', bview: 'book', tbook: 'book'}[bt] || bt;
   if (t === 'book') bookReady.then(renderBook);
   if (t === 'tbook') tbReady.then(renderTbook);
   if (t === 'bview') renderBview();
@@ -1697,7 +1697,7 @@ function switchTab(t, fromHistory) {
   if (t === 'past') renderPastSelects();
   if (t === 'ex') renderEx();
   if (t === 'preview') { saveExamRecord(); renderPreview(); }
-  if (t === 'stu') { stuGo(bt === 'stuname' ? 'name' : 'grade'); syncSB(); }
+  if (t === 'stu') { stuGo({stuname: 'name', stuall: 'all', stuup: 'up'}[bt] || 'grade'); syncSB(); }
   if (t === 'cls') clsGo('list');
   if (t === 'msg') msgOpen();
   if (t === 'selector') draftBanner();
@@ -2651,6 +2651,32 @@ function renderStu() {
     const i = $('stu-q');
     i.oninput = () => { clearTimeout(renderStu.t); renderStu.t = setTimeout(() => { stuView = ['name', i.value]; renderStu(); const n = $('stu-q'); n.focus(); n.setSelectionRange(n.value.length, n.value.length); }, 200); };
     if (!q) i.focus();
+  } else if (v === 'all') {
+    // 전체 명단: 중1~고3 학년 순, 학년 안에서는 이름 가나다순 (졸업 등 그 밖의 학년은 맨 뒤)
+    const gs = [...new Set(stuDB.students.map(s => s.grade))].sort((x, y) => grOrder(x) - grOrder(y) || x.localeCompare(y, 'ko'));
+    const by = g => stuDB.students.filter(s => s.grade === g).sort((x, y) => x.name.localeCompare(y.name, 'ko'));
+    b.innerHTML = `<div class="flex items-center gap-3 mb-5 flex-wrap"><h2 class="text-xl font-semibold">전체 학생 명단 <span class="text-base font-normal text-gray-500">(${stuDB.students.length}명)</span></h2>
+      <div class="ml-auto flex gap-2 flex-wrap no-print">${gs.map(g => `<a href="#" onclick="document.getElementById('all-${esc(g)}').scrollIntoView({behavior:'smooth'});return false" class="stu-back">${esc(g)} ${by(g).length}</a>`).join('')}
+      <button onclick="window.print()" class="stu-back"><i data-lucide="printer"></i>인쇄</button></div></div>` +
+      (gs.length ? gs.map(g => { const ss = by(g); return `<div id="all-${esc(g)}" class="mb-6"><h3 class="font-semibold mb-2">${esc(g)} <span class="text-sm font-normal text-gray-500">${ss.length}명</span></h3>
+        <table class="stu-tbl"><thead><tr><th class="w-14">번호</th><th>이름</th><th>아이디</th><th>듣는 수업</th></tr></thead><tbody>${ss.map((s, i) => `<tr class="cursor-pointer hover:bg-indigo-50" onclick="stuGo('detail','${s.id}')"><td>${i + 1}</td><td class="font-semibold">${esc(s.name)}</td><td class="text-gray-500">${s.lid ? esc(s.lid) : '계정 없음'}</td><td class="text-left text-gray-600">${esc(clsOf(s.id).map(c => c.name).join(', '))}</td></tr>`).join('')}</tbody></table></div>`; }).join('')
+        : '<p class="text-center text-gray-400 py-12">등록된 학생이 없습니다. 학년으로 검색 탭에서 학생을 등록하세요.</p>');
+  } else if (v === 'up') {
+    // 일괄 학년 승급: 중1→중2 … 고2→고3, 고3→졸업. 남길 학생은 체크 해제
+    const un = promoUndo(), cnt = g => stuDB.students.filter(s => s.grade === g).length;
+    b.innerHTML = `<h2 class="text-xl font-semibold mb-2">일괄 학년 승급</h2>
+      <p class="text-sm text-gray-500 mb-4">새 학년도에 학생들의 학년을 한 단계씩 올립니다 (중1→중2 … 중3→고1 … 고2→고3). 학년이 그대로여야 하는 학생은 체크를 해제하세요. 풀이 기록·수업·계정은 그대로 남습니다.</p>
+      <label class="flex items-center gap-2 mb-4 text-sm font-semibold"><input type="checkbox" id="up-g3" checked class="accent-indigo-600"> 고3 학생은 '졸업'으로 옮기기 <span class="font-normal text-gray-400">(해제하면 고3은 그대로)</span></label>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-5">${GR.map(g => { const ss = stuDB.students.filter(s => s.grade === g).sort((x, y) => x.name.localeCompare(y.name, 'ko'));
+        return `<div class="border rounded-xl p-3" data-g="${g}"><label class="flex items-center gap-2 font-semibold mb-2"><input type="checkbox" class="up-all accent-indigo-600" ${ss.length ? 'checked' : 'disabled'}>${g} → ${GR_NEXT[g]} <span class="text-sm font-normal text-gray-500">(${ss.length}명)</span></label>
+          <div class="flex flex-wrap gap-x-3 gap-y-1 text-sm">${ss.map(s => `<label class="flex items-center gap-1"><input type="checkbox" class="up-s accent-indigo-600" value="${s.id}" checked>${esc(s.name)}</label>`).join('') || '<span class="text-gray-400">학생 없음</span>'}</div></div>`; }).join('')}</div>
+      <button id="up-go" onclick="stuPromote()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg"></button>
+      ${un ? `<div class="mt-4 p-3 border rounded-xl bg-amber-50 flex items-center gap-3 flex-wrap text-sm"><span>지난 승급: ${new Date(un.at).toLocaleString('ko-KR')} · ${un.list.length}명</span><button onclick="stuPromoteUndo()" class="stu-back ml-auto">되돌리기</button></div>` : ''}
+      ${cnt('졸업') ? `<p class="text-xs text-gray-400 mt-3">졸업한 학생 ${cnt('졸업')}명은 전체 명단 맨 뒤에 있습니다.</p>` : ''}`;
+    const upd = () => { const n = upPicked().length; $('up-go').textContent = `선택한 학생 ${n}명 학년 올리기`; $('up-go').disabled = !n; $('up-go').classList.toggle('opacity-50', !n); };
+    b.querySelectorAll('.up-all').forEach(a => a.onchange = () => { a.closest('[data-g]').querySelectorAll('.up-s').forEach(c => c.checked = a.checked); upd(); });
+    b.querySelectorAll('.up-s').forEach(c => c.onchange = () => { const box = c.closest('[data-g]'), all = [...box.querySelectorAll('.up-s')]; box.querySelector('.up-all').checked = all.every(x => x.checked); upd(); });
+    $('up-g3').onchange = upd; upd();
   } else if (v === 'list') {
     const ss = stuDB.students.filter(s => s.grade === a).sort((x, y) => x.name.localeCompare(y.name, 'ko'));
     b.innerHTML = `<div class="flex items-center gap-3 mb-4 flex-wrap"><button onclick="stuGo('grade')" class="stu-back">← 학년 선택</button><h2 class="text-xl font-semibold">${a} 학생 (${ss.length}명)</h2>
@@ -2751,6 +2777,31 @@ function bindAnsEntry(n) {
     count();
   });
   count(); go(0);
+}
+/* ===== 학년 순서·일괄 승급 ===== */
+const GR_NEXT = {'중1': '중2', '중2': '중3', '중3': '고1', '고1': '고2', '고2': '고3', '고3': '졸업'};
+const grOrder = g => { const i = GR.indexOf(g); return i >= 0 ? i : g === '졸업' ? GR.length + 1 : GR.length; };
+const PROMO_K = 'sciBankPromoUndo_v1';
+const promoUndo = () => { try { return JSON.parse(localStorage.getItem(PROMO_K) || 'null'); } catch(e) { return null; } };
+/* 승급할 학생: 체크된 학생 (고3은 '졸업으로 옮기기'를 켰을 때만) */
+const upPicked = () => [...document.querySelectorAll('.up-s:checked')].map(c => stuDB.students.find(s => s.id === c.value)).filter(s => s && GR_NEXT[s.grade] && (s.grade !== '고3' || $('up-g3').checked));
+function stuPromote() {
+  const ss = upPicked(); if (!ss.length) return;
+  const sum = GR.map(g => { const n = ss.filter(s => s.grade === g).length; return n ? `${g}→${GR_NEXT[g]} ${n}명` : ''; }).filter(Boolean).join(', ');
+  if (!confirm(`학생 ${ss.length}명의 학년을 올릴까요?\n${sum}\n\n(이 화면에서 한 번 되돌릴 수 있습니다)`)) return;
+  const list = ss.map(s => ({id: s.id, from: s.grade}));
+  ss.forEach(s => s.grade = GR_NEXT[s.grade]);
+  try { localStorage.setItem(PROMO_K, JSON.stringify({at: Date.now(), list})); } catch(e) {}
+  stuSave(); sbSyncStudents();
+  toast(`학생 ${ss.length}명의 학년을 올렸습니다.`); switchTab('stuall');
+}
+function stuPromoteUndo() {
+  const un = promoUndo(); if (!un) return;
+  if (!confirm(`지난 승급(${un.list.length}명)을 되돌려 원래 학년으로 바꿀까요?`)) return;
+  let n = 0; un.list.forEach(x => { const s = stuDB.students.find(y => y.id === x.id); if (s) { s.grade = x.from; n++; } });
+  try { localStorage.removeItem(PROMO_K); } catch(e) {}
+  stuSave(); sbSyncStudents();
+  toast(`학생 ${n}명을 원래 학년으로 되돌렸습니다.`); renderStu();
 }
 function stuAdd(e, g) {
   e.preventDefault();
